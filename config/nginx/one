@@ -9,8 +9,8 @@ server {
     root        /var/www/one/public;
     index       index.php;
 
-    #access_log  /var/www/one/log/access.log;
-    #error_log   /var/www/one/log/error.log;
+    access_log  /var/www/one/storage/log/access.log;
+    error_log   /var/www/one/storage/logs/error.log;
 
      location / {
                     # First attempt to serve request as file, then
