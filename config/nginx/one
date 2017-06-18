@@ -5,12 +5,12 @@ server {
     listen 80; ## listen for ipv4
     #listen [::]:80 default_server ipv6only=on; ## слушаем ipv6
 
-    server_name one;
-    root        /var/www/one/public;
+    server_name lone;
+    root        /home/dmitry/my/one/public/;
     index       index.php;
 
-    access_log  /var/www/one/storage/logs/access.log;
-    error_log   /var/www/one/storage/logs/error.log;
+    access_log  /home/dmitry/my/one/storage/logs/access.log;
+    error_log   /home/dmitry/my/one/storage/logs/error.log;
 
      location / {
                     # First attempt to serve request as file, then

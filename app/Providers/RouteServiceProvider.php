@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
@@ -51,9 +54,29 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));
+        $namespace = 'App\Http\Controllers\\';
+        $class = 'Controller';
+        $method = 'index';
+
+        $url = Request::path();
+        $parts = explode('/', $url);
+        $appName = [];
+        foreach ($parts as $p){
+            $appName[] = ucfirst($p);
+        }
+        $appName = implode('',$appName);
+        if(class_exists($namespace.$appName.'Controller')){
+            $class = $appName.'Controller';
+        }else{
+            $method = 'page_404';
+        }
+
+        $app = $namespace.$class;
+        if(isset($app::$appSetts)){
+            \View::share('app_settings', $app::$appSetts);
+        }
+
+        Route::any($url, $app.'@'.$method);
     }
 
     /**
