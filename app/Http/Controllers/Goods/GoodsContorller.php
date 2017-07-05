@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 class GoodsController extends Controller{
 
     public static $appSetts = [
-        'title' => 'Товары'
+        'title' => 'Товары',
     ];
 
     public function index(){
