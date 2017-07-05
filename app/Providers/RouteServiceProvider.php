@@ -54,7 +54,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        $namespace = 'App\Http\Controllers\\';
+        $namespace = $this->namespace.'\\';
         $class = 'Controller';
         $method = 'index';
 
@@ -75,7 +75,6 @@ class RouteServiceProvider extends ServiceProvider
         if(isset($app::$appSetts)){
             \View::share('app_settings', $app::$appSetts);
         }
-
         Route::any($url, $app.'@'.$method);
     }
 

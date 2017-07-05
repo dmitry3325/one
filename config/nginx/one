@@ -2,8 +2,8 @@ server {
     charset utf-8;
     client_max_body_size 128M;
 
-    listen 80; ## listen for ipv4
-    #listen [::]:80 default_server ipv6only=on; ## слушаем ipv6
+    listen 8080; ## listen for ipv4
+    #listen [::]:8080 default_server ipv6only=on; ## слушаем ipv6
 
     server_name lone;
     root        /home/dmitry/my/one/public/;
