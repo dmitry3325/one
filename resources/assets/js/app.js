@@ -4,7 +4,7 @@ Vue.use(require('vue-resource'));
 require('./core/core.js');
 
 
-Ajax.post('goods','getGoods1',{'id':1},function(data){console.log(data)});
+Ajax.post('goods','getGoods',{id:'aaa'},function(data){console.log(data)});
 
 
 

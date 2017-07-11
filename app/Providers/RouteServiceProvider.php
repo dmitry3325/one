@@ -59,7 +59,7 @@ class RouteServiceProvider extends ServiceProvider
         $class     = 'Controller';
         $method    = 'index';
         if (Input::get('method')) {
-            $method = Input::get('method');
+            $method = explode('?',Input::get('method'))[0];
         }
 
         $url     = Request::path();
