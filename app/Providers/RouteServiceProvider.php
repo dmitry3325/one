@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Input;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -54,28 +55,39 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        $namespace = $this->namespace.'\\';
-        $class = 'Controller';
-        $method = 'index';
+        $namespace = $this->namespace . '\\';
+        $class     = 'Controller';
+        $method    = 'index';
+        if (Input::get('method')) {
+            $method = Input::get('method');
+        }
 
-        $url = Request::path();
-        $parts = explode('/', $url);
+        $url     = Request::path();
+        $parts   = explode('/', $url);
         $appName = [];
-        foreach ($parts as $p){
+        foreach ($parts as $p) {
             $appName[] = ucfirst($p);
         }
-        $appName = implode('',$appName);
-        if(class_exists($namespace.$appName.'Controller')){
-            $class = $appName.'Controller';
-        }else{
+        $appName = implode('', $appName);
+        if (class_exists($namespace . $appName . 'Controller') && method_exists($namespace . $appName . 'Controller',
+                $method)
+        ) {
+            $class = $appName . 'Controller';
+        }
+        else {
             $method = 'page_404';
         }
 
-        $app = $namespace.$class;
-        if(isset($app::$appSetts)){
+        $app = $namespace . $class;
+        if (isset($app::$appSetts)) {
             \View::share('app_settings', $app::$appSetts);
         }
-        Route::any($url, $app.'@'.$method);
+
+        $params = Input::get('params');
+        Route::any($url, function () use ($app, $method, $params) {
+            $controller = app($app);
+            return call_user_func_array([$controller, $method], $params?$params:[]);
+        });
     }
 
     /**
@@ -87,9 +99,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        Route::prefix('api')
-             ->middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));
+
     }
 }

@@ -6,7 +6,7 @@
  * Time: 14:38
  */
 
-namespace App\Classes\Menu;
+namespace App\Classes\Blocks;
 
 class AdminBar
 {

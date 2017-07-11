@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Classes\Packages\LinePackage;
 use App\Http\Controllers\Controller;
 
 class GoodsController extends Controller{
@@ -10,6 +11,11 @@ class GoodsController extends Controller{
     ];
 
     public function index(){
-        return view('general.main');
+        return view('apps.goods.goods');
+    }
+
+    public function getGoods($id){
+
+        return ['aaaa'=>$id];
     }
 }
