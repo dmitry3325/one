@@ -25,7 +25,7 @@
     @yield('content')
 </div>
 <footer>
-    <script src="/js/app.js"></script>
+    <script src="/js/core.js"></script>
     @stack('scripts')
 </footer>
 </body>

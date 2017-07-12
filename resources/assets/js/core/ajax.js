@@ -1,7 +1,6 @@
 class Ajax {
     constructor() {
         this.requests = [];
-        Vue.http.options.emulateJSON = true;
         return this;
     }
 
@@ -9,18 +8,17 @@ class Ajax {
         if (typeof className === 'undefined') return false;
         if (typeof data === 'undefined') data = {};
 
-        let def = Vue.http.post(className + '?method=' + method, {'params': data});
-
+        let def = axios.post(className + '?method=' + method, {'params': data});
         def.then(function (response) {
             if (typeof callbackSuccess === 'function') {
-                if (response.body) {
-                    callbackSuccess(response.body);
+                if (response.data) {
+                    callbackSuccess(response.data);
                 }
             }
         }, function (response) {
             if (typeof callBackError === 'function') {
-                if (response.body) {
-                    callBackError(response.body)
+                if (response.data) {
+                    callBackError(response.data)
                 }
             }
         });
@@ -50,21 +48,22 @@ class Ajax {
             }
         }
 
-        let res = Vue.http.get(className + func + params);
-        if(res.ok){
+        let def = axios.get(className + func + params);
+        def.then(function (response) {
             if (typeof callbackSuccess === 'function') {
-                if (response.body) {
-                    callbackSuccess(response.body);
+                if (response.data) {
+                    callbackSuccess(response.data);
                 }
             }
-        } else {
+        }, function (response) {
             if (typeof callBackError === 'function') {
-                if (response.body) {
-                    callBackError(response.body)
+                if (response.data) {
+                    callBackError(response.data)
                 }
             }
-        }
-        return res;
+        });
+
+        return def;
     }
 
     getHistory() {
