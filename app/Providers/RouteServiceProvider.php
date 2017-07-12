@@ -66,12 +66,15 @@ class RouteServiceProvider extends ServiceProvider
         $parts   = explode('/', $url);
         $appName = [];
         foreach ($parts as $p) {
+            if(!$p) continue;
             $appName[] = ucfirst($p);
         }
 
-        $namespace .= $appName[0].'\\';
-        if(count($appName)>1){
-            unset($appName[0]);
+        if(count($appName)) {
+            $namespace .= $appName[0] . '\\';
+            if (count($appName) > 1) {
+                unset($appName[0]);
+            }
         }
         $appName   = implode('', $appName);
         if (class_exists($namespace . $appName . 'Controller') && method_exists($namespace . $appName . 'Controller',
