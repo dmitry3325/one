@@ -59,7 +59,7 @@ class RouteServiceProvider extends ServiceProvider
         $class     = 'Controller';
         $method    = 'index';
         if (Input::get('method')) {
-            $method = explode('?',Input::get('method'))[0];
+            $method = explode('?', Input::get('method'))[0];
         }
 
         $url     = Request::path();
@@ -68,17 +68,24 @@ class RouteServiceProvider extends ServiceProvider
         foreach ($parts as $p) {
             $appName[] = ucfirst($p);
         }
-        $appName = implode('', $appName);
+
+        $namespace .= $appName[0].'\\';
+        if(count($appName)>1){
+            unset($appName[0]);
+        }
+        $appName   = implode('', $appName);
         if (class_exists($namespace . $appName . 'Controller') && method_exists($namespace . $appName . 'Controller',
                 $method)
         ) {
             $class = $appName . 'Controller';
         }
         else {
+            $namespace = $this->namespace . '\\';
             $method = 'page_404';
         }
 
         $app = $namespace . $class;
+
         if (isset($app::$appSetts)) {
             \View::share('app_settings', $app::$appSetts);
         }
@@ -86,7 +93,7 @@ class RouteServiceProvider extends ServiceProvider
         $params = Input::get('params');
         Route::any($url, function () use ($app, $method, $params) {
             $controller = app($app);
-            return call_user_func_array([$controller, $method], $params?$params:[]);
+            return call_user_func_array([$controller, $method], $params ? $params : []);
         });
     }
 

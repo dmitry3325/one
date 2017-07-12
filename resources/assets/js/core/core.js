@@ -1,3 +1,5 @@
+require('./bootstrap');
+window.Vue = require('vue');
 import Ajax from "./ajax.js";
 import Errors from "./errors.js";
 
