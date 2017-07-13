@@ -30,9 +30,9 @@ $curPath = '/' . Request::path();
                     </li>
                 @endif
             @endforeach
+            
             <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" >
                     {{Illuminate\Support\Facades\Auth::user()->firstname}}
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
