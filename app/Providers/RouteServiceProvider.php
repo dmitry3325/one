@@ -100,14 +100,12 @@ class RouteServiceProvider extends ServiceProvider
             return call_user_func_array([$controller, $method], $params ? $params : []);
         });
 
-        $middleware = 'auth';
-        if(isset($app::$appSetts['auth'])) {
-            $middleware = $app::$appSetts['auth'];
+        $middleware = ['web'];
+        if(!isset($app::$appSetts['auth']) || $app::$appSetts['auth'] !== 'none') {
+            $middleware[] = 'auth';
         }
 
-        if($middleware !== 'none') {
-            $route->middleware($middleware);
-        }
+        $route->middleware($middleware);
 
     }
 
