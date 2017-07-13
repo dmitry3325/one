@@ -775,15 +775,20 @@ module.exports = __webpack_require__(37);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ajax_js__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__errors_js__ = __webpack_require__(36);
-__webpack_require__(10);
-window.Vue = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bootstrap__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__bootstrap___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__bootstrap__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ajax_js__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__errors_js__ = __webpack_require__(36);
 
 
 
-window.Ajax = window.J = __WEBPACK_IMPORTED_MODULE_0__ajax_js__["a" /* default */];
-window.Errors = __WEBPACK_IMPORTED_MODULE_1__errors_js__["a" /* default */];
+
+
+window.Vue = __WEBPACK_IMPORTED_MODULE_1_vue___default.a;
+window.Ajax = window.J = __WEBPACK_IMPORTED_MODULE_2__ajax_js__["a" /* default */];
+window.Errors = __WEBPACK_IMPORTED_MODULE_3__errors_js__["a" /* default */];
 
 /***/ }),
 /* 10 */
