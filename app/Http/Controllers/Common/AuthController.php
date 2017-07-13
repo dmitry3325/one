@@ -11,6 +11,9 @@ class AuthController extends Controller
 
     use AuthenticatesUsers;
 
+    protected $redirectTo = '/';
+
+
     public static $appSetts = [
         'title' => 'Авторизация',
         'auth'  => 'none',

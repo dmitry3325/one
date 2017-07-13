@@ -64,28 +64,30 @@
 </head>
 <body>
 <div id="content">
+    <h1 class="text-center login-title">One</h1>
+    <form class="form-signin" action="/common/auth/?method=login" method="get">
 
-    <div class="container">
-        <h1 class="text-center login-title">One</h1>
-        <form class="form-signin" action="/common/auth/?method=login" method="get">
-            <input type="text" class="form-control" placeholder="Email" name="email" required autofocus>
-            <input type="password" class="form-control" placeholder="Password" name="password" required>
-            <input type="hidden" name="method" value="login">
-            <button class="btn btn-lg btn-primary btn-block" type="submit">
-                вход
-            </button>
-            <label class="checkbox pull-left">
-                <input type="checkbox" value="remember-me">
-                Запомнить
-            </label>
-        </form>
+        {!! csrf_field() !!}
 
-        <h3>id = {{\Illuminate\Support\Facades\Auth::id()}}</h3>
-        @if(isset($errors))
-        {{var_dump($errors)}}
+        <input type="text" class="form-control" placeholder="Email" name="email" required autofocus>
+        <input type="password" class="form-control" placeholder="Password" name="password" required>
+        <input type="hidden" name="method" value="login">
+        <button class="btn btn-lg btn-primary btn-block" type="submit">
+            вход
+        </button>
+        <label class="checkbox pull-left">
+            <input type="checkbox" value="remember-me">
+            Запомнить
+        </label>
+
+        @if(count($errors))
+            <div class="form-item">
+                @foreach($errors->all() as $e)
+                    <div class="label error">{{$e}}</div>
+                @endforeach
+            </div>
         @endif
-    </div>
-
+    </form>
 </div>
 </body>
 </html>
