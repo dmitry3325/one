@@ -93,11 +93,22 @@ class RouteServiceProvider extends ServiceProvider
             \View::share('app_settings', $app::$appSetts);
         }
 
+
         $params = Input::get('params');
-        Route::any($url, function () use ($app, $method, $params) {
+        $route = Route::any($url, function () use ($app, $method, $params) {
             $controller = app($app);
             return call_user_func_array([$controller, $method], $params ? $params : []);
         });
+
+        $middleware = 'auth';
+        if(isset($app::$appSetts['auth'])) {
+            $middleware = $app::$appSetts['auth'];
+        }
+
+        if($middleware !== 'none') {
+            $route->middleware($middleware);
+        }
+
     }
 
     /**
