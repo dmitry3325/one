@@ -14,9 +14,14 @@
     <link rel="stylesheet" href="/css/app.css">
     @stack('style')
     <style>
+        body {
+            background: #292b2c;
+            color:#fff;
+        }
         .form-signin {
             max-width: 330px;
             padding: 15px;
+            outline: none;
             margin: 0 auto;
         }
 
@@ -55,7 +60,7 @@
         }
 
         .login-title {
-            color: #555;
+            margin: 14% 0 30px 0;
             font-size: 18px;
             font-weight: 400;
             display: block;
