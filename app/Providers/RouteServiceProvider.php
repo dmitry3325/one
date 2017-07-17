@@ -39,22 +39,6 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapApiRoutes();
-
-        $this->mapWebRoutes();
-
-        //
-    }
-
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
-     */
-    protected function mapWebRoutes()
-    {
         $namespace = $this->namespace . '\\';
         $class     = 'Controller';
         $method    = 'index';
@@ -66,17 +50,19 @@ class RouteServiceProvider extends ServiceProvider
         $parts   = explode('/', $url);
         $appName = [];
         foreach ($parts as $p) {
-            if(!$p) continue;
+            if (!$p) {
+                continue;
+            }
             $appName[] = ucfirst($p);
         }
 
-        if(count($appName)) {
+        if (count($appName)) {
             $namespace .= $appName[0] . '\\';
             if (count($appName) > 1) {
                 unset($appName[0]);
             }
         }
-        $appName   = implode('', $appName);
+        $appName = implode('', $appName);
         if (class_exists($namespace . $appName . 'Controller') && method_exists($namespace . $appName . 'Controller',
                 $method)
         ) {
@@ -84,7 +70,7 @@ class RouteServiceProvider extends ServiceProvider
         }
         else {
             $namespace = $this->namespace . '\\';
-            $method = 'page_404';
+            $method    = 'page_404';
         }
 
         $app = $namespace . $class;
@@ -93,33 +79,18 @@ class RouteServiceProvider extends ServiceProvider
             \View::share('app_settings', $app::$appSetts);
         }
 
-
         $params = Input::get('params');
-        $route = Route::any($url, function () use ($app, $method, $params) {
+        $route  = Route::any($url, function () use ($app, $method, $params) {
             $controller = app($app);
             return call_user_func_array([$controller, $method], $params ? $params : []);
         });
 
-        $middleware = 'auth';
-        if(isset($app::$appSetts['auth'])) {
-            $middleware = $app::$appSetts['auth'];
+        $middleware = ['web'];
+        if (!isset($app::$appSetts['auth']) || $app::$appSetts['auth'] !== 'none') {
+            $middleware[] = 'auth';
         }
 
-        if($middleware !== 'none') {
-            $route->middleware($middleware);
-        }
-
+        $route->middleware($middleware);
     }
 
-    /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
-     *
-     * @return void
-     */
-    protected function mapApiRoutes()
-    {
-
-    }
 }

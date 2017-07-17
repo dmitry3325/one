@@ -19,7 +19,9 @@
     @stack('style')
 </head>
 <body>
-@include('general.menu')
+@if(\Auth::user())
+    @include('general.menu')
+@endif
 <div id="content">
     @yield('content')
 </div>

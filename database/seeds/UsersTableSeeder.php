@@ -31,7 +31,7 @@ class UsersTableSeeder extends Seeder
             'firstname'    => 'Admin',
             'lastname'     => 'Admin',
             'email'        => 'admin@admin.com',
-            'password'     => 'admin',
+            'password'     => bcrypt('admin'),
             'is_confirmed' => true,
         ]);
 

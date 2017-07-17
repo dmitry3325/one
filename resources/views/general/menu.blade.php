@@ -1,8 +1,10 @@
 <?php
-    $curPath = '/'.Request::path();
+$curPath = '/' . Request::path();
 ?>
 <nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
-    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false"
+            aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <a class="navbar-brand" href="/">ONE</a>
@@ -11,12 +13,14 @@
             @foreach($admin_bar as $app)
                 @if(isset($app['children']))
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="{{$app['url']}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="{{$app['url']}}" data-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">
                             {{(isset($app['title'])?$app['title']:'')}}
                         </a>
                         <div class="dropdown-menu">
                             @foreach($app['children'] as $subUp)
-                                <a class="dropdown-item {{($curPath == $subUp['url'])?'active':''}}" href="{{$subUp['url']}}">{{(isset($subUp['title'])?$subUp['title']:'')}}</a>
+                                <a class="dropdown-item {{($curPath == $subUp['url'])?'active':''}}"
+                                   href="{{$subUp['url']}}">{{(isset($subUp['title'])?$subUp['title']:'')}}</a>
                             @endforeach
                         </div>
                     </li>
@@ -26,6 +30,16 @@
                     </li>
                 @endif
             @endforeach
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" >
+                    {{Illuminate\Support\Facades\Auth::user()->firstname}}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="/common/auth?method=logout">Logout</a>
+                </div>
+            </li>
         </ul>
     </div>
 </nav>
