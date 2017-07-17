@@ -1,5 +1,11 @@
 {
   "/js/app.js": "/js/app.js",
   "/css/app.css": "/css/app.css",
-  "/js/core.js": "/js/core.js"
+  "/js/core.js": "/js/core.js",
+  "/js/app/app.js": "/js/app/app.js",
+  "/js/app/*.js": "/js/app/*.js",
+  "/js/app/goods.js": "/js/app/goods.js",
+  "/js/apps/goods.js": "/js/apps/goods.js",
+  "/js/apps/goods/goods.js": "/js/apps/goods/goods.js",
+  "/js/apps/*.js": "/js/apps/*.js"
 }

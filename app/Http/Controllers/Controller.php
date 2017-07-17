@@ -12,12 +12,14 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Controller extends BaseController
 {
+    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
 
     public static $appSetts = [
         'title' => 'ONE',
     ];
 
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    protected static $baseNamespace = 'App\Http\Controllers\\';
 
     public function __construct()
     {
@@ -26,14 +28,17 @@ class Controller extends BaseController
 
     public function index()
     {
-        return view('general.main');
+        $class = get_called_class();
+        return view('general.main', ['app' => $class::$appSetts]);
     }
+
 
     public function page_404()
     {
-        if(request()->wantsJson()){
-            return response()->json(['error'=>'Page Not Found!'], 404);
-        }else {
+        if (request()->wantsJson()) {
+            return response()->json(['error' => 'Page Not Found!'], 404);
+        }
+        else {
             return response()->view('general.404', [], 404);
         }
     }

@@ -13,3 +13,9 @@ const {mix} = require('laravel-mix');
 
 mix.js('resources/assets/js/core/core.js', 'public/js')
     .sass('resources/assets/sass/app.scss', 'public/css');
+
+/**
+ * All apps here
+ * */
+
+mix.js('resources/assets/js/apps/goods/goods.js', 'public/js/apps/goods/goods.js');
