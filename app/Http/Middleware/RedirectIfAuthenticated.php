@@ -19,10 +19,8 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if ($request->wantsJson()) {
-            return response()->json(['error'=>'Not Authorized'], 403);
-        }
-
-        if (!Auth::check()) {
+            if(!Auth::check()) return response()->json(['error'=>'Not Authorized'], 403);
+        }else if (!Auth::check()) {
             return redirect('/common/auth');
         }
 

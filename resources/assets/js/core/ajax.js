@@ -75,4 +75,8 @@ class Ajax {
         return this;
     }
 }
-export default new Ajax();
+export default {
+    install(Vue){
+        window.Ajax = window.J = Vue.Ajax = Vue.J = new Ajax();
+    }
+}
