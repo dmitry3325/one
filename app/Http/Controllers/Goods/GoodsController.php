@@ -9,6 +9,7 @@ class GoodsController extends Controller{
     public static $appSetts = [
         'title' => 'Товары',
         'js' => ['apps/goods/goods.js'],
+        'css' => ['apps/goods/goods.css']
     ];
 
 

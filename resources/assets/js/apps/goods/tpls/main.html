@@ -1,0 +1,18 @@
+<div style="padding:15px;" id="goodsAdmin">
+    <div class="menu">
+        <ul class="nav nav-tabs">
+            <li v-for="(tab,index) in tabs" class="nav-item">
+                <a class="nav-link" :class="{active: tab.isActive}" href="" @click.prevent="switchCategory(index)">
+                    <span class="title text-ellipsis">{{tab.title}}</span>
+                    <span v-show="tab.isBase !== true" @click.prevent="removeTab(index)" class="glyphicon glyphicon-remove"></span>
+                </a>
+            </li>
+            <div class="ml-auto">
+                <input class="form-control" placeholder="Поиск..." @change="makeSearch" type="text">
+            </div>
+        </ul>
+
+    </div>
+    <div class="path"></div>
+    <div class="m"></div>
+</div>

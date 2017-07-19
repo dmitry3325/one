@@ -7,5 +7,6 @@
   "/js/app/goods.js": "/js/app/goods.js",
   "/js/apps/goods.js": "/js/apps/goods.js",
   "/js/apps/goods/goods.js": "/js/apps/goods/goods.js",
-  "/js/apps/*.js": "/js/apps/*.js"
+  "/js/apps/*.js": "/js/apps/*.js",
+  "/css/apps/goods/goods.css": "/css/apps/goods/goods.css"
 }
