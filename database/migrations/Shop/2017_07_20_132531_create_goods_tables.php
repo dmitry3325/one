@@ -162,9 +162,14 @@ class CreateGoodsTables extends Migration
                 $table->increments('id');
                 $table->string('title')->default('');
                 $table->string('vendor_group')->default('');
+                $table->integer('orderby')->default(0);
+                $table->integer('picture_id')->default(0);
+                $table->string('photos')->default('');
+
                 $table->timestamps();
 
                 $table->index('title');
+                $table->index('orderby');
             });
         }
 
