@@ -8,11 +8,11 @@
                 </a>
             </li>
             <div class="ml-auto">
-                <input class="form-control" placeholder="Поиск..." @change="makeSearch" type="text">
+                <input class="form-control" placeholder="Поиск..." @change="showSearch($event.target.value,$event)" type="text">
             </div>
         </ul>
 
     </div>
     <div class="path"></div>
-    <div class="m"></div>
+    <div class="main-content"><slot></slot></div>
 </div>

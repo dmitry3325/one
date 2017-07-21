@@ -10,6 +10,22 @@ Vue.use(Url);
 Vue.use(Ajax);
 Vue.use(Cookies);
 Vue.use(Ls);
+Vue.use({
+    install(Vue){
+        Vue.prototype.setTarget = function (el) {
+            if(typeof el === "string"){
+                el = document.querySelector(el);
+            }
+            if(!el){
+                console.log('Warning! Target element not found!');
+                return false;
+            }
+            var vueEl = document.createElement('div');
+            el.appendChild(vueEl);
+            this.$options.el = vueEl;
+        }
+    }
+});
 
 window.Vue = Vue;
 window.Errors = Errors;

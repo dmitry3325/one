@@ -225,7 +225,10 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
+        'Goods' => \App\Models\Shop\Goods::class,
+        'Sections' => \App\Models\Shop\Sections::class,
+        'Filters' => \App\Models\Shop\Filters::class,
+        'Vendors' => \App\Models\Shop\Vendors::class,
     ],
 
 ];

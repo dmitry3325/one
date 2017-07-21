@@ -1,7 +1,6 @@
 <template>
     <div>
         <div v-for="item in items">{{item}}</div>
-        <div>{{my_var}}</div>
     </div>
 </template>
 <script>
