@@ -14,7 +14,7 @@ class Filters extends ShopBaseModel
         for ($i = 1; $i <= self::COUNT; $i++) {
             $filters['filter_' . $i]         = [
                 'title' => 'Фильтр №' . $i,
-                'type'  => parent::FIELD_TYPE_INPUT,
+                'type'  => parent::FIELD_TYPE_STRING,
             ];
             $filters['filter_' . $i . '_id'] = [
                 'title'    => 'Фильтр id №' . $i,

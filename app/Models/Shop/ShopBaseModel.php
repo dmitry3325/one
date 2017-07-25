@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Model;
 class ShopBaseModel extends Model
 {
     const FIELD_TYPE_INT      = 'int';
-    const FIELD_TYPE_INPUT    = 'input';
+    const FIELD_TYPE_STRING   = 'input';
+    const FIELD_TYPE_DOUBLE    = 'double';
     const FIELD_TYPE_TEXT     = 'textarea';
     const FIELD_TYPE_CHECKBOX = 'checkbox';
     const FIELD_TYPE_RADIO    = 'radio';
@@ -33,15 +34,15 @@ class ShopBaseModel extends Model
         ],
         'title'             => [
             'title' => 'Короткое наименование',
-            'type'  => self::FIELD_TYPE_INPUT,
+            'type'  => self::FIELD_TYPE_STRING,
         ],
         'h1_title'          => [
             'title' => 'H1 наименование',
-            'type'  => self::FIELD_TYPE_INPUT,
+            'type'  => self::FIELD_TYPE_STRING,
         ],
         'path_title'        => [
             'title' => 'Наименование в пути',
-            'type'  => self::FIELD_TYPE_INPUT,
+            'type'  => self::FIELD_TYPE_STRING,
         ],
         'orderby'           => [
             'title' => 'Приоритет',
@@ -49,7 +50,7 @@ class ShopBaseModel extends Model
         ],
         'hidden'            => [
             'title' => 'Скрыт',
-            'type'  => self::FIELD_TYPE_INT,
+            'type'  => self::FIELD_TYPE_CHECKBOX,
         ],
         'picture_id'        => [
             'title' => '№ картинки',
