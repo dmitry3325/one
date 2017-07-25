@@ -8,9 +8,11 @@
                           class="glyphicon glyphicon-remove"></span>
                 </a>
             </li>
-            <div class="ml-auto">
-                <input class="form-control" placeholder="Поиск..." @change="showSearch($event.target.value,$event)"
-                       type="text">
+            <div class="d-flex ml-auto">
+                <div class="ml-3">
+                    <input class="form-control" placeholder="Поиск..." @change="showSearch($event.target.value,$event)"
+                           type="text">
+                </div>
             </div>
         </ul>
     </div>
@@ -24,25 +26,27 @@
                         'title': 'Разделы',
                         'isActive': false,
                         'isBase': true,
+                        'entity': 'sections'
                     },
                     'filters': {
                         'title': 'Фильтры',
                         'isActive': false,
                         'isBase': true,
+                        'entity': 'filters'
                     },
                     'goods': {
                         'title': 'Товары',
                         'isActive': false,
                         'isBase': true,
+                        'entity': 'goods'
                     },
                     'seo': {
                         'title': 'HTML-страницы',
                         'isActive': false,
                         'isBase': true,
+                        'entity': 'html_pages'
                     }
-                },
-                fields: {},
-                filters: {},
+                }
             }
         },
         mounted: function () {
@@ -93,7 +97,7 @@
             },
             showContent: function () {
                 if (typeof this.action === 'function') {
-                    this.action(this.activeTab, this.fields, this.filters);
+                    this.action(this.tabs[this.activeTab]);
                 }
             }
         }

@@ -229,6 +229,7 @@ return [
         'Sections' => \App\Models\Shop\Sections::class,
         'Filters' => \App\Models\Shop\Filters::class,
         'Vendors' => \App\Models\Shop\Vendors::class,
+        'HtmlPages' => \App\Models\Shop\HtmlPages::class,
     ],
 
 ];

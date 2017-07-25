@@ -2,9 +2,9 @@
 
 namespace App\Models\Shop;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Sections extends Model
+class Sections extends ShopBaseModel
 {
     protected $table = 'shop.sections';
+
+
 }

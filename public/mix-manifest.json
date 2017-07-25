@@ -8,5 +8,7 @@
   "/js/apps/goods.js": "/js/apps/goods.js",
   "/js/apps/goods/goods.js": "/js/apps/goods/goods.js",
   "/js/apps/*.js": "/js/apps/*.js",
-  "/css/apps/goods/goods.css": "/css/apps/goods/goods.css"
+  "/css/apps/goods/goods.css": "/css/apps/goods/goods.css",
+  "/css/apps/shop/itemsList.css": "/css/apps/shop/itemsList.css",
+  "/js/apps/shop/itemsList.js": "/js/apps/shop/itemsList.js"
 }

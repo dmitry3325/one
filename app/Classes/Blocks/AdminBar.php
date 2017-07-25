@@ -12,7 +12,7 @@ class AdminBar
 {
     private static $baseNamespace = 'App\Http\Controllers\\';
     private static $app           = [
-        'goods' => [],
+        'shop/lists' => [],
     ];
 
     public static function getMenu()

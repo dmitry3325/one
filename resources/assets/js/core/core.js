@@ -12,7 +12,7 @@ Vue.use(Cookies);
 Vue.use(Ls);
 Vue.use({
     install(Vue){
-        Vue.prototype.setTarget = function (el) {
+        Vue.prototype.setTarget = function (el, set) {
             if(typeof el === "string"){
                 el = document.querySelector(el);
             }
@@ -22,7 +22,8 @@ Vue.use({
             }
             var vueEl = document.createElement('div');
             el.appendChild(vueEl);
-            this.$options.el = vueEl;
+            if(set === true) this.$options.el = vueEl;
+            return vueEl;
         }
     }
 });
