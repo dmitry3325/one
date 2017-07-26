@@ -57,7 +57,7 @@
             }
         },
         mounted: function () {
-            //this.showFieldsEditor();
+            this.showFieldsEditor();
             this.loadData();
         },
         methods: {

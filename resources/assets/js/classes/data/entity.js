@@ -19,13 +19,13 @@ class Entity {
 
     getBaseFields(entity, force) {
         let self = this;
-        if (self.allFields[entity] && !force) {
+        if (self.baseFields[entity] && !force) {
             return new Promise((resolve, reject) => {
-                resolve(self.allFields[entity]);
+                resolve(self.baseFields[entity]);
             });
         } else {
             return Ajax.post('/shop/lists', 'getBaseFields', {entity: entity}, function (data) {
-                self.allFields[entity] = data;
+                self.baseFields[entity] = data;
             });
         }
     }

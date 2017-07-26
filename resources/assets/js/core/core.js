@@ -23,7 +23,7 @@ Vue.use({
                 console.log('Warning! Target element not found!');
                 return false;
             }
-            var vueEl = document.createElement('div');
+            let vueEl = document.createElement('div');
             el.appendChild(vueEl);
             if(set === true) this.$options.el = vueEl;
             return vueEl;

@@ -16,3 +16,11 @@ body {
 .cursor-pointer{
   cursor:pointer;
 }
+
+.dropdown-menu{
+  max-height: 350px;
+  overflow-y:auto;
+}
+.dropdown-menu a{
+  cursor:pointer;
+}
