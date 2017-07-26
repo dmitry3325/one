@@ -27,18 +27,27 @@ class ShopBaseModel extends Model
             'title'    => 'ID',
             'type'     => self::FIELD_TYPE_INT,
             'editable' => false,
+            'baseField' => true
         ],
         'parent_id'         => [
             'title' => 'Папка',
             'type'  => self::FIELD_TYPE_INT,
+            'baseField' => true
+        ],
+        'url'=>[
+            'title' => 'URL',
+            'type'  => self::FIELD_TYPE_STRING,
+            'baseField' => true
         ],
         'title'             => [
             'title' => 'Короткое наименование',
             'type'  => self::FIELD_TYPE_STRING,
+            'baseField' => true
         ],
         'h1_title'          => [
             'title' => 'H1 наименование',
             'type'  => self::FIELD_TYPE_STRING,
+            'baseField' => true
         ],
         'path_title'        => [
             'title' => 'Наименование в пути',
@@ -47,10 +56,12 @@ class ShopBaseModel extends Model
         'orderby'           => [
             'title' => 'Приоритет',
             'type'  => self::FIELD_TYPE_INT,
+            'baseField' => true
         ],
         'hidden'            => [
             'title' => 'Скрыт',
             'type'  => self::FIELD_TYPE_CHECKBOX,
+            'baseField' => true
         ],
         'picture_id'        => [
             'title' => '№ картинки',
@@ -78,7 +89,7 @@ class ShopBaseModel extends Model
         ],
     ];
 
-    public static function getFieldsTitles()
+    public static function getAllFields()
     {
         $ownFields = [];
         if (isset(get_called_class()::$fields)) {
@@ -86,6 +97,17 @@ class ShopBaseModel extends Model
         }
 
         return array_merge(self::$commonFields, $ownFields);
+    }
+
+    public static function getBaseFields()
+    {
+        $fields = [];
+        foreach(self::getAllFields() as $k=>$v){
+            if(isset($v['baseField']) && $v['baseField']){
+                $fields[] = $k;
+            }
+        }
+        return $fields;
     }
 
 }

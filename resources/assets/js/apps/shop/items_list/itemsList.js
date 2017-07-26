@@ -5,10 +5,7 @@ new Vue({
     el: '#content',
     replace: true,
     template: require('./tpls/main.html'),
-    data: {
-        filters: {},
-        fields: {},
-    },
+    data: {},
     beforeCreate: function () {
     },
     mounted: function () {
@@ -16,10 +13,10 @@ new Vue({
         this.buildApp();
     },
     methods: {
-        setMainParams(){
+        setMainParams() {
 
         },
-        buildApp(){
+        buildApp() {
             this.Menu = new MainMenu({
                 el: '.menu',
                 data: {
@@ -27,25 +24,24 @@ new Vue({
                 }
             });
         },
-        showList(tab){
+        showList(tab) {
             if (!this.$content) {
                 this.$content = document.querySelector('.main-content');
             }
 
             this.$content.innerHTML = '';
             let $el = this.setTarget(this.$content);
-
-            new ItemsList({
-                el: $el,
-                data: {
-                    entity: tab.entity,
-                    filters: this.filters[tab.entity],
-                    fields: this.fields[tab.entity],
-                    selected: {
-                        'title': ',kzkzz'
-                    },
-                }
-            });
+            if (tab.entity) {
+                new ItemsList({
+                    el: $el,
+                    data: {
+                        entity: tab.entity,
+                        selected: {
+                            'title': ',kzkzz'
+                        },
+                    }
+                });
+            }
         }
     }
 });

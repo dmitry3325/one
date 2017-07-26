@@ -8,7 +8,7 @@
                     <button type="button" class="btn btn-info">Добавить фильтр</button>
                 </div>
                 <div class="ml-3">
-                    <button type="button" class="btn btn-warning">Настроить поля</button>
+                    <button type="button" class="btn btn-warning" @click="showFieldsEditor">Настроить поля</button>
                 </div>
                 <div class="ml-3">
                     <button type="button" class="btn btn-success" @click="createEntity($event)">Создать</button>
@@ -20,25 +20,36 @@
                 <h5>Подождите, данные загружаются...</h5>
             </div>
             <div v-else>
-                <table v-if="Object.keys(items).length > 0" class="table table-bordered table-striped">
+                <table v-if="Object.keys(items).length > 0" class="table table-bordered">
+                    <thead>
                     <tr>
-                        <th v-for="field in fields">{{field.title}}</th>
+                        <th v-for="field in fields">{{(fields_info[field]) ? fields_info[field].title : field}}</th>
                     </tr>
-                    <tr v-for="item in items">
-                        <th v-for="(field,index) in fields">{{item[index]}}</th>
+                    </thead>
+                    <tbody>
+                    <tr class="row-item" v-for="item in items">
+                        <td v-for="field in fields">{{prepareField(item[field], field)}}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-default wh-100 cursor-pointer"><span
+                                    class="glyphicon glyphicon-edit"></span></button>
+                        </td>
                     </tr>
+                    </tbody>
+
                 </table>
-                <div class="text-center"><h3>Ничего не нашлось</h3></div>
+                <div v-else class="text-center"><h3>Ничего не нашлось</h3></div>
             </div>
         </div>
     </div>
 </template>
 <script>
+    let FilterSelector = require( '../../../../components/filtersSelector.vue');
     module.exports = Vue.extend({
         data: function () {
             return {
                 'entity': null,
                 'loading': true,
+                'fields_info': {},
                 'items': {},
                 'selected': {},
                 'filters': {},
@@ -46,23 +57,40 @@
             }
         },
         mounted: function () {
-            console.log(this)
+            //this.showFieldsEditor();
             this.loadData();
         },
         methods: {
-            loadData(){
+            loadData() {
                 let self = this;
-                Ajax.post('/shop/lists', 'getItemsList', {
-                    entity: this.entity,
-                    filters: this.filters,
-                    fields: this.fields
-                }, function (res) {
-                    self.loading = false;
 
-                    console.log(res)
+                let q = [
+                    Data.entity.getAllFields(this.entity),
+                    Ajax.post('/shop/lists', 'getItemsList', {
+                        entity: this.entity,
+                        filters: this.filters,
+                        fields: this.fields
+                    })];
+
+                if (!Object.keys(self.fields).length) {
+                    q.push(Data.entity.getBaseFields(this.entity));
+                }
+
+                Ajax.when(q, function (fields, items, fields_list) {
+                    self.loading = false;
+                    self.fields_info = fields;
+                    if (items.result && items.list) {
+                        self.items = items.list;
+                        self.$forceUpdate();
+                    }
+
+                    if (fields_list) {
+                        self.fields = fields_list;
+                    }
                 });
+
             },
-            createEntity($event){
+            createEntity($event) {
                 let entity = this.entity;
                 $event.target.classList.add('disabled');
                 Ajax.post('/shop/lists', 'createEntity', {
@@ -73,7 +101,26 @@
                     }
                     $event.target.classList.remove('disabled');
                 });
+            },
+            prepareField(value, key) {
+                return value;
+            },
+            showFieldsEditor(e){
+                new FilterSelector({
+                    el: this.setTarget('#goodsAdmin'),
+                    data: {
+                        'entity': this.entity,
+                        'callback' : function(filters){
+                            console.log(callback)
+                        }
+                    }
+                });
             }
         }
     });
 </script>
+<style>
+    .row-item {
+        cursor: pointer;
+    }
+</style>

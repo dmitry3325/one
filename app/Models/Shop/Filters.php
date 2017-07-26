@@ -8,7 +8,7 @@ class Filters extends ShopBaseModel
 
     protected $table = 'shop.filters';
 
-    public static function getFieldsTitles()
+    public static function getAllFields()
     {
         $filters = [];
         for ($i = 1; $i <= self::COUNT; $i++) {

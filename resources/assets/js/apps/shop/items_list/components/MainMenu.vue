@@ -103,3 +103,8 @@
         }
     });
 </script>
+<style>
+    .nav-item .nav-link .glyphicon {
+        right: -8px;
+    }
+</style>

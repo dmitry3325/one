@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Shop;
 
-use App\Classes\Packages\LinePackage;
 use App\Http\Controllers\Controller;
 use App\Models\Shop\Filters;
 use App\Models\Shop\Goods;
@@ -49,20 +48,20 @@ class ListsController extends Controller
         }
     }
 
-    public function getFieldsTitles($entity)
+    public function getAllFields($entity)
     {
         switch ($entity) {
             case 'sections':
-                return Sections::getFieldsTitles();
+                return Sections::getAllFields();
                 break;
             case 'filters':
-                return Filters::getFieldsTitles();
+                return Filters::getAllFields();
                 break;
             case 'goods':
-                return Goods::getFieldsTitles();
+                return Goods::getAllFields();
                 break;
             case 'html_pages':
-                return HtmlPages::getFieldsTitles();
+                return HtmlPages::getAllFields();
                 break;
         }
         return [];
@@ -88,7 +87,26 @@ class ListsController extends Controller
 
         return [
             'result' => true,
-            'lists'  => $q->get(),
+            'list'   => $q->get(),
         ];
+    }
+
+    public function getBaseFields($entity)
+    {
+        switch ($entity) {
+            case 'sections':
+                return Sections::getBaseFields();
+                break;
+            case 'filters':
+                return Filters::getBaseFields();
+                break;
+            case 'goods':
+                return Goods::getBaseFields();
+                break;
+            case 'html_pages':
+                return HtmlPages::getBaseFields();
+                break;
+        }
+        return [];
     }
 }

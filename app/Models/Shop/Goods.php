@@ -26,6 +26,7 @@ class Goods extends ShopBaseModel
                 self::GOOD_TYPE_SUB_LINE => 'Компонент',
                 self::GOOD_TYPE_COMPLEX  => 'Комплексный товар',
             ],
+            'baseField' => true
         ],
         'order_title'              => [
             'title' => 'Короткое наименование',
@@ -52,14 +53,17 @@ class Goods extends ShopBaseModel
             'title'   => 'Производитель',
             'type'    => parent::FIELD_TYPE_SELECT,
             'options' => [],
+            'baseField' => true
         ],
         'articul'                  => [
             'title' => 'Артикул',
             'type'  => parent::FIELD_TYPE_STRING,
+            'baseField' => true
         ],
         'sarticul'                 => [
             'title' => 'Оптимизированный артикул',
             'type'  => parent::FIELD_TYPE_STRING,
+            'baseField' => true
         ],
         'cost'                     => [
             'title' => 'Закупка',
@@ -68,10 +72,12 @@ class Goods extends ShopBaseModel
         'price'                    => [
             'title' => 'Цена',
             'type'  => parent::FIELD_TYPE_DOUBLE,
+            'baseField' => true
         ],
         'final_price'              => [
             'title' => 'Цена скидка',
             'type'  => parent::FIELD_TYPE_DOUBLE,
+            'baseField' => true
         ],
         'price_opt1'               => [
             'title' => 'ОПТ 1',
@@ -132,6 +138,7 @@ class Goods extends ShopBaseModel
                 2 => 'При наличии на любом складе',
                 3 => 'Под заказ',
             ],
+            'baseField' => true
         ],
         'img_new'                  => [
             'title' => 'Новинка',
@@ -168,10 +175,10 @@ class Goods extends ShopBaseModel
         return self::$fields['type']['options'];
     }
 
-    public static function getFieldsTitles()
+    public static function getAllFields()
     {
         $filters = [];
-        for ($i = 1; $i <= self::COUNT; $i++) {
+        for ($i = 1; $i <= Filters::COUNT; $i++) {
             $filters['filter_' . $i]         = [
                 'title' => 'Фильтр №' . $i,
                 'type'  => parent::FIELD_TYPE_STRING,
