@@ -5,7 +5,7 @@
                 <li v-if="selected" class="breadcrumb-item"><a target="_blank"
                                                                :href="selected.url">{{selected.title}}</a></li>
                 <div class="ml-3 ml-auto">
-                    <button type="button" class="btn btn-info">Добавить фильтр</button>
+                    <button type="button" class="btn btn-info" @click="showFiltersSelector">Добавить фильтр</button>
                 </div>
                 <div class="ml-3">
                     <button type="button" class="btn btn-warning" @click="showFieldsEditor">Настроить поля</button>
@@ -43,7 +43,7 @@
     </div>
 </template>
 <script>
-    let FilterSelector = require( '../../../../components/filtersSelector.vue');
+    let FilterSelector = require('../../../../components/filtersSelector.vue');
     module.exports = Vue.extend({
         data: function () {
             return {
@@ -57,20 +57,28 @@
             }
         },
         mounted: function () {
-            this.showFieldsEditor();
             this.loadData();
+            this.showFieldsEditor();
         },
         methods: {
             loadData() {
                 let self = this;
 
+                if (!this.filters || !Object.keys(this.filters).length) {
+                    this.filters = Ls.get(this._getFiltersKey());
+                }
+
+                if (this.filters) Url.set('filters', this.filters);
+                else Url.unset('filters');
+
                 let q = [
                     Data.entity.getAllFields(this.entity),
-                    Ajax.post('/shop/lists', 'getItemsList', {
-                        entity: this.entity,
-                        filters: this.filters,
-                        fields: this.fields
-                    })];
+                    Data.entity.getItemsList(this.entity, {
+                        'filters': this.filters,
+                        'fields': this.fields
+                    })
+                ];
+
 
                 if (!Object.keys(self.fields).length) {
                     q.push(Data.entity.getBaseFields(this.entity));
@@ -105,17 +113,26 @@
             prepareField(value, key) {
                 return value;
             },
-            showFieldsEditor(e){
+            showFieldsEditor(e) {
+
+            },
+            showFiltersSelector() {
+                let self = this;
                 new FilterSelector({
                     el: this.setTarget('#goodsAdmin'),
                     data: {
                         'entity': this.entity,
-                        'ls_storage_key' : 'filters_selector:tab='+this.entity,
-                        'callback' : function(filters){
-                            console.log(filters)
+                        'ls_storage_key': this._getFiltersKey(),
+                        'filters': ((this.filters) ? this.filters : []),
+                        'callback': function (filters) {
+                            Url.set('filters', filters);
+                            self.loadData();
                         }
                     }
                 });
+            },
+            _getFiltersKey() {
+                return 'filters_selector:tab=' + this.entity;
             }
         }
     });

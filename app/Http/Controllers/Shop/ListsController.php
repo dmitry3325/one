@@ -7,9 +7,11 @@ use App\Models\Shop\Filters;
 use App\Models\Shop\Goods;
 use App\Models\Shop\HtmlPages;
 use App\Models\Shop\Sections;
+use App\Classes\Traits\Shop\QueryFilterTrait;
 
 class ListsController extends Controller
 {
+    use QueryFilterTrait;
 
     public static $appSetts = [
         'title' => 'Сайт',
@@ -67,9 +69,10 @@ class ListsController extends Controller
         return [];
     }
 
-    public function getItemsList($entity, $filters = [], $fields = [])
+    public function getItemsList($entity, $options = [])
     {
         $q = null;
+        $allFields = array_keys($this->getAllFields($entity));
         switch ($entity) {
             case 'sections':
                 $q = Sections::query();
@@ -84,6 +87,11 @@ class ListsController extends Controller
                 $q = HtmlPages::query();
                 break;
         }
+
+        if(isset($options['filters']) && count($options['filters'])){
+            $this->addFilterByParams($q, $options['filters'], $allFields);
+        }
+
 
         return [
             'result' => true,

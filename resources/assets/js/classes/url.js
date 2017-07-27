@@ -4,23 +4,37 @@ class Url {
         this.URL = {};
         this.current = {};
 
+        let _goDeep = function (obj, arr, val) {
+            let key = arr[0].replace(/\[|\]/g, '');
+            arr.splice(0, 1);
+            if (key === '') key = 0;
+            if (!arr.length) {
+                obj[key] = val;
+            } else {
+                if (!obj[key]) obj[key] = {};
+                _goDeep(obj[key], arr, val);
+            }
+
+        };
+
         let getparams = window.location.search;
         if (getparams.length > 0) {
             let pArr = getparams.substring(1).split('&');
             for (let i in pArr) {
                 let p = pArr[i].split('=', 2);
                 if (p[0] !== undefined && p[1] !== undefined) {
-                    let m = p[0].match(/([^\[]+)(?:\[([^\]]+)\])?/);
-                    let key = '';
-                    if (m[2] === undefined) {
-                        key = p[0];
-                        this.current[key] = p[1];
+                    let m = p[0].match(/(\[(.*?)\]+)/g);
+                    if (m) {
+                        let key = p[0].split('[')[0];
+                        if (!this.current[key]) {
+                            this.current[key] = {};
+                        }
+                        _goDeep(this.current[key], m, p[1]);
+                        this.set(key, this.current[key], false);
                     } else {
-                        key = m[1];
-                        if (this.current[key] === undefined) this.current[key] = {};
-                        this.current[key][m[2]] = p[1];
+                        this.current[p[0]] = p[1];
+                        this.set(p[0], this.current[p[0]], false);
                     }
-                    this.set(key, this.current[key], false);
                 }
             }
         }
@@ -72,7 +86,7 @@ class Url {
 }
 
 module.exports = {
-    install(Vue){
+    install(Vue) {
         Vue.Url = window.Url = new Url();
 
     }
