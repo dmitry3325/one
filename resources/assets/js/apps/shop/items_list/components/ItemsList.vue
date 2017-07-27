@@ -110,8 +110,9 @@
                     el: this.setTarget('#goodsAdmin'),
                     data: {
                         'entity': this.entity,
+                        'ls_storage_key' : 'filters_selector:tab='+this.entity,
                         'callback' : function(filters){
-                            console.log(callback)
+                            console.log(filters)
                         }
                     }
                 });

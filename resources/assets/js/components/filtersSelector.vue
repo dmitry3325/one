@@ -98,7 +98,6 @@
 
             if(!this.filters.length){
                 let filters = Ls.get(this.ls_storage_key);
-                console.log(filters)
                 if(!filters) this.$set(this.filters,0,[{}]);
                 else this.$set(self,'filters',filters);
             }
@@ -113,9 +112,6 @@
             save(e){
                 Ls.set(this.ls_storage_key,this.filters);
                 $(this.$el).modal('hide');
-            },
-            some(a){
-
             }
         }
     });
