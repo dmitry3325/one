@@ -1,20 +1,7 @@
 <template>
     <div>
-        <div class="tool-bar">
-            <ol class="breadcrumb d-flex">
-                <li v-if="selected" class="breadcrumb-item"><a target="_blank"
-                                                               :href="selected.url">{{selected.title}}</a></li>
-                <div class="ml-3 ml-auto">
-                    <button type="button" class="btn btn-info">Добавить фильтр</button>
-                </div>
-                <div class="ml-3">
-                    <button type="button" class="btn btn-warning" @click="showFieldsEditor">Настроить поля</button>
-                </div>
-                <div class="ml-3">
-                    <button type="button" class="btn btn-success" @click="createEntity($event)">Создать</button>
-                </div>
-            </ol>
-        </div>
+        <h1>hello</h1>
+
         <div class="list">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
@@ -43,7 +30,6 @@
     </div>
 </template>
 <script>
-    let FilterSelector = require( '../../../../components/filtersSelector.vue');
     module.exports = Vue.extend({
         data: function () {
             return {
@@ -57,7 +43,6 @@
             }
         },
         mounted: function () {
-            this.showFieldsEditor();
             this.loadData();
         },
         methods: {
@@ -65,21 +50,23 @@
                 let self = this;
 
                 let q = [
-                    Data.entity.getAllFields(this.entity),
+                    Data.vendors.getAllFields(),
 
-                    Ajax.post('/shop/lists', 'getItemsList', {
-                        entity: this.entity,
-                        filters: this.filters,
-                        fields: this.fields
-                    })];
+                Ajax.post('/shop/vendors', 'getVendorsList', {
+                    entity: this.entity,
+                    filters: this.filters,
+                    fields: this.fields
+                })];
+
 
                 if (!Object.keys(self.fields).length) {
-                    q.push(Data.entity.getBaseFields(this.entity));
+                    q.push(Data.vendors.getBaseFields());
                 }
 
                 Ajax.when(q, function (fields, items, fields_list) {
                     self.loading = false;
                     self.fields_info = fields;
+
                     if (items.result && items.list) {
                         self.items = items.list;
                         self.$forceUpdate();
@@ -91,38 +78,9 @@
                 });
 
             },
-            createEntity($event) {
-                let entity = this.entity;
-                $event.target.classList.add('disabled');
-                Ajax.post('/shop/lists', 'createEntity', {
-                    entity: entity
-                }, function (res) {
-                    if (res.result && res.id) {
-                        window.open('/shop/item?type=' + entity + '&id=' + res.id, '_blank');
-                    }
-                    $event.target.classList.remove('disabled');
-                });
-            },
             prepareField(value, key) {
                 return value;
             },
-            showFieldsEditor(e){
-                new FilterSelector({
-                    el: this.setTarget('#goodsAdmin'),
-                    data: {
-                        'entity': this.entity,
-                        'ls_storage_key' : 'filters_selector:tab='+this.entity,
-                        'callback' : function(filters){
-                            console.log(filters)
-                        }
-                    }
-                });
-            }
         }
     });
 </script>
-<style>
-    .row-item {
-        cursor: pointer;
-    }
-</style>

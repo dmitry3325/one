@@ -1,5 +1,4 @@
 import './bootstrap';
-import BS from "bootstrap.native";
 import Vue from "vue";
 import Ajax from "../classes/ajax.js";
 import Errors from "../classes/errors.js";
@@ -32,5 +31,4 @@ Vue.use({
 });
 
 window.Vue = Vue;
-window.BS = BS;
 window.Errors = Errors;
