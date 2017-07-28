@@ -67,8 +67,9 @@
         methods: {
             switchCategory: function (selected) {
                 for (let tab in this.tabs) {
-                    if (tab === selected) this.tabs[tab].isActive = true;
-                    else this.tabs[tab].isActive = false;
+                    this.tabs[tab].isActive = (tab === selected);
+//                    if (tab === selected) this.tabs[tab].isActive = true;
+//                    else this.tabs[tab].isActive = false;
                 }
                 this.activeTab = selected;
                 Url.set('tab', selected);
@@ -88,12 +89,13 @@
                 this.$forceUpdate();
             },
             removeTab: function (tab) {
-                delete this.tabs[tab];
+                this.$delete(this.tabs, tab);
+
                 if (tab === 'search') {
                     Url.unset('search');
                 }
                 Url.unset('tab');
-                this.$forceUpdate();
+
             },
             showContent: function () {
                 if (typeof this.action === 'function') {
