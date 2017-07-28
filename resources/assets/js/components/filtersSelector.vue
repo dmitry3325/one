@@ -31,11 +31,11 @@
                                 <div class="dropdown">
                                     <button class="btn btn-secondary dropdown-toggle" type="button"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{(filter.method) ? filter.method : 'Операция'}}
+                                        {{(typeof filter.method !== undefined && methods[filter.method]) ? methods[filter.method] : 'Операция'}}
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a v-for="method in methods"
-                                           @click="$set(filter,'method',method)"
+                                        <a v-for="(method,method_index) in methods"
+                                           @click="$set(filter,'method',method_index)"
                                            class="dropdown-item">
                                             {{method}}
                                         </a>
@@ -49,21 +49,20 @@
                                        placeholder="Значение"/>
                             </div>
                             <div class="col-md-1">
-                                <button type="button" class="btn btn-sm btn-danger" @click="$delete(list,index_and);">
+                                <button type="button" class="btn btn-sm btn-danger"
+                                        @click="$delete(list,index_and); ((filters.length>1)?$delete(filters,index_or):'')">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </button>
                             </div>
                         </div>
                         <div>
-                            <span @click="list.push({})" class="badge badge-default">
-                                {{(list.length) ? 'И' : 'Добавить'}}
-                            </span>
+                            <span @click="$set(list,Object.keys(list).length,{})"
+                                  class="badge badge-default">Добавить</span>
                         </div>
                     </div>
                     <div>
-                        <span @click="filters.push([{}])" class="badge badge-default">
-                            {{(filters.length) ? 'Или' : 'Добавить'}}
-                        </span>
+                        <span @click="$set(filters,Object.keys(filters).length,[{}])"
+                              class="badge badge-default">Добавить</span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -80,10 +79,10 @@
         data: function () {
             return {
                 'entity': null,
-                'ls_storage_key' : 'selected_filters',
+                'ls_storage_key': 'selected_filters',
                 'allFields': {},
                 'filters': [],
-                'methods': ['=', '>', '<', '>=', '<=', 'LIKE'],
+                'methods': [],
                 'callback': null,
             };
         },
@@ -91,16 +90,22 @@
             if (!this.entity) {
                 return false;
             }
+
             let self = this;
             Data.entity.getAllFields(this.entity).then(function (flds) {
                 self.$set(self, 'allFields', flds);
             });
 
-            if(!this.filters.length){
+            Data.entity.getFilterMethods().then(function (methods) {
+                self.methods = methods;
+            });
+
+            if (!this.filters || !Object.keys(this.filters).length) {
                 let filters = Ls.get(this.ls_storage_key);
-                if(!filters) this.$set(this.filters,0,[{}]);
-                else this.$set(self,'filters',filters);
+                if (!filters) this.$set(this.filters, 0, [{}]);
+                else this.$set(self, 'filters', filters);
             }
+
 
             $(this.$el).modal('show');
             $(this.$el).on('hidden.bs.modal', function (e) {
@@ -108,10 +113,14 @@
                 self.$destroy();
             })
         },
-        methods:{
-            save(e){
-                Ls.set(this.ls_storage_key,this.filters);
+        methods: {
+            save() {
+                Ls.set(this.ls_storage_key, this.filters);
+
                 $(this.$el).modal('hide');
+                if (typeof this.callback === 'function') {
+                    this.callback(this.filters);
+                }
             }
         }
     });
@@ -126,7 +135,8 @@
     .row {
         margin-bottom: 10px;
     }
-    .row .btn-danger{
+
+    .row .btn-danger {
         margin-top: 5px;
         cursor: pointer;
     }

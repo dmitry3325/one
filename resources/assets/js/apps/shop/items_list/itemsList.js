@@ -5,7 +5,10 @@ new Vue({
     el: '#content',
     replace: true,
     template: require('./tpls/main.html'),
-    data: {},
+    data: {
+        first_show : true,
+        comps: [],
+    },
     beforeCreate: function () {
     },
     mounted: function () {
@@ -29,19 +32,32 @@ new Vue({
                 this.$content = document.querySelector('.main-content');
             }
 
+            let filters = {};
+            if(this.first_show){
+                filters = Url.get('filters');
+            }
+
             this.$content.innerHTML = '';
             let $el = this.setTarget(this.$content);
             if (tab.entity) {
-                new ItemsList({
+                let L = new ItemsList({
                     el: $el,
                     data: {
                         entity: tab.entity,
+                        filters : filters,
                         selected: {
                             'title': ',kzkzz'
                         },
                     }
                 });
+
+                if(this.first_show && filters && Object.keys(filters).length) {
+                    Ls.set(L._getFiltersKey(),filters);
+                    Ls.get(L._getFiltersKey())
+                }
             }
+
+            this.first_show = false;
         }
     }
 });
