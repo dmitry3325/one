@@ -10,54 +10,62 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div v-for="(list,index_or) in filters" class="alert alert-info">
-                        <div class="row" v-for="(filter,index_and) in list">
-                            <div class="col-md-4">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{(filter.field && allFields[filter.field]) ? allFields[filter.field].title : 'Поле'}}
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a v-for="(field,field_name) in allFields"
-                                           v-if="!filter.typeahead || field.title.indexOf(filter.typeahead)!=-1"
-                                           @click="$set(filter,'field',field_name)" class="dropdown-item">
-                                            {{field.title}}
-                                        </a>
+                    <div v-for="(list,index_or) in filters">
+                        <div class="alert alert-info">
+                            <div v-for="(filter,index_and) in list">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {{(filter.field && allFields[filter.field]) ? allFields[filter.field].title : 'Поле'}}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a v-for="(field,field_name) in allFields"
+                                                   v-if="!filter.typeahead || field.title.indexOf(filter.typeahead)!=-1"
+                                                   @click="$set(filter,'field',field_name)" class="dropdown-item">
+                                                    {{field.title}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {{(typeof filter.method !== undefined && methods[filter.method]) ? methods[filter.method] : 'Операция'}}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a v-for="(method,method_index) in methods"
+                                                   @click="$set(filter,'method',method_index)"
+                                                   class="dropdown-item">
+                                                    {{method}}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input class="input-sm form-control"
+                                               v-model="filter.value"
+                                               @keyup="$set(filter,'value',$event.target.value)"
+                                               placeholder="Значение"/>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                                @click="$delete(list,index_and);
+                                                ((Object.keys(filters).length>1 && Object.keys(list).length==0)?$delete(filters,index_or):'')">
+                                            <span class="glyphicon glyphicon-remove"></span>
+                                        </button>
                                     </div>
                                 </div>
+                                <div class="row" v-if="index_and != (Object.keys(list).length - 1)">
+                                    <span class="badge badge-default">И</span></div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{(typeof filter.method !== undefined && methods[filter.method]) ? methods[filter.method] : 'Операция'}}
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a v-for="(method,method_index) in methods"
-                                           @click="$set(filter,'method',method_index)"
-                                           class="dropdown-item">
-                                            {{method}}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <input class="input-sm form-control"
-                                       v-model="filter.value"
-                                       @keyup="$set(filter,'value',$event.target.value)"
-                                       placeholder="Значение"/>
-                            </div>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-sm btn-danger"
-                                        @click="$delete(list,index_and); ((filters.length>1)?$delete(filters,index_or):'')">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                </button>
-                            </div>
+                            <div><span @click="$set(list,Object.keys(list).length,{})"
+                                       class="badge badge-default">Добавить</span></div>
                         </div>
-                        <div>
-                            <span @click="$set(list,Object.keys(list).length,{})"
-                                  class="badge badge-default">Добавить</span>
+                        <div class="row" v-if="index_or != (Object.keys(filters).length - 1)">
+                            <div class="col-12"><span class="badge badge-default">ИЛИ</span></div>
                         </div>
                     </div>
                     <div>

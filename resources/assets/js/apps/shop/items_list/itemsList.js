@@ -34,7 +34,7 @@ new Vue({
 
             let filters = {};
             if(this.first_show){
-                filters = Url.get('filters');
+                filters = Object.assign({}, Url.get('filters'));
             }
 
             this.$content.innerHTML = '';

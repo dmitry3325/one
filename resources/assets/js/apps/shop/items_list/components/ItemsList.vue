@@ -11,6 +11,11 @@
                     <button type="button" class="btn btn-warning" @click="showFieldsEditor">Настроить поля</button>
                 </div>
                 <div class="ml-3">
+                    <button type="button" class="btn btn-primary">
+                        <span class="glyphicon glyphicon-arrow-down"></span>
+                    </button>
+                </div>
+                <div class="ml-3">
                     <button type="button" class="btn btn-success" @click="createEntity($event)">Создать</button>
                 </div>
             </ol>
@@ -140,5 +145,9 @@
 <style>
     .row-item {
         cursor: pointer;
+    }
+
+    .glyphicon-arrow-down {
+        top: 3px
     }
 </style>
