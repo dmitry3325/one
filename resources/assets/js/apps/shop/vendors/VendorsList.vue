@@ -1,7 +1,5 @@
 <template>
     <div>
-        <h1>hello</h1>
-
         <div class="list">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
@@ -15,11 +13,8 @@
                     </thead>
                     <tbody>
                     <tr class="row-item" v-for="item in items">
-                        <td v-for="field in fields">{{prepareField(item[field], field)}}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-default wh-100 cursor-pointer"><span
-                                    class="glyphicon glyphicon-edit"></span></button>
-                        </td>
+                        <td v-for="field in fields"><input @change="updateField($event, item['id'], field)"
+                                                           v-bind:value="item[field]" :disabled="fields_info[field].disabled"></td>
                     </tr>
                     </tbody>
 
@@ -33,12 +28,9 @@
     module.exports = Vue.extend({
         data: function () {
             return {
-                'entity': null,
                 'loading': true,
                 'fields_info': {},
                 'items': {},
-                'selected': {},
-                'filters': {},
                 'fields': {},
             }
         },
@@ -52,11 +44,11 @@
                 let q = [
                     Data.vendors.getAllFields(),
 
-                Ajax.post('/shop/vendors', 'getVendorsList', {
-                    entity: this.entity,
-                    filters: this.filters,
-                    fields: this.fields
-                })];
+                    Ajax.post('/shop/vendors', 'getVendorsList', {
+                        filters: this.filters,
+                        fields: this.fields
+                    })
+                ];
 
 
                 if (!Object.keys(self.fields).length) {
@@ -78,9 +70,15 @@
                 });
 
             },
-            prepareField(value, key) {
-                return value;
-            },
+            updateField(event, id, field) {
+                let options = {};
+                options[field] = event.target.value;
+
+                force = event.target.value !== event.target._value;
+                if(force) {
+                    Data.vendors.update(id, options, force);
+                }
+            }
         }
     });
 </script>
