@@ -8,13 +8,13 @@
                 <table v-if="Object.keys(items).length > 0" class="table table-bordered">
                     <thead>
                     <tr>
-                        <th v-for="field in fields">{{(fields_info[field]) ? fields_info[field].title : field}}</th>
+                        <th v-for="field in fields">{{field.title}}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="row-item" v-for="item in items">
-                        <td v-for="field in fields"><input @change="updateField($event, item['id'], field)"
-                                                           v-bind:value="item[field]" :disabled="fields_info[field].disabled"></td>
+                        <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
+                                                           v-bind:value="item[key]" :disabled="field.disabled"></td>
                     </tr>
                     </tbody>
 
@@ -29,7 +29,6 @@
         data: function () {
             return {
                 'loading': true,
-                'fields_info': {},
                 'items': {},
                 'fields': {},
             }
@@ -51,22 +50,15 @@
                 ];
 
 
-                if (!Object.keys(self.fields).length) {
-                    q.push(Data.vendors.getBaseFields());
-                }
-
-                Ajax.when(q, function (fields, items, fields_list) {
+                Ajax.when(q, function (fields, items) {
                     self.loading = false;
-                    self.fields_info = fields;
+                    self.fields = fields;
 
                     if (items.result && items.list) {
                         self.items = items.list;
                         self.$forceUpdate();
                     }
 
-                    if (fields_list) {
-                        self.fields = fields_list;
-                    }
                 });
 
             },
@@ -74,10 +66,7 @@
                 let options = {};
                 options[field] = event.target.value;
 
-                force = event.target.value !== event.target._value;
-                if(force) {
-                    Data.vendors.update(id, options, force);
-                }
+                Data.vendors.update(id, options);
             }
         }
     });

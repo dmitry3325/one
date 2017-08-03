@@ -29,11 +29,6 @@ class VendorsController extends Controller
         ];
     }
 
-    public function getBaseFields()
-    {
-        return Vendors::getBaseFields();
-    }
-
     public function update($id, $data){
         $vendor = Vendors::find($id);
 

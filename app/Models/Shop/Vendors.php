@@ -55,14 +55,4 @@ class Vendors extends Model
         return self::$commonFields;
     }
 
-    public static function getBaseFields()
-    {
-        $fields = [];
-        foreach(self::getAllFields() as $k=>$v){
-            if(isset($v['baseField']) && $v['baseField']){
-                $fields[] = $k;
-            }
-        }
-        return $fields;
-    }
 }
