@@ -1,5 +1,8 @@
 <template>
     <div>
+
+        <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск" />
+        <br/>
         <div class="list">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
@@ -14,7 +17,8 @@
                     <tbody>
                     <tr class="row-item" v-for="item in items">
                         <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
-                                                           v-bind:value="item[key]" :disabled="field.disabled"></td>
+                                                                  v-bind:value="item[key]" :disabled="field.disabled">
+                        </td>
                     </tr>
                     </tbody>
 
@@ -43,10 +47,10 @@
                 let q = [
                     Data.vendors.getAllFields(),
 
-                    Ajax.post('/shop/vendors', 'getVendorsList', {
+                    Data.vendors.getVendorsList({
                         filters: this.filters,
                         fields: this.fields
-                    })
+                    }),
                 ];
 
 
@@ -55,8 +59,7 @@
                     self.fields = fields;
 
                     if (items.result && items.list) {
-                        self.items = items.list;
-                        self.$forceUpdate();
+                        self.$set(self, 'items', items.list);
                     }
 
                 });
@@ -67,6 +70,21 @@
                 options[field] = event.target.value;
 
                 Data.vendors.update(id, options);
+            },
+            search(value) {
+                let self = this;
+                Data.vendors.getVendorsList().then(function(all){
+
+                    let result = [];
+
+                    for (let i = 0; i < all.length; i++) {
+                        if (all[i]['id'] == value || all[i]['title'].indexOf(value) != -1) {
+                            result.push(all[i]);
+                        }
+                    }
+
+                    self.$set(self, 'items', result);
+                });
             }
         }
     });
