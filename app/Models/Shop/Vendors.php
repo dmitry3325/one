@@ -8,6 +8,8 @@ class Vendors extends Model
 {
     protected $table = 'shop.vendors';
 
+    protected $fillable = ['title', 'orderby', 'picture_id', 'photos'];
+
     const FIELD_TYPE_INT      = 'int';
     const FIELD_TYPE_STRING   = 'input';
     const FIELD_TYPE_DOUBLE   = 'double';
@@ -22,7 +24,7 @@ class Vendors extends Model
         'id'                => [
             'title'    => 'ID',
             'type'     => self::FIELD_TYPE_INT,
-            'editable' => false,
+            'disabled' => true,
             'baseField' => true
         ],
         'title'             => [
@@ -38,22 +40,14 @@ class Vendors extends Model
         'picture_id'        => [
             'title' => '№ картинки',
             'type'  => self::FIELD_TYPE_INT,
+            'baseField' => true
         ],
         'photos'            => [
             'title'  => 'Изображения',
             'type'   => self::FIELD_TYPE_OBJECT,
             'entity' => 'photos',
-        ],
-        'created_at'        => [
-            'title'    => 'Создан',
-            'editable' => false,
-            'type'     => self::FIELD_TYPE_DATE,
-        ],
-        'updated_at'        => [
-            'title'    => 'Обновлен',
-            'editable' => false,
-            'type'     => self::FIELD_TYPE_DATE,
-        ],
+            'baseField' => true
+        ]
     ];
 
     public static function getAllFields()
@@ -61,14 +55,4 @@ class Vendors extends Model
         return self::$commonFields;
     }
 
-    public static function getBaseFields()
-    {
-        $fields = [];
-        foreach(self::getAllFields() as $k=>$v){
-            if(isset($v['baseField']) && $v['baseField']){
-                $fields[] = $k;
-            }
-        }
-        return $fields;
-    }
 }

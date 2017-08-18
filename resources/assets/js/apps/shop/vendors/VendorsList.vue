@@ -1,7 +1,8 @@
 <template>
     <div>
-        <h1>hello</h1>
 
+        <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск" />
+        <br/>
         <div class="list">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
@@ -10,15 +11,13 @@
                 <table v-if="Object.keys(items).length > 0" class="table table-bordered">
                     <thead>
                     <tr>
-                        <th v-for="field in fields">{{(fields_info[field]) ? fields_info[field].title : field}}</th>
+                        <th v-for="field in fields">{{field.title}}</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="row-item" v-for="item in items">
-                        <td v-for="field in fields">{{prepareField(item[field], field)}}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-default wh-100 cursor-pointer"><span
-                                    class="glyphicon glyphicon-edit"></span></button>
+                        <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
+                                                                  v-bind:value="item[key]" :disabled="field.disabled">
                         </td>
                     </tr>
                     </tbody>
@@ -33,12 +32,8 @@
     module.exports = Vue.extend({
         data: function () {
             return {
-                'entity': null,
                 'loading': true,
-                'fields_info': {},
                 'items': {},
-                'selected': {},
-                'filters': {},
                 'fields': {},
             }
         },
@@ -52,35 +47,45 @@
                 let q = [
                     Data.vendors.getAllFields(),
 
-                Ajax.post('/shop/vendors', 'getVendorsList', {
-                    entity: this.entity,
-                    filters: this.filters,
-                    fields: this.fields
-                })];
+                    Data.vendors.getVendorsList({
+                        filters: this.filters,
+                        fields: this.fields
+                    }),
+                ];
 
 
-                if (!Object.keys(self.fields).length) {
-                    q.push(Data.vendors.getBaseFields());
-                }
-
-                Ajax.when(q, function (fields, items, fields_list) {
+                Ajax.when(q, function (fields, items) {
                     self.loading = false;
-                    self.fields_info = fields;
+                    self.fields = fields;
 
                     if (items.result && items.list) {
-                        self.items = items.list;
-                        self.$forceUpdate();
+                        self.$set(self, 'items', items.list);
                     }
 
-                    if (fields_list) {
-                        self.fields = fields_list;
-                    }
                 });
 
             },
-            prepareField(value, key) {
-                return value;
+            updateField(event, id, field) {
+                let options = {};
+                options[field] = event.target.value;
+
+                Data.vendors.update(id, options);
             },
+            search(value) {
+                let self = this;
+                Data.vendors.getVendorsList().then(function(all){
+
+                    let result = [];
+
+                    for (let i = 0; i < all.length; i++) {
+                        if (all[i]['id'] == value || all[i]['title'].indexOf(value) != -1) {
+                            result.push(all[i]);
+                        }
+                    }
+
+                    self.$set(self, 'items', result);
+                });
+            }
         }
     });
 </script>

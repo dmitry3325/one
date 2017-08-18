@@ -1,7 +1,7 @@
 class Vendors {
     constructor() {
         this.allFields = null;
-        this.baseFields = null;
+        this.all = null;
     }
 
     getAllFields(force) {
@@ -17,17 +17,23 @@ class Vendors {
         }
     }
 
-    getBaseFields(force) {
+    getVendorsList(options, force) {
         let self = this;
-        if (self.baseFields && !force) {
+        if (self.all && !force) {
             return new Promise((resolve, reject) => {
-                resolve(self.baseFields);
+                resolve(self.all);
             });
         } else {
-            return Ajax.post('/shop/vendors', 'getBaseFields', {}, function (data) {
-                self.baseFields = data;
+            return Ajax.post('/shop/vendors', 'getVendorsList', {options}, function (data) {
+                if (data.result && data.list) {
+                    self.all = data.list;
+                }
             });
         }
+    }
+
+    update(id, data) {
+        return Ajax.post('/shop/vendors', 'update', {id: id, data:data});
     }
 }
 
