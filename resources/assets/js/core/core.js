@@ -1,4 +1,5 @@
 import './bootstrap';
+import './extentions/extentions.js';
 import Vue from "vue";
 import Ajax from "../classes/ajax.js";
 import Errors from "../classes/errors.js";
@@ -26,9 +27,27 @@ Vue.use({
             el.appendChild(vueEl);
             if(set === true) this.$options.el = vueEl;
             return vueEl;
-        }
+        };
+
+        Vue.prototype.call = function (func) {
+            if (typeof this[func] === 'function') {
+                this[func]();
+            }
+        };
+
+        Vue.prototype.cloneObject = function (obj) {
+            let clone = {};
+            for(let i in obj) {
+                if(typeof(obj[i])==="object" && obj[i] !== null)
+                    clone[i] = this.cloneObject(obj[i]);
+                else
+                    clone[i] = obj[i];
+            }
+            return clone;
+        };
     }
 });
 
 window.Vue = Vue;
 window.Errors = Errors;
+window.AppNotifications = new Vue(require('../components/notifications.vue'));

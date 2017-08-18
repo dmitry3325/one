@@ -1,5 +1,5 @@
 <template>
-    <div id="filtersCont" class="modal fade" role="dialog" aria-labelledby="myLargeModalLabel">
+    <div id="filtersCont" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
 
             <div class="modal-content">
@@ -80,8 +80,6 @@
         </div>
     </div>
 </template>
-
-
 <script>
     module.exports = Vue.extend({
         data: function () {
@@ -114,12 +112,11 @@
                 else this.$set(self, 'filters', filters);
             }
 
-
             $(this.$el).modal('show');
             $(this.$el).on('hidden.bs.modal', function (e) {
                 self.$el.remove();
                 self.$destroy();
-            })
+            });
         },
         methods: {
             save() {
@@ -133,8 +130,6 @@
         }
     });
 </script>
-
-
 <style>
     .badge {
         cursor: pointer;

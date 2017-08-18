@@ -230,6 +230,7 @@ return [
         'Filters' => \App\Models\Shop\Filters::class,
         'Vendors' => \App\Models\Shop\Vendors::class,
         'HtmlPages' => \App\Models\Shop\HtmlPages::class,
+        'Urls' => \App\Models\Shop\Urls::class,
     ],
 
 ];

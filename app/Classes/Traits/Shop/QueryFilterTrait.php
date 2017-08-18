@@ -16,7 +16,7 @@ trait QueryFilterTrait
         return ['=', '>', '<', '>=', '<=', 'LIKE', 'IN'];
     }
 
-    public function addFilterByParams($Q, $filters, $allowedFields = [])
+    public static function addFilterByParams($Q, $filters, $allowedFields = [])
     {
         $methods = self::getFilterMethods();
 
@@ -46,4 +46,5 @@ trait QueryFilterTrait
             }
         });
     }
+
 }
