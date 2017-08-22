@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Shop\GoodsPhoto;
 use Illuminate\Database\Seeder;
 use Faker\Factory;
 use App\Models\Shop\Vendors;
@@ -33,5 +34,24 @@ class BaseShopSeeder extends Seeder
             ]);
             echo ' - ' . $i . ': ' . $user->name . "\n";
         }
+
+        GoodsPhoto::truncate();
+        GoodsPhoto::create([
+            'entity' => 'App\Models\Shop\Vendors',
+            'entity_id' => '1',
+            'photo_id' => 12,
+            'path' => '/images/test-meal.jpg',
+            'hash' => 4343,
+        ]);
+
+        GoodsPhoto::create([
+            'entity' => 'App\Models\Shop\Vendors',
+            'entity_id' => '2',
+            'photo_id' => 10,
+            'path' => '/images/duke-farm-logo1.jpg',
+            'hash' => 32,
+        ]);
+
+
     }
 }

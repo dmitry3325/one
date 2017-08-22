@@ -21,7 +21,7 @@ class VendorsController extends Controller
 
     public function getVendorsList($filters = [], $fields = [])
     {
-        $q = Vendors::query()->orderBy('orderBy');
+        $q = Vendors::query()->with('goodsPhoto')->orderBy('orderBy');
 
         return [
             'result' => true,
@@ -38,6 +38,11 @@ class VendorsController extends Controller
         $vendor->save();
 
         return $vendor;
+
+    }
+
+    public function imgupload($img = null){
+        var_dump($img);exit();
 
     }
 

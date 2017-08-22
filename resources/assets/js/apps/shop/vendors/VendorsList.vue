@@ -12,12 +12,18 @@
                     <thead>
                     <tr>
                         <th v-for="field in fields">{{field.title}}</th>
+                        <th>Hello</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="row-item" v-for="item in items">
                         <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
                                                                   v-bind:value="item[key]" :disabled="field.disabled">
+                        </td>
+                        <td>
+                            <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']" :src="img.path" width="100px" />
+                            <input v-if="item['goods_photo'].length === 0" type="file" @change="onFileChange($event, item['id'])">
+
                         </td>
                     </tr>
                     </tbody>
@@ -85,7 +91,27 @@
 
                     self.$set(self, 'items', result);
                 });
-            }
+            },
+            onFileChange(e, id) {
+                let files = e.target.files || e.dataTransfer.files;
+                console.log(files);
+
+                if (!files.length){
+                    return;
+                }
+                this.createImage(files[0]);
+            },
+            createImage(file) {
+                let image = new Image();
+                let reader = new FileReader();
+
+                reader.onload = (e) => {
+                    options['goods_photo']['path'] = e.target.result;
+                    Data.vendors.update(id, options);
+
+                };
+                reader.readAsDataURL(file);
+            },
         }
     });
 </script>
