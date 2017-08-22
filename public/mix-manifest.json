@@ -12,5 +12,7 @@
   "/css/apps/shop/itemsList.css": "/css/apps/shop/itemsList.css",
   "/js/apps/shop/itemsList.js": "/js/apps/shop/itemsList.js",
   "/css/apps/shop/vendors.css": "/css/apps/shop/vendors.css",
-  "/js/apps/shop/vendors.js": "/js/apps/shop/vendors.js"
+  "/js/apps/shop/vendors.js": "/js/apps/shop/vendors.js",
+  "/css/apps/shop/goods.css": "/css/apps/shop/goods.css",
+  "/js/apps/shop/goods.js": "/js/apps/shop/goods.js"
 }

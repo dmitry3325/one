@@ -15,7 +15,7 @@ class AdminBar
         'shop' => [
             'title' => 'Сайт',
             'children' => [
-                'lists' => [],
+                '' => [],
                 'vendors' => []
             ]
         ],

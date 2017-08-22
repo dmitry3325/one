@@ -6,5 +6,4 @@ class Sections extends ShopBaseModel
 {
     protected $table = 'shop.sections';
 
-
 }

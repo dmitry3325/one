@@ -1,0 +1,25 @@
+#goodsAdmin {
+  .section_list{
+    z-index:100;
+    position: fixed;
+    padding: 10px 0 10px 0;
+    border-right: 1px solid #ccc;
+    background: white;
+    height:100%;
+    width:300px;
+    -webkit-box-shadow: 7px 1px 32px -6px rgba(0,0,0,0.55);
+    -moz-box-shadow: 7px 1px 32px -6px rgba(0,0,0,0.55);
+    box-shadow: 7px 1px 32px -6px rgba(0,0,0,0.55);
+  }
+  .main-content{
+    padding:10px;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}

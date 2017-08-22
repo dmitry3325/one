@@ -18,8 +18,8 @@ mix.js('resources/assets/js/core/core.js', 'public/js')
  * All apps here
  * */
 
-mix.js('resources/assets/js/apps/shop/items_list/itemsList.js', 'public/js/apps/shop/itemsList.js')
-    .sass('resources/assets/sass/apps/shop/itemsList.scss', 'public/css/apps/shop/itemsList.css');
+mix.js('resources/assets/js/apps/shop/goods/goods.js', 'public/js/apps/shop/goods.js')
+    .sass('resources/assets/sass/apps/shop/goods.scss', 'public/css/apps/shop/goods.css');
 
 mix.js('resources/assets/js/apps/shop/vendors/vendors.js', 'public/js/apps/shop/vendors.js')
     .sass('resources/assets/sass/apps/shop/vendors.scss', 'public/css/apps/shop/vendors.css');

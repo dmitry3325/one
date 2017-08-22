@@ -45,8 +45,8 @@ class CreateGoodsTables extends Migration
                 $table->double('discount')->default(0);
 
                 for ($i = 1; $i <= Filters::COUNT; $i++) {
-                    $table->string('filter_' . $i);
-                    $table->string('filter_' . $i . '_id');
+                    $table->string('filter_' . $i)->default('');
+                    $table->string('filter_' . $i . '_id')->default(0);
                 }
 
                 $table->double('tarif')->default(0);
@@ -54,7 +54,7 @@ class CreateGoodsTables extends Migration
                 $table->double('min_qty')->nullable();
                 $table->tinyInteger('ignore_min_qty')->default(0);
                 $table->double('weight')->default(0);
-                $table->string('final_price_round_method', 25);
+                $table->string('final_price_round_method', 25)->default(0);
                 $table->double('nds')->default(0);
                 $table->integer('show_qty')->nullable();
                 $table->integer('show_buy')->nullable();
@@ -88,6 +88,12 @@ class CreateGoodsTables extends Migration
                 $table->string('path_title')->default('');
                 $table->integer('orderby')->default(0);
                 $table->tinyInteger('hidden')->default(0);
+
+                for ($i = 1; $i <= Filters::COUNT; $i++) {
+                    $table->string('filter_' . $i)->default('');
+                    $table->string('filter_' . $i . '_id')->default(0);
+                }
+
                 $table->integer('picture_id')->default(0);
                 $table->string('photos')->default('');
                 $table->string('short_description')->default('');
@@ -110,8 +116,8 @@ class CreateGoodsTables extends Migration
                 $table->tinyInteger('hidden')->default(0);
 
                 for ($i = 1; $i <= Filters::COUNT; $i++) {
-                    $table->string('filter_' . $i);
-                    $table->string('filter_' . $i . '_id');
+                    $table->string('filter_' . $i)->default('');
+                    $table->string('filter_' . $i . '_id')->default(0);
                 }
 
                 $table->integer('picture_id')->default(0);
