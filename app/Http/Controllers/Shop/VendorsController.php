@@ -41,6 +41,15 @@ class VendorsController extends Controller
 
     }
 
+    public function delete($id){
+        $vendor = Vendors::find($id)->delete();
+
+        return [
+            'result' => $vendor,
+        ];
+
+    }
+
     public function imgupload($img = null){
         var_dump($img);exit();
 

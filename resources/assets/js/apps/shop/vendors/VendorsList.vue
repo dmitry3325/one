@@ -1,9 +1,15 @@
 <template>
     <div>
 
-        <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск" />
-        <br/>
-        <div class="list">
+        <div class="row">
+            <div class="col-md-1">
+                <button class="btn btn-success">Создать</button>
+            </div>
+            <div class="col-md-11">
+                <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск" />
+            </div>
+        </div>
+        <div class="list ">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
             </div>
@@ -12,7 +18,8 @@
                     <thead>
                     <tr>
                         <th v-for="field in fields">{{field.title}}</th>
-                        <th>Hello</th>
+                        <th>Картинка</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -23,7 +30,9 @@
                         <td>
                             <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']" :src="img.path" width="100px" />
                             <input v-if="item['goods_photo'].length === 0" type="file" @change="onFileChange($event, item['id'])">
-
+                        </td>
+                        <td>
+                            <button class="btn btn-danger" @click="deleteVendor(item['id'])">Удалить</button>
                         </td>
                     </tr>
                     </tbody>
@@ -76,6 +85,23 @@
                 options[field] = event.target.value;
 
                 Data.vendors.update(id, options);
+            },
+            deleteVendor(id) {
+                let self = this;
+
+                Data.vendors.delete(id).then(function(data){
+                    if(data.result){
+                        let result = [];
+
+                        for (let i = 0; i < self.items.length; i++) {
+                            if (self.items[i]['id'] != id) {
+                                result.push(self.items[i]);
+                            }
+                        }
+
+                        self.$set(self, 'items', result);
+                    }
+                });
             },
             search(value) {
                 let self = this;
