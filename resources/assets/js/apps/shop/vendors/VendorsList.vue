@@ -6,7 +6,7 @@
                 <button class="btn btn-success">Создать</button>
             </div>
             <div class="col-md-11">
-                <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск" />
+                <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск"/>
             </div>
         </div>
         <div class="list ">
@@ -28,8 +28,10 @@
                                                                   v-bind:value="item[key]" :disabled="field.disabled">
                         </td>
                         <td>
-                            <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']" :src="img.path" width="100px" />
-                            <input v-if="item['goods_photo'].length === 0" type="file" @change="onFileChange($event, item['id'])">
+                            <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']"
+                                 :src="img.path" width="100px"/>
+                            <input v-if="item['goods_photo'].length === 0" type="file"
+                                   @change="onFileChange($event, item['id'])">
                         </td>
                         <td>
                             <button class="btn btn-danger" @click="deleteVendor(item['id'])">Удалить</button>
@@ -44,6 +46,8 @@
     </div>
 </template>
 <script>
+    let ConfirmModal = require('../../../components/confirmModal.vue');
+
     module.exports = Vue.extend({
         data: function () {
             return {
@@ -89,23 +93,31 @@
             deleteVendor(id) {
                 let self = this;
 
-                Data.vendors.delete(id).then(function(data){
-                    if(data.result){
-                        let result = [];
+                new ConfirmModal({
+                    'data': {
+                        'body': 'Уверены, что хотите удалить производителя безвозвратно?',
+                        'confirm_func': function () {
+                            Data.vendors.delete(id).then(function (data) {
+                                if (data.result) {
+                                    let result = [];
 
-                        for (let i = 0; i < self.items.length; i++) {
-                            if (self.items[i]['id'] != id) {
-                                result.push(self.items[i]);
-                            }
+                                    for (let i = 0; i < self.items.length; i++) {
+                                        if (self.items[i]['id'] != id) {
+                                            result.push(self.items[i]);
+                                        }
+                                    }
+
+                                    self.$set(self, 'items', result);
+                                }
+                            });
                         }
-
-                        self.$set(self, 'items', result);
                     }
                 });
+
             },
             search(value) {
                 let self = this;
-                Data.vendors.getVendorsList().then(function(all){
+                Data.vendors.getVendorsList().then(function (all) {
 
                     let result = [];
 
@@ -122,7 +134,7 @@
                 let files = e.target.files || e.dataTransfer.files;
                 console.log(files);
 
-                if (!files.length){
+                if (!files.length) {
                     return;
                 }
                 this.createImage(files[0]);
