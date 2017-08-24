@@ -35,6 +35,10 @@ class Vendors {
     update(id, data) {
         return Ajax.post('/shop/vendors', 'update', {id: id, data:data});
     }
+
+    delete(id) {
+        return Ajax.post('/shop/vendors', 'delete', {id: id});
+    }
 }
 
 module.exports = new Vendors();
