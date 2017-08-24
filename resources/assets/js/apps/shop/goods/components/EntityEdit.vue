@@ -82,9 +82,6 @@
                 }
             };
         },
-        mounted: function () {
-            console.log(this.packages, 'a')
-        },
         beforeCreate() {
             let self = this;
             let Info = this.$options.data();

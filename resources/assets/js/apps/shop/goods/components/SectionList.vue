@@ -1,5 +1,5 @@
 <template>
-    <div class="menu">
+    <div class="sections-menu">
         <div class="search">
             <div class="mb-2    ">
                 <button style="width: 90px;" @click="((typeof toggleAction === 'function')?toggleAction(false):false)"
@@ -73,7 +73,7 @@
                 return Data.entity.getItemsList('Sections', {
                     'tree_view': true
                 }, force).then(function (data) {
-                    self.list = data.list;
+                    self.list = data.data;
                     self.buildTree();
                     self.$set(self, 'inProcess', false);
                 });
@@ -163,42 +163,42 @@
 </script>
 
 <style>
-    .tree {
+    .sections-menu .tree {
         margin-top: 10px;
         overflow-y: auto;
         max-height: calc(100% - 120px);
     }
 
-    .search {
+    .sections-menu .search {
         padding: 0 10px;
     }
 
-    .children {
+    .sections-menu .children {
         background: #eee;
         margin: 10px 0;
     }
 
-    .item > .row {
+    .sections-menu .item > .row {
         padding: 0 10px;
     }
 
-    .title {
+    .sections-menu .title {
         padding: 0 10px;
     }
 
-    .btn-cont {
+    .sections-menu .btn-cont {
         width: 30px;
     }
 
-    .title {
+    .sections-menu .title {
         width: calc(100% - 40px);
     }
 
-    .btn-cont.in {
+    .sections-menu .btn-cont.in {
         margin-left: 10px;
     }
 
-    .row.selected {
+    .sections-menu .row.selected {
         color: #fb4900;
     }
 </style>

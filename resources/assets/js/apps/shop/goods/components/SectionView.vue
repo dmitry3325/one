@@ -44,7 +44,8 @@
                 </ol>
             </div>
             <div class="tab-content">
-                <div v-for="(tab,index) in tabs" v-show="index === activeTab" class="tab" :class="((index === activeTab)?'active':'')+' '+index">
+                <div v-for="(tab,index) in tabs" v-show="index === activeTab" class="tab"
+                     :class="((index === activeTab)?'active':'')+' '+index">
                 </div>
             </div>
         </div>
@@ -52,6 +53,7 @@
 </template>
 <script>
     let FilterSelector = require('../../../../components/filtersSelector.vue');
+    let FieldsSelector = require('../../../../components/fieldsSelector.vue');
     let ItemsList = require('./ItemsList.vue');
     let EntityEdit = require('./EntityEdit.vue');
 
@@ -127,27 +129,28 @@
             },
             showContent: function () {
                 let tab = this.tabs[this.activeTab];
-                if(tab.builded) return;
+                if (tab.builded) return;
 
                 let $target = document.querySelector('.tab-content .tab.' + this.activeTab);
                 $target.innerHTML = '';
                 let contType = this._getContType();
 
                 if (contType === 'ItemsList') {
-                    new ItemsList({
+                    let fields = Ls.get(this._getCurEntity() + 'fields');
+                    this.tabs[this.activeTab].view = new ItemsList({
                         el: this.setTarget($target),
                         data: {
                             entity: this._getCurEntity(),
                             section: this.id,
-                            filters: this.cloneObject(this.filters)
+                            filters: this.cloneObject(this.filters),
+                            fields: (fields)?fields:[]
                         },
                     });
                 } else if (contType === 'EntityEdit') {
-
                     let $el = this.setTarget($target);
                     let $cont = this.setTarget($el);
                     $el.classList.add('mt-3');
-                    new EntityEdit({
+                    this.tabs[this.activeTab].view = new EntityEdit({
                         el: $cont,
                         data: {
                             id: this.id,
@@ -159,12 +162,39 @@
                 tab.builded = true;
             },
             createEntity(e) {
+                let self = this;
                 let entity = this._getCurEntity(true);
                 if (entity && Data[entity]) {
-                    Data[entity].create(this._getCurEntity())
+                    Data[entity].create(this._getCurEntity(), {'section_id': this.id})
                         .then(function (res) {
-                            console.log(res);
+                            if (res.id) {
+                                window.open(location.pathname + '?entity=' + self._getCurEntity() + '&id=' + res.id, '_blank');
+                            }
+                            self.callLoadData(function () {
+                                AppNotifications.add({
+                                    'type': 'success',
+                                    'body': 'Готово! Создано успешно!'
+                                });
+                            });
                         });
+                }
+            },
+            callLoadData(callback, setData) {
+                if(typeof setData === 'undefined') setData = {};
+                if (this.tabs[this.activeTab].view) {
+                    let module = this.tabs[this.activeTab].view;
+                    for(let i in setData){
+                        module.$set(module,i, setData[i]);
+                    }
+                    if (module.loadData) {
+                        let def = module.loadData();
+                        if (def.then && typeof callback === 'function') {
+                            def.then(function () {
+                                callback();
+                            });
+
+                        }
+                    }
                 }
             },
             loadFile(e) {
@@ -180,13 +210,29 @@
                         'callback': function (filters) {
                             self.filters = filters;
                             Url.set('filters', filters);
-                            self.loadData();
+                            self.callLoadData();
                         }
                     }
                 });
             },
             showFieldsEditor(e) {
+                let self = this;
 
+                let fields = Ls.get(this._getCurEntity() + 'fields');
+                console.log(fields)
+                new FieldsSelector({
+                    el: this.setTarget('#goodsAdmin'),
+                    data: {
+                        'entity': this._getCurEntity(),
+                        'fields': ((fields) ? fields.slice() : []),
+                        'callback': function (fields) {
+                            Ls.set(self._getCurEntity() + 'fields', fields);
+                            self.callLoadData(null, {
+                                'fields': fields
+                            });
+                        }
+                    }
+                });
             },
             _getCurEntity(get_data_key) {
                 if (get_data_key) return (this.tabs[this.activeTab]) ? this.activeTab : null;

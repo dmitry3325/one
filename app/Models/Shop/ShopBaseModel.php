@@ -10,6 +10,7 @@ namespace App\Models\Shop;
 
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\Paginator;
 
 class ShopBaseModel extends Model
 {
@@ -94,7 +95,7 @@ class ShopBaseModel extends Model
             'type'     => self::FIELD_TYPE_DATE,
         ],
     ];
-    protected $guarded = ['id', 'created_at', 'updated_at'];
+    protected        $guarded      = ['id', 'created_at', 'updated_at'];
 
     public static function getAllFields()
     {
@@ -105,7 +106,7 @@ class ShopBaseModel extends Model
         }
 
         $filters = [];
-        if($className!='HtmlPages') {
+        if ($className != 'HtmlPages') {
             for ($i = 1; $i <= Filters::COUNT; $i++) {
                 $filters['filter_' . $i]         = [
                     'title' => 'Фильтр №' . $i,
@@ -162,26 +163,27 @@ class ShopBaseModel extends Model
         }
     }
 
-    public function save(array $options = []){
+    public function save(array $options = [])
+    {
         $metaDataFields = ShopMetadata::getAllFields();
 
         $result = [
-            'result' => false
+            'result' => false,
         ];
 
         $setToMeta = [];
-        $dirty = $this->getDirty();
-        foreach($metaDataFields as $fld=>$val){
-            if(isset($this->attributes[$fld]) && isset($dirty[$fld])){
+        $dirty     = $this->getDirty();
+        foreach ($metaDataFields as $fld => $val) {
+            if (isset($this->attributes[$fld]) && isset($dirty[$fld])) {
                 $setToMeta[$fld] = $this->attributes[$fld];
                 unset($this->attributes[$fld]);
             }
         }
 
         $setUrl = [];
-        if(isset($dirty['url'])){
+        if (isset($dirty['url'])) {
             $res = Urls::createNew(self::getClassName(), $this->id, $this->attributes['url']);
-            if(isset($res['errors'])){
+            if (isset($res['errors'])) {
                 $result['errors'] = $res['errors'];
             }
             $setUrl['url'] = $this->attributes['url'];
@@ -190,9 +192,9 @@ class ShopBaseModel extends Model
 
         $result['result'] = parent::save($options);
 
-        if(count($setToMeta)){
+        if (count($setToMeta)) {
             $res = ShopMetadata::saveMetadata(self::getClassName(), $this->id, $setToMeta);
-            if(isset($res['errors'])){
+            if (isset($res['errors'])) {
                 $result['errors'] = $res['errors'];
             }
         }
@@ -224,21 +226,80 @@ class ShopBaseModel extends Model
 
     public static function getData($options = [])
     {
-         return self::getDataQuery($options)->get();
+        $res = self::getDataQuery($options, true);
+        $q   = $res['q'];
+
+        if (isset($options['order_by']['field'])) {
+            $type = 'asc';
+            if (isset($options['order_by']['type'])) {
+                $type = $options['order_by']['type'];
+            }
+            $q->orderBy($options['order_by']['field'], $type);
+        }
+
+        $data = [];
+        if (isset($options['paginate']) && $options['paginate']) {
+            if (isset($options['current_page']) && $options['current_page']) {
+                Paginator::currentPageResolver(function () use ($options) {
+                    return $options['current_page'];
+                });
+            }
+            $perPage = 5;
+            if (isset($options['per_page']) && $options['per_page']) {
+                $perPage = $options['per_page'];
+            }
+            $data = $q->paginate($perPage);
+            if (count($res['meta'])) {
+                self::addMeta($data, $res['meta']);
+            }
+        }
+        else {
+            $data = $q->get();
+            if (count($res['meta'])) {
+                self::addMeta($data, $res['meta']);
+            }
+        }
+
+        return $data;
     }
 
-    public static function getDataQuery($options = [])
+    public static function addMeta(&$data, $fields = [])
+    {
+        foreach ($data as $entity) {
+            $entity->getMetaData($fields);
+        }
+    }
+
+    public static function getDataQuery($options = [], $getMetaFields = false)
     {
         $table  = self::getTableName();
         $entity = self::getClassName(true);
-        $q      = self::select([$table . '.*', 'urls.url'])
+
+        $metaData = [];
+        $select   = [$table . '.*', 'urls.url'];
+        if (isset($options['fields'])) {
+            $metaFields = ShopMetadata::$fields;
+            foreach ($options['fields'] as $fld) {
+                if ($fld === 'url') {
+                    $select[] = 'urls.url';
+                }
+                else if (isset($metaFields[$fld])) {
+                    $metaData[] = $fld;
+                }
+                else {
+                    $select[] = $table . '.' . $fld;
+                }
+            }
+        }
+
+        $q = self::select($select)
             ->leftJoin('shop.urls', function ($on) use ($entity, $table) {
                 $on->where('entity', '=', $entity);
                 $on->where('entity_id', '=', $table . '.id');
             });
 
-        if(isset($options['section_id']) && $options['section_id']){
-            $q->where($table.'.section_id', '=', $options['section_id']);
+        if (isset($options['section_id']) && $options['section_id']) {
+            $q->where($table . '.section_id', '=', $options['section_id']);
         }
 
         if (isset($options['filters']) && count($options['filters'])) {
@@ -246,19 +307,33 @@ class ShopBaseModel extends Model
             self::addFilterByParams($q, $options['filters'], $allFields);
         }
 
-        return $q;
+        if ($getMetaFields) {
+            return [
+                'q'    => $q,
+                'meta' => $metaData,
+            ];
+        }
+        else {
+            return $q;
+        }
     }
 
-    public static function deleteEntity($id){
+    public static function deleteEntity($id)
+    {
         $entity = self::getClassName();
-        Urls::where('entity','=',$entity)->where('id','=',$id)->delete();
-        ShopMetadata::where('entity','=',$entity)->where('id','=',$id)->delete();
-        return self::where('id','=', $id)->delete();
+        Urls::where('entity', '=', $entity)->where('id', '=', $id)->delete();
+        ShopMetadata::where('entity', '=', $entity)->where('id', '=', $id)->delete();
+        return self::where('id', '=', $id)->delete();
     }
 
-    public function getMetaData(){
-        $meta = $this->metadata()->get();
-         foreach($meta as $m){
+    public function getMetaData($fields = [])
+    {
+        $q = $this->metadata();
+        if (count($fields)) {
+            $q->whereIn('key', $fields);
+        }
+        $meta = $q->get();
+        foreach ($meta as $m) {
             $this->{$m->key} = $m->value;
         }
         return $this;

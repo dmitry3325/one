@@ -11,7 +11,7 @@ class ShopMetadata extends Model
 
     protected $guarded = ['id'];
 
-    protected static $fields = [
+    public static $fields = [
         'html_title'       => [
             'title' => 'HTML title',
             'type'  => ShopBaseModel::FIELD_TYPE_STRING,

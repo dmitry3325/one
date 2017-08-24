@@ -19,6 +19,9 @@
     "vue": "^2.1.10"
   },
   "dependencies": {
+    "@types/requirejs": "^2.1.31",
+    "popper.js": "^1.12.3",
+    "vuedraggable": "^2.14.1",
     "webpack": "^3.3.0"
   }
 }

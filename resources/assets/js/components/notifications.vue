@@ -17,7 +17,7 @@
         data: function () {
             return {
                 'list': {},
-                'index' : 0,
+                'index': 0,
             }
         },
         beforeCreate: function () {
@@ -25,27 +25,31 @@
         },
         methods: {
             add: function (notification) {
-                if (!notification.lifetime) {
+                if (typeof notification.lifetime === 'undefined') {
                     notification.lifetime = 5000;
                 }
 
                 let index = ++this.index;
-                this.$set(this.list,index,notification);
+                this.$set(this.list, index, notification);
 
                 let self = this;
-                setTimeout(function () {
-                    self.remove(index);
-                }, notification.lifetime);
+                if (notification.lifetime) {
+                    setTimeout(function () {
+                        self.remove(index);
+                    }, notification.lifetime);
+                }
+
+                return index;
             },
             remove: function (id) {
-                let $n = this.$el.querySelector('.notification[data-index="'+id+'"]');
-                if($n) {
+                let $n = this.$el.querySelector('.notification[data-index="' + id + '"]');
+                if ($n) {
                     $n.classList.remove('bounceIn');
                     $n.classList.add('bounceOut');
                 }
                 let self = this;
-                setTimeout(function(){
-                    self.$delete(self.list,id);
+                setTimeout(function () {
+                    self.$delete(self.list, id);
                 }, 500);
             }
 
@@ -60,219 +64,16 @@
         right: 1rem;
     }
 
-    .notification {
+    .notification-list .notification {
         position: relative;
         cursor: pointer;
+        width: 400px;
     }
 
-    .glyphicon-remove {
+    .notification-list .notification .glyphicon-remove {
         font-size: 12px;
         position: absolute;
         top: 5px;
         right: 5px;
     }
-
-
-    @keyframes animation {
-        0% {
-            transform: matrix3d(0.04, 0, 0, 0, 0, 0.04, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        3.4% {
-            transform: matrix3d(0.238, 0, 0, 0, 0, 0.238, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        4.7% {
-            transform: matrix3d(0.38, 0, 0, 0, 0, 0.38, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        6.81% {
-            transform: matrix3d(0.665, 0, 0, 0, 0, 0.665, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        9.41% {
-            transform: matrix3d(1.029, 0, 0, 0, 0, 1.029, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        10.21% {
-            transform: matrix3d(1.126, 0, 0, 0, 0, 1.126, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        13.61% {
-            transform: matrix3d(1.391, 0, 0, 0, 0, 1.391, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        14.11% {
-            transform: matrix3d(1.407, 0, 0, 0, 0, 1.407, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        17.52% {
-            transform: matrix3d(1.39, 0, 0, 0, 0, 1.39, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        18.72% {
-            transform: matrix3d(1.345, 0, 0, 0, 0, 1.345, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        21.32% {
-            transform: matrix3d(1.221, 0, 0, 0, 0, 1.221, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        24.32% {
-            transform: matrix3d(1.085, 0, 0, 0, 0, 1.085, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        25.23% {
-            transform: matrix3d(1.052, 0, 0, 0, 0, 1.052, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        29.03% {
-            transform: matrix3d(0.964, 0, 0, 0, 0, 0.964, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        29.93% {
-            transform: matrix3d(0.954, 0, 0, 0, 0, 0.954, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        35.54% {
-            transform: matrix3d(0.954, 0, 0, 0, 0, 0.954, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        36.74% {
-            transform: matrix3d(0.961, 0, 0, 0, 0, 0.961, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        41.04% {
-            transform: matrix3d(0.986, 0, 0, 0, 0, 0.986, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        44.44% {
-            transform: matrix3d(0.998, 0, 0, 0, 0, 0.998, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        52.15% {
-            transform: matrix3d(0.998, 0, 0, 0, 0, 0.998, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        59.86% {
-            transform: matrix3d(0.997, 0, 0, 0, 0, 0.997, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        63.26% {
-            transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        75.28% {
-            transform: matrix3d(1.003, 0, 0, 0, 0, 1.003, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        85.49% {
-            transform: matrix3d(0.999, 0, 0, 0, 0, 0.999, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        90.69% {
-            transform: matrix3d(0.998, 0, 0, 0, 0, 0.998, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-        100% {
-            transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        }
-    }
-
-    .animated {
-        -webkit-animation-duration: 0.6s;
-        animation-duration: 0.6s;
-        -webkit-animation-fill-mode: both;
-        animation-fill-mode: both;
-    }
-
-    .animated.bounceIn {
-        -webkit-animation-duration: .75s;
-        animation-duration: .75s;
-    }
-
-    @-webkit-keyframes bounceIn {
-        from, 20%, 40%, 60%, 80%, to {
-            -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-            animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-        }
-
-        0% {
-            opacity: 0;
-            -webkit-transform: scale3d(.3, .3, .3);
-            transform: scale3d(.3, .3, .3);
-        }
-
-        20% {
-            -webkit-transform: scale3d(1.1, 1.1, 1.1);
-            transform: scale3d(1.1, 1.1, 1.1);
-        }
-
-        40% {
-            -webkit-transform: scale3d(.9, .9, .9);
-            transform: scale3d(.9, .9, .9);
-        }
-
-        60% {
-            opacity: 1;
-            -webkit-transform: scale3d(1.03, 1.03, 1.03);
-            transform: scale3d(1.03, 1.03, 1.03);
-        }
-
-        80% {
-            -webkit-transform: scale3d(.97, .97, .97);
-            transform: scale3d(.97, .97, .97);
-        }
-
-        to {
-            opacity: 1;
-            -webkit-transform: scale3d(1, 1, 1);
-            transform: scale3d(1, 1, 1);
-        }
-    }
-
-    @keyframes bounceIn {
-        from, 20%, 40%, 60%, 80%, to {
-            -webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-            animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-        }
-
-        0% {
-            opacity: 0;
-            -webkit-transform: scale3d(.3, .3, .3);
-            transform: scale3d(.3, .3, .3);
-        }
-
-        20% {
-            -webkit-transform: scale3d(1.1, 1.1, 1.1);
-            transform: scale3d(1.1, 1.1, 1.1);
-        }
-
-        40% {
-            -webkit-transform: scale3d(.9, .9, .9);
-            transform: scale3d(.9, .9, .9);
-        }
-
-        60% {
-            opacity: 1;
-            -webkit-transform: scale3d(1.03, 1.03, 1.03);
-            transform: scale3d(1.03, 1.03, 1.03);
-        }
-
-        80% {
-            -webkit-transform: scale3d(.97, .97, .97);
-            transform: scale3d(.97, .97, .97);
-        }
-
-        to {
-            opacity: 1;
-            -webkit-transform: scale3d(1, 1, 1);
-            transform: scale3d(1, 1, 1);
-        }
-    }
-
-    .bounceIn {
-        -webkit-animation-name: bounceIn;
-        animation-name: bounceIn;
-    }
-
-    .bounceInUp {
-        animation-name: bounceInUp;
-    }
-
-    @keyframes bounceOut {
-        20% {
-            transform: scale3d(.9, .9, .9);
-        }
-
-        50%, 55% {
-            opacity: 1;
-            transform: scale3d(1.1, 1.1, 1.1);
-        }
-
-        to {
-            opacity: 0;
-            transform: scale3d(.3, .3, .3);
-        }
-    }
-
-    .bounceOut {
-        animation-name: bounceOut;
-    }
-
 </style>

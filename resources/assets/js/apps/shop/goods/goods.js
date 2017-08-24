@@ -8,10 +8,10 @@ new Vue({
     template: require('./tpls/main.html'),
     data: {
         curSection: null,
+        curEntity: null,
+        curEntityId: null,
         filters: {},
         fields: {},
-    },
-    beforeCreate: function () {
     },
     mounted: function () {
         this.setMainParams();
@@ -20,6 +20,8 @@ new Vue({
     methods: {
         setMainParams() {
             this.curSection = Url.get('section');
+            this.curEntity = Url.get('entity');
+            this.curEntityId = Url.get('entity_id');
         },
         buildApp() {
             let self = this;

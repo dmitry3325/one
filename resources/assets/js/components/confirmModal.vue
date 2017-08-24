@@ -55,7 +55,7 @@
     });
 </script>
 <style>
-    h4 {
+    .modal h4 {
         margin-bottom: 0px;
     }
 </style>

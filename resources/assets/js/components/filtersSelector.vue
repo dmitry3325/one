@@ -1,7 +1,6 @@
 <template>
     <div id="filtersCont" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
-
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myLargeModalLabel">Выберите фильтры</h4>
@@ -54,7 +53,7 @@
                                         <button type="button" class="btn btn-sm btn-danger"
                                                 @click="$delete(list,index_and);
                                                 ((Object.keys(filters).length>1 && Object.keys(list).length==0)?$delete(filters,index_or):'')">
-                                            <span class="glyphicon glyphicon-remove"></span>
+                                                <span class="glyphicon glyphicon-remove"></span>
                                         </button>
                                     </div>
                                 </div>
@@ -131,15 +130,15 @@
     });
 </script>
 <style>
-    .badge {
+    #filtersCont .badge {
         cursor: pointer;
     }
 
-    .row {
+    #filtersCont .row {
         margin-bottom: 10px;
     }
 
-    .row .btn-danger {
+    #filtersCont .row .btn-danger {
         margin-top: 5px;
         cursor: pointer;
     }

@@ -62,7 +62,6 @@ class ShopController extends Controller
         }
 
         $res = $entity::deleteEntity($id);
-
         return [
             'result' => $res,
         ];
@@ -137,10 +136,13 @@ class ShopController extends Controller
 
         $list = $entity::getData($options);
 
-        return [
-            'result' => true,
-            'list'   => $list,
-        ];
+        if(isset($options['paginate']) && $options['paginate']){
+            return $list;
+        }else {
+            return [
+                'data'   => $list,
+            ];
+        }
     }
 
     public function getBaseFields($entity)
