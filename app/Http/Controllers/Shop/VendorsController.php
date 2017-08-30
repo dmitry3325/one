@@ -21,7 +21,7 @@ class VendorsController extends Controller
 
     public function getVendorsList($filters = [], $fields = [])
     {
-        $q = Vendors::query()->with('goodsPhoto')->orderBy('orderBy');
+        $q = Vendors::query()->orderBy('id', 'DESC');
 
         return [
             'result' => true,
@@ -46,6 +46,19 @@ class VendorsController extends Controller
 
         return [
             'result' => $vendor,
+        ];
+
+    }
+
+    public function create(){
+        $vendor =  new Vendors();
+        $result = $vendor->save();
+
+        $vendor = Vendors::find($vendor->id);
+
+        return [
+            'result' => $result,
+            'vendor' => $vendor,
         ];
 
     }

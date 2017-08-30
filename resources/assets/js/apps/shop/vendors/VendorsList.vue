@@ -1,14 +1,15 @@
 <template>
     <div>
 
-        <div class="row">
+        <div class="row mb-2">
             <div class="col-md-1">
-                <button class="btn btn-success">Создать</button>
+                <button class="btn btn-success" @click="createVendor()">Создать</button>
             </div>
             <div class="col-md-11">
                 <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск"/>
             </div>
         </div>
+
         <div class="list ">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
@@ -18,7 +19,6 @@
                     <thead>
                     <tr>
                         <th v-for="field in fields">{{field.title}}</th>
-                        <th>Картинка</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -27,12 +27,7 @@
                         <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
                                                                   v-bind:value="item[key]" :disabled="field.disabled">
                         </td>
-                        <td>
-                            <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']"
-                                 :src="img.path" width="100px"/>
-                            <input v-if="item['goods_photo'].length === 0" type="file"
-                                   @change="onFileChange($event, item['id'])">
-                        </td>
+
                         <td>
                             <button class="btn btn-danger" @click="deleteVendor(item['id'])">Удалить</button>
                         </td>
@@ -52,7 +47,7 @@
         data: function () {
             return {
                 'loading': true,
-                'items': {},
+                'items': [],
                 'fields': {},
             }
         },
@@ -108,12 +103,38 @@
                                     }
 
                                     self.$set(self, 'items', result);
+
+                                    AppNotifications.add({
+                                        'type': 'success',
+                                        'body': 'Производитель удален'
+                                    })
                                 }
                             });
                         }
                     }
                 });
 
+            },
+            createVendor(){
+                let self = this;
+
+                new ConfirmModal({
+                    'data': {
+                        'body': 'Создать нового производителя?',
+                        'confirm_func': function () {
+                            Data.vendors.create().then(function (data) {
+                                if (data.result) {
+                                    self.items.unshift(data.vendor);
+
+                                    AppNotifications.add({
+                                        'type': 'success',
+                                        'body': 'Производитель создан'
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
             },
             search(value) {
                 let self = this;
@@ -129,26 +150,6 @@
 
                     self.$set(self, 'items', result);
                 });
-            },
-            onFileChange(e, id) {
-                let files = e.target.files || e.dataTransfer.files;
-                console.log(files);
-
-                if (!files.length) {
-                    return;
-                }
-                this.createImage(files[0]);
-            },
-            createImage(file) {
-                let image = new Image();
-                let reader = new FileReader();
-
-                reader.onload = (e) => {
-                    options['goods_photo']['path'] = e.target.result;
-                    Data.vendors.update(id, options);
-
-                };
-                reader.readAsDataURL(file);
             },
         }
     });
