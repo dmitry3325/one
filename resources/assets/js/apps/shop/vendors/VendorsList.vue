@@ -18,7 +18,7 @@
                 <table v-if="Object.keys(items).length > 0" class="table table-bordered">
                     <thead>
                     <tr>
-                        <th v-for="field in fields">{{field.title}}</th>
+                        <th v-for="(field, key) in fields" @click="sortBy(key)">{{field.title}}</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -49,12 +49,38 @@
                 'loading': true,
                 'items': [],
                 'fields': {},
+                'sortKey': 'id',
+                'sortRevers': false
             }
         },
         mounted: function () {
             this.loadData();
         },
         methods: {
+            sortBy(sortKey) {
+                let self = this;
+
+                self.sortRevers = self.sortKey === sortKey ? !self.sortRevers : self.sortRevers;
+                self.sortKey = sortKey;
+
+                self.items.sort(function(a, b) {
+                    if(self.sortRevers) {
+                        if (a[self.sortKey] < b[self.sortKey])
+                            return -1;
+                        if (a[self.sortKey] > b[self.sortKey])
+                            return 1;
+                        return 0;
+                    }
+
+                    if (a[self.sortKey] > b[self.sortKey])
+                        return -1;
+                    if (a[self.sortKey] < b[self.sortKey])
+                        return 1;
+                    return 0;
+                });
+
+                self.$set(self, 'items', self.items);
+            },
             loadData() {
                 let self = this;
 
