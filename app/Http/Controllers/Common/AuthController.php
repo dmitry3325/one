@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\CurrentPageState;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Input;
 
@@ -11,8 +12,7 @@ class AuthController extends Controller
 
     use AuthenticatesUsers;
 
-    protected $redirectTo = '/';
-
+    //    protected $redirectTo = '/';
 
     public static $appSetts = [
         'title' => 'Авторизация',
@@ -22,6 +22,11 @@ class AuthController extends Controller
     public function index()
     {
         return view('auth.index');
+    }
+
+    public function redirectTo()
+    {
+        return \Session::get(CurrentPageState::PAGE_NAME, '/');
     }
 
     public function login()
@@ -52,7 +57,8 @@ class AuthController extends Controller
     /**
      * Log the user out of the application.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function logout()
@@ -63,6 +69,6 @@ class AuthController extends Controller
 
         request()->session()->regenerate();
 
-        return redirect('/');
+        return redirect('/common/auth');
     }
 }
