@@ -39,6 +39,10 @@ class Vendors {
     delete(id) {
         return Ajax.post('/shop/vendors', 'delete', {id: id});
     }
+
+    create() {
+        return Ajax.post('/shop/vendors', 'create');
+    }
 }
 
 module.exports = new Vendors();
