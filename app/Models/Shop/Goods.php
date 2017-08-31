@@ -26,6 +26,7 @@ class Goods extends ShopBaseModel
                 self::GOOD_TYPE_SUB_LINE => 'Компонент',
                 self::GOOD_TYPE_COMPLEX  => 'Комплексный товар',
             ],
+            'empty_text'=>'Укажите тип товара',
             'baseField' => true
         ],
         'order_title'              => [
@@ -43,7 +44,7 @@ class Goods extends ShopBaseModel
         ],
         'stop_sale'                => [
             'title' => 'Снято с продажи',
-            'type'  => parent::FIELD_TYPE_INT,
+            'type'  => parent::FIELD_TYPE_CHECKBOX,
         ],
         'cancelled'                => [
             'title' => 'Снято с производства',
@@ -63,7 +64,8 @@ class Goods extends ShopBaseModel
         'sarticul'                 => [
             'title' => 'Оптимизированный артикул',
             'type'  => parent::FIELD_TYPE_STRING,
-            'baseField' => true
+            'baseField' => true,
+            'editable'=>false
         ],
         'cost'                     => [
             'title' => 'Закупка',
@@ -75,7 +77,7 @@ class Goods extends ShopBaseModel
             'baseField' => true
         ],
         'final_price'              => [
-            'title' => 'Цена скидка',
+            'title' => 'Цена cо скидкой',
             'type'  => parent::FIELD_TYPE_DOUBLE,
             'baseField' => true
         ],
@@ -108,7 +110,7 @@ class Goods extends ShopBaseModel
             'type'  => parent::FIELD_TYPE_CHECKBOX,
         ],
         'weight'                   => [
-            'title' => 'Игнорировать мин. кол-во',
+            'title' => 'Вес',
             'type'  => parent::FIELD_TYPE_DOUBLE,
         ],
         'final_price_round_method' => [
@@ -116,7 +118,7 @@ class Goods extends ShopBaseModel
             'type'    => parent::FIELD_TYPE_SELECT,
             'options' => [
                 self::PRICE_ROUND_METHOD_DEFAULT => "Оставить как есть",
-                self::PRICE_ROUND_METHOD_MINUS_1 => "&gt;1900 — xx90.00, &gt;1000 — xx9.00, &gt;500 — xx9.00&uArr;, &lt;500 — xxx.00",
+                self::PRICE_ROUND_METHOD_MINUS_1 => ">1900 — xx90.00; >1000 — xx9.00; >500 — xx9.00; <500 — xxx.00",
                 self::PRICE_ROUND_METHOD_INTEGER => "До целого",
             ],
         ],
@@ -151,10 +153,12 @@ class Goods extends ShopBaseModel
         'comments_avg'             => [
             'title' => 'Оценка по отзывам',
             'type'  => parent::FIELD_TYPE_INT,
+            'editable' => false
         ],
         'comments_num'             => [
             'title' => 'Кол-во отзывов',
             'type'  => parent::FIELD_TYPE_INT,
+            'editable' => false
         ],
         'first_inventory'          => [
             'title' => 'Дата первого прихода/переучета',

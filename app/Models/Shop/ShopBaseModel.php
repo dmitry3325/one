@@ -9,6 +9,7 @@
 namespace App\Models\Shop;
 
 use App\Classes\Traits\Shop\QueryFilterTrait;
+use App\Models\Photos\Photos;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 
@@ -26,6 +27,7 @@ class ShopBaseModel extends Model
     const FIELD_TYPE_DATE     = 'date';
     const FIELD_TYPE_OBJECT   = 'obejct';
 
+    const DB = 'shop';
     protected static $class_name;
     protected static $class_full_name;
     protected static $fields;
@@ -97,12 +99,45 @@ class ShopBaseModel extends Model
     ];
     protected        $guarded      = ['id', 'created_at', 'updated_at'];
 
+    public static function checkEntity($entity)
+    {
+        return in_array($entity, ['Sections', 'Filters', 'Goods', 'HtmlPages']);
+    }
+
+    public static function getTableName($onlyTable = false)
+    {
+        $name = with(new static)->getTable();
+        if ($onlyTable) {
+            $name = str_replace(self::DB . '.', '', $name);
+        }
+        return $name;
+    }
+
+    public static function getClassName($full = false)
+    {
+        if (self::$class_name && !$full) {
+            return self::$class_name;
+        }
+        if (self::$class_full_name && $full) {
+            return self::$class_full_name;
+        }
+
+        self::$class_full_name = get_called_class();
+        $arr                   = explode('\\', self::$class_full_name);
+        self::$class_name      = end($arr);
+        return ($full) ? self::$class_full_name : self::$class_name;
+    }
+
     public static function getAllFields()
     {
         $ownFields = [];
         $className = self::getClassName(true);
         if (isset($className::$fields)) {
             $ownFields = self::getClassName(true)::$fields;
+        }
+
+        if (isset($ownFields['manid']) && !count($ownFields['manid']['options'])) {
+            $ownFields['manid']['options'] = Vendors::all()->pluck('title', 'id');
         }
 
         $filters = [];
@@ -136,14 +171,12 @@ class ShopBaseModel extends Model
         return $fields;
     }
 
+    /**
+     * Url functions
+     */
     public function url()
     {
         return $this->hasOne(Urls::class, 'entity_id')->where('entity', '=', self::getClassName());
-    }
-
-    public function metadata()
-    {
-        return $this->hasMany(ShopMetadata::class, 'entity_id')->where('entity', '=', self::getClassName());
     }
 
     public function getUrlAttribute()
@@ -160,6 +193,124 @@ class ShopBaseModel extends Model
                 $this->attributes['url'] = ($url) ? $url->url : '';
             }
             return $this->attributes['url'];
+        }
+    }
+
+    /**
+     * Metadata functions
+     */
+    public function metadata()
+    {
+        return $this->hasMany(ShopMetadata::class, 'entity_id')->where('entity', '=', self::getClassName());
+    }
+
+    public static function addMeta(&$data, $fields = [])
+    {
+        foreach ($data as $entity) {
+            $entity->getMetaData($fields);
+        }
+    }
+
+    public function getMetaData($fields = [])
+    {
+        $q = $this->metadata();
+        if (count($fields)) {
+            $q->whereIn('key', $fields);
+        }
+        $meta = $q->get();
+        foreach ($meta as $m) {
+            $this->{$m->key} = $m->value;
+        }
+        return $this;
+    }
+
+    /**
+     * Data functions
+     */
+    public static function getData($options = [])
+    {
+        $res = self::getDataQuery($options, true);
+        $q   = $res['q'];
+
+        if (isset($options['order_by']['field'])) {
+            $type = 'asc';
+            if (isset($options['order_by']['type'])) {
+                $type = $options['order_by']['type'];
+            }
+            $q->orderBy($options['order_by']['field'], $type);
+        }
+
+        $data = [];
+        if (isset($options['paginate']) && $options['paginate']) {
+            if (isset($options['current_page']) && $options['current_page']) {
+                Paginator::currentPageResolver(function () use ($options) {
+                    return $options['current_page'];
+                });
+            }
+            $perPage = (isset($options['pages'])) ? $options['pages'] : 50;
+            if (isset($options['per_page']) && $options['per_page']) {
+                $perPage = $options['per_page'];
+            }
+            $data = $q->paginate($perPage);
+            if (count($res['meta'])) {
+                self::addMeta($data, $res['meta']);
+            }
+        }
+        else {
+            $data = $q->get();
+            if (count($res['meta'])) {
+                self::addMeta($data, $res['meta']);
+            }
+        }
+
+        return $data;
+    }
+
+    public static function getDataQuery($options = [], $getMetaFields = false)
+    {
+        $table  = self::getTableName();
+        $entity = self::getClassName(true);
+
+        $metaData = [];
+        $select   = [$table . '.*', 'urls.url'];
+        if (isset($options['fields'])) {
+            $metaFields = ShopMetadata::getAllFields();
+            foreach ($options['fields'] as $fld) {
+                if ($fld === 'url') {
+                    $select[] = 'urls.url';
+                }
+                else if (isset($metaFields[$fld])) {
+                    $metaData[] = $fld;
+                }
+                else {
+                    $select[] = $table . '.' . $fld;
+                }
+            }
+        }
+
+        $q = self::select($select)
+            ->leftJoin('shop.urls', function ($on) use ($entity, $table) {
+                $on->where('entity', '=', $entity);
+                $on->where('entity_id', '=', $table . '.id');
+            });
+
+        if (isset($options['section_id']) && $options['section_id']) {
+            $q->where($table . '.section_id', '=', $options['section_id']);
+        }
+
+        if (isset($options['filters']) && count($options['filters'])) {
+            $allFields = array_keys(self::getAllFields($entity));
+            self::addFilterByParams($q, $options['filters'], $allFields);
+        }
+
+        if ($getMetaFields) {
+            return [
+                'q'    => $q,
+                'meta' => $metaData,
+            ];
+        }
+        else {
+            return $q;
         }
     }
 
@@ -204,120 +355,6 @@ class ShopBaseModel extends Model
         return $result;
     }
 
-    public static function getClassName($full = false)
-    {
-        if (self::$class_name && !$full) {
-            return self::$class_name;
-        }
-        if (self::$class_full_name && $full) {
-            return self::$class_full_name;
-        }
-
-        self::$class_full_name = get_called_class();
-        $arr                   = explode('\\', self::$class_full_name);
-        self::$class_name      = end($arr);
-        return ($full) ? self::$class_full_name : self::$class_name;
-    }
-
-    public static function getTableName()
-    {
-        return with(new static)->getTable();
-    }
-
-    public static function getData($options = [])
-    {
-        $res = self::getDataQuery($options, true);
-        $q   = $res['q'];
-
-        if (isset($options['order_by']['field'])) {
-            $type = 'asc';
-            if (isset($options['order_by']['type'])) {
-                $type = $options['order_by']['type'];
-            }
-            $q->orderBy($options['order_by']['field'], $type);
-        }
-
-        $data = [];
-        if (isset($options['paginate']) && $options['paginate']) {
-            if (isset($options['current_page']) && $options['current_page']) {
-                Paginator::currentPageResolver(function () use ($options) {
-                    return $options['current_page'];
-                });
-            }
-            $perPage = 5;
-            if (isset($options['per_page']) && $options['per_page']) {
-                $perPage = $options['per_page'];
-            }
-            $data = $q->paginate($perPage);
-            if (count($res['meta'])) {
-                self::addMeta($data, $res['meta']);
-            }
-        }
-        else {
-            $data = $q->get();
-            if (count($res['meta'])) {
-                self::addMeta($data, $res['meta']);
-            }
-        }
-
-        return $data;
-    }
-
-    public static function addMeta(&$data, $fields = [])
-    {
-        foreach ($data as $entity) {
-            $entity->getMetaData($fields);
-        }
-    }
-
-    public static function getDataQuery($options = [], $getMetaFields = false)
-    {
-        $table  = self::getTableName();
-        $entity = self::getClassName(true);
-
-        $metaData = [];
-        $select   = [$table . '.*', 'urls.url'];
-        if (isset($options['fields'])) {
-            $metaFields = ShopMetadata::$fields;
-            foreach ($options['fields'] as $fld) {
-                if ($fld === 'url') {
-                    $select[] = 'urls.url';
-                }
-                else if (isset($metaFields[$fld])) {
-                    $metaData[] = $fld;
-                }
-                else {
-                    $select[] = $table . '.' . $fld;
-                }
-            }
-        }
-
-        $q = self::select($select)
-            ->leftJoin('shop.urls', function ($on) use ($entity, $table) {
-                $on->where('entity', '=', $entity);
-                $on->where('entity_id', '=', $table . '.id');
-            });
-
-        if (isset($options['section_id']) && $options['section_id']) {
-            $q->where($table . '.section_id', '=', $options['section_id']);
-        }
-
-        if (isset($options['filters']) && count($options['filters'])) {
-            $allFields = array_keys(self::getAllFields($entity));
-            self::addFilterByParams($q, $options['filters'], $allFields);
-        }
-
-        if ($getMetaFields) {
-            return [
-                'q'    => $q,
-                'meta' => $metaData,
-            ];
-        }
-        else {
-            return $q;
-        }
-    }
-
     public static function deleteEntity($id)
     {
         $entity = self::getClassName();
@@ -326,16 +363,51 @@ class ShopBaseModel extends Model
         return self::where('id', '=', $id)->delete();
     }
 
-    public function getMetaData($fields = [])
+    /**
+     * Photos functions
+     */
+    public function savePhotos()
     {
-        $q = $this->metadata();
-        if (count($fields)) {
-            $q->whereIn('key', $fields);
+        $list = $this->photos()->get();
+
+        $photos = [];
+        foreach ($list as $l) {
+            if ($l->hidden) {
+                continue;
+            }
+            $photos[] = $l->photo_id;
         }
-        $meta = $q->get();
-        foreach ($meta as $m) {
-            $this->{$m->key} = $m->value;
+
+        $this->photos = json_encode($photos);
+        $this->save();
+
+        return $photos;
+    }
+
+    public function photos()
+    {
+        return $this->hasMany(Photos::class, 'entity_id')->where('entity', '=', self::getClassName());
+    }
+
+    public function getPhotosAttribute()
+    {
+        return $this->getPhotos('jpeg');
+    }
+
+    public function getPhotos($ext = 'jpeg')
+    {
+        $ph     = ($this->attributes['photos']) ? json_decode($this->attributes['photos'], true) : [];
+        $photos = [];
+        foreach (Photos::$sizes as $size => $photo) {
+            foreach ($ph as $num) {
+                if ($this->url) {
+                    $photos[$num][$size] = Photos::PIC_PATH . '/' . $size . '/' . $this->url . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
+                }
+                else {
+                    $photos[$num][$size] = Photos::PIC_PATH . '/' . $size . '/' . self::getTableName(true) . '/' . $this->id . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
+                }
+            }
         }
-        return $this;
+        return $photos;
     }
 }

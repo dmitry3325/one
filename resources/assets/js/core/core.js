@@ -7,11 +7,17 @@ import Url from '../classes/url.js';
 import Cookies from '../classes/cookies.js';
 import Ls from '../classes/ls.js';
 import Data from '../classes/data.js';
+import Funs from '../classes/funs.js';
 
 Vue.use(Url);
 Vue.use(Ajax);
 Vue.use(Cookies);
 Vue.use(Ls);
+Vue.use({
+    install(Vue){
+        Vue.Funs = window.Funs = Funs;
+    }
+});
 Vue.use(Data);
 Vue.use({
     install(Vue){
@@ -35,16 +41,9 @@ Vue.use({
             }
         };
 
-        Vue.prototype.cloneObject = function (obj) {
-            let clone = {};
-            for(let i in obj) {
-                if(typeof(obj[i])==="object" && obj[i] !== null)
-                    clone[i] = this.cloneObject(obj[i]);
-                else
-                    clone[i] = obj[i];
-            }
-            return clone;
-        };
+        Vue.prototype.log = function(data){
+            console.log(data);
+        }
     }
 });
 

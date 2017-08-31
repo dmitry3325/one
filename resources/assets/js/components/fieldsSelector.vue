@@ -4,6 +4,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4>Выберите поля</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-2">
@@ -24,7 +27,7 @@
                         <div class="dropdown-menu">
                             <a v-for="(field, index) in all_fields"
                                @click="fields.push(index)"
-                               v-show="((!search || field.title.indexOf(search)!==-1)?true:false)"
+                               v-show="((!search || field.title.toLowerCase().indexOf(search.toLowerCase())!==-1)?true:false)"
                                class="dropdown-item" href="#">{{field.title}}</a>
                         </div>
                     </div>

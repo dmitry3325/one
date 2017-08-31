@@ -55,9 +55,4 @@ class Vendors extends Model
         return self::$commonFields;
     }
 
-    public function goodsPhoto()
-    {
-        return $this->morphMany(GoodsPhoto::class, 'entity', 'entity');
-    }
-
 }

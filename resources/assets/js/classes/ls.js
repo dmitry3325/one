@@ -24,7 +24,8 @@ class LS {
     }
 
     get(key) {
-        return this.LS[key];
+        if(key) return this.LS[key];
+        else return this.LS;
     }
 
     unset(key) {

@@ -68,6 +68,10 @@ class RouteServiceProvider extends ServiceProvider
         ) {
             $class = $appName . 'Controller';
         }
+        else if (preg_match('#p\/(.+)\.(gif|jpg|jpeg|png)\z#',$url)) {
+            $namespace = $this->namespace . '\\';
+            $class = 'Common\ImagesController';
+        }
         else {
             $namespace = $this->namespace . '\\';
             $method    = 'page_404';

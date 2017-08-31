@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Shop\GoodsPhoto;
+use App\Models\Shop\Photos;
 use Illuminate\Database\Seeder;
 use Faker\Factory;
 use App\Models\Shop\Vendors;
@@ -35,8 +35,8 @@ class BaseShopSeeder extends Seeder
             echo ' - ' . $i . ': ' . $user->name . "\n";
         }
 
-        GoodsPhoto::truncate();
-        GoodsPhoto::create([
+        Photos::truncate();
+        Photos::create([
             'entity' => 'App\Models\Shop\Vendors',
             'entity_id' => '1',
             'photo_id' => 12,
@@ -44,7 +44,7 @@ class BaseShopSeeder extends Seeder
             'hash' => 4343,
         ]);
 
-        GoodsPhoto::create([
+        Photos::create([
             'entity' => 'App\Models\Shop\Vendors',
             'entity_id' => '2',
             'photo_id' => 10,

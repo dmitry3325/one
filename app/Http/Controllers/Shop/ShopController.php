@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Models\Photos\Photos;
 use App\Models\Shop\Filters;
 use App\Models\Shop\Goods;
 use App\Models\Shop\HtmlPages;
 use App\Models\Shop\Sections;
 use App\Classes\Traits\Shop\QueryFilterTrait;
+use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
+use App\Services\Common\Images;
 
 class ShopController extends Controller
 {
@@ -20,18 +23,13 @@ class ShopController extends Controller
         'css'   => ['apps/shop/goods.css'],
     ];
 
-    private function checkEntity($entity)
-    {
-        return in_array($entity, ['Sections', 'Filters', 'Goods', 'HtmlPages']);
-    }
-
     public function createEntity($entity, $data = [], $getEntity = false)
     {
         $result = [
             'result' => false,
         ];
 
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return $result;
         }
 
@@ -69,7 +67,7 @@ class ShopController extends Controller
 
     public function updateEntity($entity, $id, $data)
     {
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return ['result' => false];
         }
 
@@ -81,12 +79,18 @@ class ShopController extends Controller
 
     public function getEntity($entity, $id)
     {
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return [];
         }
         $table = $entity::getTableName();
-        $e     = $entity::getDataQuery()->where($table . '.id', '=', $id)->first()->getMetaData();
-        return $e;
+        $e     = $entity::getDataQuery()->where($table . '.id', '=', $id)->first();
+        if ($e) {
+            $e->getMetaData();
+            return $e;
+        }
+        else {
+            return [];
+        }
     }
 
     public function generateUrl($entity, $id)
@@ -95,7 +99,7 @@ class ShopController extends Controller
             'result' => false,
         ];
 
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return $result;
         }
 
@@ -119,7 +123,7 @@ class ShopController extends Controller
 
     public function getAllFields($entity)
     {
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return [];
         }
         return $entity::getAllFields();
@@ -130,26 +134,49 @@ class ShopController extends Controller
         $result = [
             'result' => false,
         ];
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return $result;
         }
 
         $list = $entity::getData($options);
 
-        if(isset($options['paginate']) && $options['paginate']){
+        if (isset($options['paginate']) && $options['paginate']) {
             return $list;
-        }else {
+        }
+        else {
             return [
-                'data'   => $list,
+                'data' => $list,
             ];
         }
     }
 
     public function getBaseFields($entity)
     {
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return [];
         }
         return $entity::getBaseFields();
+    }
+
+    /**
+     * Images function
+     */
+    public function uploadImgs()
+    {
+        $id     = \Request::get('id');
+        $entity = \Request::get('entity');
+        $images = \Request::file('images');
+
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return [];
+        }
+
+        foreach ($images as $k => $img) {
+            Photos::addImg($entity, $id, new Images($img->path()));
+        }
+
+        return [
+            'result' => true,
+        ];
     }
 }

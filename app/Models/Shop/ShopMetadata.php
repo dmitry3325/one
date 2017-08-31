@@ -11,7 +11,7 @@ class ShopMetadata extends Model
 
     protected $guarded = ['id'];
 
-    public static $fields = [
+    protected static $fields = [
         'html_title'       => [
             'title' => 'HTML title',
             'type'  => ShopBaseModel::FIELD_TYPE_STRING,
@@ -24,10 +24,33 @@ class ShopMetadata extends Model
             'title' => 'DESCRIPTION',
             'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
         ],
+        'big_description' => [
+            'title' => 'Полное описание',
+            'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
+        ],
+        'links_title' => [
+            'title' => 'Заголовок к связанным товарам',
+            'type'  => ShopBaseModel::FIELD_TYPE_STRING,
+        ],
+        'links_list' => [
+            'title' => 'Список связаных товаров',
+            'type'  => ShopBaseModel::FIELD_TYPE_STRING,
+            'description'=>''
+        ],
+        'components' => [
+            'title' => 'Компоненты товара',
+            'type'  => ShopBaseModel::FIELD_TYPE_STRING,
+        ],
     ];
 
     public static function getAllFields()
     {
+        for($i = 1; $i<=Filters::COUNT; $i++){
+            self::$fields['filter_'.$i.'_use_in_autocreate'] = [
+                'title' => 'Создавать автоматически',
+                'type'  => ShopBaseModel::FIELD_TYPE_CHECKBOX,
+            ];
+        }
         return self::$fields;
     }
 

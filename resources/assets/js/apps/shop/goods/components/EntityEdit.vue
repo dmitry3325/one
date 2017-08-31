@@ -24,43 +24,60 @@
             <div v-for="(tab,index) in getPackage()">
                 <div v-show="index == curTab" :ref="index">
                     <div v-if="tab.content" class="mt-2">
-                        <div v-for="row in tab.content">
-                            <div class="row">
-                                <div v-for="field in row" :class="((field.size)?'col-md-'+field.size:'')">
-                                    <div v-if="Fields[field.field]">
-                                        <div class="label">{{Fields[field.field].title}}</div>
-                                        <div v-if="Fields[field.field].type==='int'">
-                                            <input type="number" class="form-control" v-model="Model[field.field]"
-                                                   :disabled="isNoEditable(field.field)"/>
-                                        </div>
-                                        <div v-if="Fields[field.field].type==='input'" class="input-group">
-                                            <input type="text" class="form-control" v-model="Model[field.field]"
-                                                   :disabled="isNoEditable(field.field)"/>
-                                            <span v-if="field.add && field.add.el == 'button'" class="input-group-btn">
+                        <div v-for="row in tab.content" class="mb-2 row">
+                            <div v-for="field in row" :class="((field.size)?'col-md-'+field.size:'')">
+                                <div v-if="Fields[field.field]">
+                                    <div class="label">{{Fields[field.field].title}}</div>
+                                    <div v-if="Fields[field.field].type==='int' || Fields[field.field].type==='double'">
+                                        <input type="number" class="form-control" v-model="Model[field.field]"
+                                               :disabled="isNoEditable(field.field)"/>
+                                    </div>
+                                    <div v-if="Fields[field.field].type==='input'" class="input-group">
+                                        <input type="text" class="form-control" v-model="Model[field.field]"
+                                               :disabled="isNoEditable(field.field)"/>
+                                        <span v-if="field.add && field.add.el == 'button'" class="input-group-btn">
                                                 <button class="btn btn-secondary" type="button"
                                                         @click="((field.add.function)?call(field.add.function):false)">
                                                     {{field.add.title}}
                                                 </button>
                                             </span>
-                                        </div>
-                                        <div v-if="Fields[field.field].type==='textarea'">
+                                    </div>
+                                    <div v-if="Fields[field.field].type==='textarea'">
                                             <textarea class="form-control" rows="5" v-model="Model[field.field]"
                                                       :disabled="isNoEditable(field.field)"></textarea>
-                                        </div>
-                                        <div v-if="Fields[field.field].type==='checkbox'">
-                                            <button type="button" class="btn"
-                                                    :class="(Model[field.field])?'btn-success':'btn-secondary'"
-                                                    @click="Model[field.field] = !Model[field.field]    "
-                                                    :disabled="isNoEditable(field.field)">
+                                    </div>
+                                    <div v-if="Fields[field.field].type==='checkbox'">
+                                        <button type="button" class="btn"
+                                                :class="(Model[field.field])?'btn-success':'btn-secondary'"
+                                                @click="$set(Model,field.field, !Model[field.field])"
+                                                :disabled="isNoEditable(field.field)">
                                                 <span class="glyphicon"
-                                                      :class="(Model[field.field] )?'glyphicon-check':'glyphicon-unchecked'"></span>
+                                                      :class="(Model[field.field])?'glyphicon-check':'glyphicon-unchecked'"></span>
+                                        </button>
+                                    </div>
+                                    <div v-if="Fields[field.field].type==='select'">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                    data-toggle="dropdown">
+                                                {{(Model[field.field] && Fields[field.field]['options'][Model[field.field]]) ?
+                                                Fields[field.field]['options'][Model[field.field]] :
+                                                ((Fields[field.field].empty_text) ? Fields[field.field].empty_text : 'Выберите')}}
                                             </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a v-for="(option,index) in Fields[field.field]['options']"
+                                                   @click="$set(Model,field.field, index)"
+                                                   class="dropdown-item" href="#">
+                                                    {{option}}
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div v-if="field.content" v-html="field.content"></div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -69,31 +86,34 @@
 <script>
     let ConfirmModal = require('../../../../components/confirmModal.vue');
     module.exports = Vue.extend({
+        props:{
+            'id': Number,
+            'entity': String,
+        },
         data: function () {
             return {
-                'id': null,
-                'entity': null,
-                'curTab': 'tab_1',
+                'curTab': 'common',
                 'Fields': {},
                 'Model': {},
                 'BaseModel': {},
                 'packages': {
-                    'Sections': require('../packages/section.js')
+                    'Sections': require('../packages/section.js'),
+                    'Filters': require('../packages/filter.js'),
+                    'Goods': require('../packages/good.js')
                 }
             };
         },
-        beforeCreate() {
+        mounted() {
             let self = this;
-            let Info = this.$options.data();
-            if (Info.entity) {
-                Data.entity.getAllFields(Info.entity).then(function (res) {
+            if (this.entity) {
+                Data.entity.getAllFields(this.entity).then(function (res) {
                     self.$set(self, 'Fields', res);
                 });
 
-                if (Info.id) {
-                    Data.entity.get(Info.entity, Info.id, true).then(function (res) {
-                        self.$set(self, 'Model', self.cloneObject(res));
-                        self.$set(self, 'BaseModel', self.cloneObject(res));
+                if (this.id) {
+                    Data.entity.get(this.entity, this.id, true).then(function (res) {
+                        self.$set(self, 'Model', Funs.cloneObject(res));
+                        self.$set(self, 'BaseModel', Funs.cloneObject(res));
                     });
                 }
             }
@@ -119,10 +139,10 @@
                         if (res.result && res.url) {
                             self.$set(self.Model, 'url', res.url);
                         }
-                        if(res.errors){
-                            for(let err in res.errors){
+                        if (res.errors) {
+                            for (let err in res.errors) {
                                 AppNotifications.add({
-                                    'type':'danger',
+                                    'type': 'danger',
                                     'body': res.errors[err],
                                 });
                             }
@@ -131,22 +151,22 @@
             },
             saveEntity() {
                 let newData = {};
-                for(let i in this.Model){
-                    if(typeof this.BaseModel[i] === 'undefined' || this.BaseModel[i]!==this.Model[i]){
+                for (let i in this.Model) {
+                    if (typeof this.BaseModel[i] === 'undefined' || this.BaseModel[i] !== this.Model[i]) {
                         newData[i] = this.Model[i];
                     }
                 }
-                Data.entity.update(this.entity, this.id, newData).then(function(res){
-                    if(res.result){
+                Data.entity.update(this.entity, this.id, newData).then(function (res) {
+                    if (res.result) {
                         AppNotifications.add({
-                            'type':'success',
+                            'type': 'success',
                             'body': 'Сохранено успешно!'
                         });
                     }
-                    if(res.errors){
-                        for(let err in res.errors){
+                    if (res.errors) {
+                        for (let err in res.errors) {
                             AppNotifications.add({
-                                'type':'danger',
+                                'type': 'danger',
                                 'body': res.errors[err],
                             });
                         }
@@ -174,13 +194,18 @@
     });
 </script>
 <style>
-    h1 {
+    .Editor h1 {
         font-size: 24px;
         color: #333;
         margin-bottom: 15px;
     }
 
-    button {
+    .Editor button {
         cursor: pointer;
+    }
+
+    .Editor .row{
+        margin-right: -10px;
+        margin-left: -10px;
     }
 </style>

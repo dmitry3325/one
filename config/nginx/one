@@ -12,7 +12,11 @@ server {
     access_log  /home/dmitry/my/one/storage/logs/access.log;
     error_log   /home/dmitry/my/one/storage/logs/error.log;
 
-     location / {
+    location ~ /p/(.+).(gif|jpg|jpeg|png) {
+        try_files $uri /;
+    }
+
+    location / {
                     # First attempt to serve request as file, then
                     # as directory, then fall back to displaying a 404.
                     try_files $uri $uri/ /index.php?$query_string;

@@ -9,7 +9,7 @@
                 <input class="form-control" @keyup="search($event.target.value)" placeholder="Поиск"/>
             </div>
         </div>
-        <div class="list ">
+        <div class="list mt-4">
             <div v-if="loading" class="text-center">
                 <h5>Подождите, данные загружаются...</h5>
             </div>
@@ -28,9 +28,9 @@
                                                                   v-bind:value="item[key]" :disabled="field.disabled">
                         </td>
                         <td>
-                            <img v-if="item['goods_photo'].length > 0" v-for="img in item['goods_photo']"
+                            <img v-if="item['photos'].length > 0" v-for="img in item['photos']"
                                  :src="img.path" width="100px"/>
-                            <input v-if="item['goods_photo'].length === 0" type="file"
+                            <input v-if="item['photos'].length === 0" type="file"
                                    @change="onFileChange($event, item['id'])">
                         </td>
                         <td>

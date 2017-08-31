@@ -1,6 +1,7 @@
 import SectionList from './components/SectionList.vue';
 import SectionView from './components/SectionView.vue';
 import EntityEdit from './components/EntityEdit.vue';
+import Photos from '../../../components/photos.vue';
 
 new Vue({
     el: '#content',
@@ -21,7 +22,7 @@ new Vue({
         setMainParams() {
             this.curSection = Url.get('section');
             this.curEntity = Url.get('entity');
-            this.curEntityId = Url.get('entity_id');
+            this.curEntityId = Url.get('id');
         },
         buildApp() {
             let self = this;
@@ -38,10 +39,12 @@ new Vue({
 
                 }
             });
-            if (!this.curSection) {
-                this.showEmpty();
-            } else {
+            if (this.curEntity && this.curEntityId) {
+                this.showEntityEdit(this.curEntity, this.curEntityId);
+            } else if (this.curSection) {
                 this.showSection(this.curSection);
+            } else {
+                this.showEmpty();
             }
         },
         toggleMenu(show) {
@@ -55,6 +58,33 @@ new Vue({
         },
         showEmpty() {
 
+        },
+        showEntityEdit(entity, id) {
+            if (!this.$content) {
+                this.$content = document.querySelector('.main-content');
+            }
+
+            this.$content.innerHTML = '';
+            let $el = this.setTarget(this.$content);
+
+            new Photos({
+                el: $el,
+                propsData: {
+                    id: parseInt(id),
+                    entity: entity,
+                },
+            });
+            this.toggleMenu(false);
+            return;
+            new EntityEdit({
+                el: $el,
+                propsData: {
+                    id: parseInt(id),
+                    entity: entity,
+                },
+            });
+
+            this.toggleMenu(false);
         },
         showSection(id) {
             this.curSection = id;

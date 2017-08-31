@@ -2,7 +2,7 @@
 
 namespace App\Services\Common;
 
-class Photos {
+class Images {
 
     const
         ERR_FILE_NOT_FOUND = 1,
@@ -191,6 +191,7 @@ class Photos {
         return $this->fromFile('data://;base64,' . base64_encode($string));
     }
 
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Savers
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,6 +347,10 @@ class Photos {
         return $this->generate($mimeType, $quality)['data'];
     }
 
+    public function getCrc32(){
+        return crc32($this->toString());
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Utilities
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,6 +404,10 @@ class Photos {
     //
     public function getMimeType() {
         return $this->mimeType;
+    }
+
+    public function getExtension(){
+        return str_replace('image/','',$this->mimeType);
     }
 
     //

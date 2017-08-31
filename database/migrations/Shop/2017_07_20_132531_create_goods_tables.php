@@ -192,25 +192,6 @@ class CreateGoodsTables extends Migration
                 $table->unique(['entity', 'entity_id','key']);
             });
         }
-
-        if (!Schema::hasTable('goods_photos')) {
-            Schema::create('shop.goods_photos', function (Blueprint $table) {
-                $table->increments('id');
-                $table->string('entity')->default(null);
-                $table->integer('entity_id');
-                $table->integer('photo_id');
-                $table->smallInteger('width')->nullable();
-                $table->smallInteger('height')->nullable();
-                $table->string('filetype')->default('');
-                $table->integer('watermark_id')->nullable();
-                $table->string('path');
-                $table->unsignedInteger('hash');
-                $table->timestamps();
-
-                //keys
-                $table->unique(['entity', 'entity_id']);
-            });
-        }
     }
 
     /**

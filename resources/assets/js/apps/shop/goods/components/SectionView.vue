@@ -94,6 +94,12 @@
                 this.showSearch(Url.get('search'));
             }
 
+            if(Url.get('filter')){
+                this.$set(this,'filters', Url.get('filter'));
+            }else if(Ls.get('selected_filters')){
+                this.$set(this,'filters', Ls.get('selected_filters'));
+            }
+
             if (!activeTab || !this.tabs[activeTab]) {
                 activeTab = 'goods';
             }
@@ -142,7 +148,7 @@
                         data: {
                             entity: this._getCurEntity(),
                             section: this.id,
-                            filters: this.cloneObject(this.filters),
+                            filters: Funs.cloneObject(this.filters),
                             fields: (fields)?fields:[]
                         },
                     });
@@ -152,7 +158,7 @@
                     $el.classList.add('mt-3');
                     this.tabs[this.activeTab].view = new EntityEdit({
                         el: $cont,
-                        data: {
+                        propsData: {
                             id: this.id,
                             entity: this._getCurEntity(),
                         },
@@ -192,7 +198,6 @@
                             def.then(function () {
                                 callback();
                             });
-
                         }
                     }
                 }
@@ -210,7 +215,10 @@
                         'callback': function (filters) {
                             self.filters = filters;
                             Url.set('filters', filters);
-                            self.callLoadData();
+                            Ls.set('selected_filters', filters);
+                            self.callLoadData(null, {
+                                'filters': filters
+                            });
                         }
                     }
                 });
@@ -219,7 +227,6 @@
                 let self = this;
 
                 let fields = Ls.get(this._getCurEntity() + 'fields');
-                console.log(fields)
                 new FieldsSelector({
                     el: this.setTarget('#goodsAdmin'),
                     data: {

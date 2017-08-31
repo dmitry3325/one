@@ -9,13 +9,13 @@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th></th>
+                            <th class="edit-button-cont"></th>
                             <th v-for="field in fields">{{(fields_info[field]) ? fields_info[field].title : field}}</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="row-item" v-for="item in items">
-                            <td>
+                            <td class="edit-button-cont">
                                 <button @click="showEntity(item['id'])" type="button"
                                         class="btn btn-sm btn-default wh-100 cursor-pointer">
                                     <span class="glyphicon glyphicon-edit"></span>
@@ -125,5 +125,9 @@
 
     .item-list thead th {
         white-space: nowrap;
+    }
+
+    .edit-button-cont{
+        width: 50px;
     }
 </style>
