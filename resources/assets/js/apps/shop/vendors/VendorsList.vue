@@ -18,14 +18,14 @@
                 <table v-if="Object.keys(items).length > 0" class="table table-bordered">
                     <thead>
                     <tr>
-                        <th v-for="(field, key) in fields" @click="sortBy(key)">{{field.title}}</th>
+                        <th v-for="(field, key) in fields" @click="sortChangeRevers(); orderByField = key; items = this.Funs.sortSubObj(items, orderByField, sortRevers);">{{field.title}}</th>
                         <th></th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="row-item" v-for="item in items">
-                        <td v-for="(field, key) in fields"><input @change="updateField($event, item['id'], key)"
-                                                                  v-bind:value="item[key]" :disabled="field.disabled">
+                        <td v-for="(field, key) in fields">
+                            <input v-model="item[key]" @change="updateField($event, item['id'], key)" :disabled="field.disabled"  />
                         </td>
                         <td>
                             <button class="btn btn-danger" @click="deleteVendor(item['id'])">Удалить</button>
@@ -48,38 +48,14 @@
                 'loading': true,
                 'items': [],
                 'fields': {},
-                'sortKey': 'id',
-                'sortRevers': false
+                'orderByField': 'id',
+                'sortRevers': 'DESC'
             }
         },
         mounted: function () {
             this.loadData();
         },
         methods: {
-            sortBy(sortKey) {
-                let self = this;
-
-                self.sortRevers = self.sortKey === sortKey ? !self.sortRevers : self.sortRevers;
-                self.sortKey = sortKey;
-
-                self.items.sort(function(a, b) {
-                    if(self.sortRevers) {
-                        if (a[self.sortKey] < b[self.sortKey])
-                            return -1;
-                        if (a[self.sortKey] > b[self.sortKey])
-                            return 1;
-                        return 0;
-                    }
-
-                    if (a[self.sortKey] > b[self.sortKey])
-                        return -1;
-                    if (a[self.sortKey] < b[self.sortKey])
-                        return 1;
-                    return 0;
-                });
-
-                self.$set(self, 'items', self.items);
-            },
             loadData() {
                 let self = this;
 
@@ -105,10 +81,16 @@
 
             },
             updateField(event, id, field) {
+                let self = this;
+
                 let options = {};
                 options[field] = event.target.value;
 
                 Data.vendors.update(id, options);
+
+                let sort = Funs.sortSubObj(self.items, self.orderByField, self.sortRevers);
+
+                self.$set(self, 'items', sort);
             },
             deleteVendor(id) {
                 let self = this;
@@ -176,6 +158,13 @@
                     self.$set(self, 'items', result);
                 });
             },
+            sortChangeRevers(){
+                let self = this;
+
+                let result = (self.sortRevers == 'DESC') ? 'ASC' : 'DESC';
+
+                self.$set(self, 'sortRevers', result);
+            }
         }
     });
 </script>
