@@ -1,7 +1,7 @@
 @extends('one')
 @section('content')
     <h1 class="text-center login-title">One</h1>
-    <form class="form-signin" action="/common/auth/?method=login" method="get">
+    <form class="form-signin" action="/common/auth/?method=login" method="post">
 
         {!! csrf_field() !!}
 
