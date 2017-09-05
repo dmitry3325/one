@@ -71,9 +71,6 @@ class CurrentPageState
             $this->storeRoute($request);
         }
 
-//        $g = $this->session->get(CurrentPageState::PAGE_NAME, '/');
-//        var_dump($g);exit();
-
         return $response;
     }
 
@@ -86,6 +83,7 @@ class CurrentPageState
             return;
         }
 
-        $this->session->put(static::PAGE_NAME, $request->getPathInfo());
+
+        $this->session->put(static::PAGE_NAME, $request->getPathInfo() . '?'. $request->getQueryString());
     }
 }
