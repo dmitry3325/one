@@ -15,8 +15,8 @@
                 <h5>Подождите, данные загружаются...</h5>
             </div>
             <div v-else>
-                <table v-if="Object.keys(items).length > 0" class="table table-bordered">
-                    <thead>
+                <table v-if="Object.keys(items).length > 0" class="table table-bordered table-striped">
+                    <thead class="thead-inverse">
                     <tr>
                         <th v-for="(field, key) in fields" @click="sortChangeRevers(); orderByField = key; items = this.Funs.sortSubObj(items, orderByField, sortRevers);">{{field.title}}</th>
                         <th></th>
