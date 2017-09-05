@@ -83,7 +83,6 @@ class CurrentPageState
             return;
         }
 
-
         $this->session->put(static::PAGE_NAME, $request->getPathInfo() . '?'. $request->getQueryString());
     }
 }
