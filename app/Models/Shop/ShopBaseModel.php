@@ -239,7 +239,7 @@ class ShopBaseModel extends Model
             }
             $q->orderBy($options['order_by']['field'], $type);
         }
-
+        \DB::enableQueryLog();
         $data = [];
         if (isset($options['paginate']) && $options['paginate']) {
             if (isset($options['current_page']) && $options['current_page']) {
@@ -262,18 +262,19 @@ class ShopBaseModel extends Model
                 self::addMeta($data, $res['meta']);
             }
         }
-
+        //dd(\DB::getQueryLog());
         return $data;
     }
 
     public static function getDataQuery($options = [], $getMetaFields = false)
     {
         $table  = self::getTableName();
-        $entity = self::getClassName(true);
+        $entity = self::getClassName();
 
         $metaData = [];
         $select   = [$table . '.*', 'urls.url'];
         if (isset($options['fields'])) {
+            $select = [];
             $metaFields = ShopMetadata::getAllFields();
             foreach ($options['fields'] as $fld) {
                 if ($fld === 'url') {
@@ -291,7 +292,7 @@ class ShopBaseModel extends Model
         $q = self::select($select)
             ->leftJoin('shop.urls', function ($on) use ($entity, $table) {
                 $on->where('entity', '=', $entity);
-                $on->where('entity_id', '=', $table . '.id');
+                $on->where('entity_id', '=', \DB::raw($table . '.id'));
             });
 
         if (isset($options['section_id']) && $options['section_id']) {
@@ -300,7 +301,7 @@ class ShopBaseModel extends Model
 
         if (isset($options['filters']) && count($options['filters'])) {
             $allFields = array_keys(self::getAllFields($entity));
-            self::addFilterByParams($q, $options['filters'], $allFields);
+            self::addFilterByParams($q, $options['filters']);
         }
 
         if ($getMetaFields) {

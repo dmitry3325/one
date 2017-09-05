@@ -8,28 +8,36 @@
 
 namespace App\Classes\Traits\Shop;
 
+
+use App\Models\Shop\Urls;
+
 trait QueryFilterTrait
 {
 
     public static function getFilterMethods()
     {
-        return ['=', '>', '<', '>=', '<=', 'LIKE', 'IN'];
+        return ['=','!=', '>', '<', '>=', '<=', 'LIKE', 'IN'];
     }
 
     public static function addFilterByParams($Q, $filters, $allowedFields = [])
     {
         $methods = self::getFilterMethods();
-        $table   = self::getTableName();
-        $Q->where(function ($q) use ($filters, $methods, $allowedFields, $table) {
+        $mainTable   = self::getTableName();
+        $urlTable = with(new Urls)->getTable();
+        $Q->where(function ($q) use ($filters, $methods, $allowedFields, $mainTable, $urlTable) {
             foreach ($filters as $or) {
-                $q->orWhere(function ($qq) use ($or, $methods, $allowedFields, $table) {
+                $q->orWhere(function ($qq) use ($or, $methods, $allowedFields, $mainTable, $urlTable) {
                     foreach ($or as $and) {
-                        if (isset($and['field']) && in_array($and['field'], $allowedFields) &&
+                        if (isset($and['field']) && (!count($allowedFields) || in_array($and['field'], $allowedFields)) &&
                             isset($and['method']) && isset($methods[$and['method']])) {
+
+                            $table = $mainTable;
+                            if($and['field'] == 'url'){
+                                $table = $urlTable;
+                            }
 
                             $value  = (isset($and['value'])) ? $and['value'] : '';
                             $method = $methods[$and['method']];
-
                             if ($method == 'LIKE') {
                                 $qq->where($table . '.' . $and['field'], $method, '%' . $value . '%');
                             }
