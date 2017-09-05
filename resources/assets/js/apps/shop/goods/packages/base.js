@@ -62,7 +62,7 @@ module.exports = {
     },
     'photos': {
         'title': 'Фото',
-        'function': 'showPhotoEditor'
+        'component': 'photos'
     },
     'seo': {
         'title': 'SEO',

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CurrentPageState
 {
-    public const PAGE_NAME = 'pageFrom';
+    const PAGE_NAME = 'pageFrom';
 
     /**
      * @var Route

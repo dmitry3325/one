@@ -15,13 +15,14 @@ class Photos extends Model
 
     public static $sizes = [
         'thumb'  => [
-            'width'         => 60,
+            'width'         => 80,
             'height'        => 60,
             'no_water_mark' => true,
         ],
         'small'  => [
-            'width'  => 180,
-            'height' => 180,
+            'width'  => 160,
+            'height' => 120,
+            'no_water_mark' => true,
         ],
         'medium' => [
             'width'  => 400,
@@ -32,6 +33,11 @@ class Photos extends Model
             'height' => 800,
         ],
     ];
+
+    public function getExtension()
+    {
+        return str_replace('image/', '', $this->filetype);
+    }
 
     public static function addImg($entity, $id, Images $img, $props = [])
     {
@@ -53,14 +59,14 @@ class Photos extends Model
             'width'     => $img->getWidth(),
             'height'    => $img->getHeight(),
             'filetype'  => $img->getMimeType(),
-            'path'      => self::getBaseStoragePath().$path,
+            'path'      => $path,
             'hash'      => $img->getCrc32(),
         ]);
 
         return $e->savePhotos();
     }
 
-    public function deleteImg($entity, $id, $num = 'all')
+    public static function deleteImg($entity, $id, $num = 'all')
     {
         $e = $entity::findOrFail($id);
         if ($num == 'all') {
@@ -70,19 +76,73 @@ class Photos extends Model
         else if (is_numeric($num)) {
             $ph = $e->photos()->where('photo_id', '=', $num)->first();
             if ($ph) {
-                unlink($ph->path);
+                unlink(self::getBaseStoragePath().$ph->path);
                 $ph->delete();
             }
         }
 
-        self::resort($entity, $id);
+        self::reOrderImgs($entity, $id);
 
         return $e->savePhotos();
     }
 
-    public function resort($entity, $id)
+    public static function reOrderImgs($entity, $id, $new_order = [])
     {
+        $e = $entity::findOrFail($id);
 
+        $afterNum = 1000;
+        $toRename = [];
+        $photos   = self::where('entity', '=', $entity)->where('entity_id', '=', $id)->orderBy('photo_id','asc')->get()->keyBy('photo_id');
+        if(!count($new_order)){
+            foreach($photos as $p){
+                $new_order[] = $p->photo_id;
+            }
+        }
+        foreach ($new_order as $k => $oldNum) {
+            $newNum = $k + 1;
+            if (isset($photos[$oldNum]) && $oldNum != $newNum) {
+                $photo           = $photos[$oldNum];
+                $photo->photo_id = $afterNum + $newNum;
+
+                $toRename[] = $photo->photo_id;
+                $oldPath    = self::getBaseStoragePath() . $photo->path;
+                $newPath    = self::getBaseStoragePath() . self::getOriginalPath($entity, $id, $photo->photo_id,
+                        $photo->getExtension());
+                rename($oldPath, $newPath);
+                $photo->path = self::getOriginalPath($entity, $id, $newNum, $photo->getExtension());
+                $photo->save();
+            }
+        }
+
+        foreach ($toRename as $num) {
+            $newNum = $num - $afterNum;
+            $old    = self::getBaseStoragePath() . self::getOriginalPath($entity, $id, $num, $photo->getExtension());
+            $new    = self::getBaseStoragePath() . self::getOriginalPath($entity, $id, $newNum, $photo->getExtension());
+            rename($old, $new);
+            Photos::where('entity', '=', $entity)->where('entity_id', '=', $id)->where('photo_id', '=', $num)
+                ->update([
+                    'photo_id' => $newNum,
+                ]);
+        }
+
+        $e->savePhotos();
+        TempPhotos::deleteFiles($entity, $id);
+        return $photos;
+    }
+
+    public static function rotateImg($entity, $id, $num, $side){
+        $e = $entity::findOrFail($id);
+
+        $ph = $e->photos()->where('photo_id', '=', $num)->first();
+
+        $path = self::getBaseStoragePath().$ph->path;
+        $im = new Images($path);
+        $im->rotate($side);
+        $im->toFile($path);
+        $ph->width = $im->getWidth();
+        $ph->height = $im->getHeight();
+        TempPhotos::deleteFiles($entity, $id, $num);
+        return ['result'=>$ph->save()];
     }
 
     public static function saveFile($img, $img_path, $basePath = null)
@@ -100,6 +160,7 @@ class Photos extends Model
             }
             $basePath = $path;
         }
+
 
         return $img->toFile($basePath . $fileName);
     }

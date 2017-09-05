@@ -14,10 +14,10 @@ class CreateGoodsPhotos extends Migration
     public function up()
     {
         DB::statement('CREATE DATABASE IF NOT EXISTS photos;');
+        DB::statement('CREATE DATABASE IF NOT EXISTS temp_photos;');
 
         Schema::getConnection()->setDatabaseName('photos');
-
-        if (!Schema::hasTable('photos.photos')) {
+        if (!Schema::hasTable('photos')) {
             Schema::create('photos.photos', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('entity')->default(null);
@@ -33,7 +33,23 @@ class CreateGoodsPhotos extends Migration
                 $table->timestamps();
 
                 //keys
+                $table->index(['entity', 'entity_id']);
                 $table->unique(['entity', 'entity_id','photo_id']);
+            });
+        }
+
+        if (!Schema::hasTable('temp_photos')) {
+            Schema::create('photos.temp_photos', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('entity')->default(null);
+                $table->integer('entity_id');
+                $table->integer('photo_id');
+                $table->string('filetype')->default('');
+                $table->string('path');
+                $table->timestamps();
+
+                //keys
+                $table->index(['entity', 'entity_id']);
             });
         }
     }

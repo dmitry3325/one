@@ -1,7 +1,9 @@
 body {
   min-width: 1280px;
 }
-
+button{
+  cursor:pointer;
+}
 .text-ellipsis {
   white-space: nowrap;
   text-overflow: ellipsis;

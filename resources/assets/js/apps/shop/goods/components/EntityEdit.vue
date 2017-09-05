@@ -12,7 +12,6 @@
                 <button class="btn btn-success" @click="saveEntity"><span
                         class="glyphicon glyphicon-floppy-save"></span> Сохранить
                 </button>
-
             </div>
             <div class="ml-3">
                 <button class="btn btn-danger" @click="deleteEntity"><span class="glyphicon glyphicon-remove"></span>
@@ -22,8 +21,8 @@
         </ul>
         <div class="content">
             <div v-for="(tab,index) in getPackage()">
-                <div v-show="index == curTab" :ref="index">
-                    <div v-if="tab.content" class="mt-2">
+                <div v-show="index == curTab" class="mt-3" :ref="index">
+                    <div v-if="tab.content">
                         <div v-for="row in tab.content" class="mb-2 row">
                             <div v-for="field in row" :class="((field.size)?'col-md-'+field.size:'')">
                                 <div v-if="Fields[field.field]">
@@ -77,15 +76,21 @@
                             </div>
                         </div>
                     </div>
-
+                    <div v-else-if="tab.component">
+                        <div v-if="tab.component == 'photos'"><photos :entity="entity" :id="id"></photos></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+    let Photos = require('../../../../components/photos.vue');
     let ConfirmModal = require('../../../../components/confirmModal.vue');
     module.exports = Vue.extend({
+        components: {
+            'photos': Photos
+        },
         props:{
             'id': Number,
             'entity': String,
@@ -131,6 +136,9 @@
                 if (typeof this.Fields[field].editable !== 'undefined' && !Boolean(this.Fields[field].editable)) {
                     return true;
                 } else return false;
+            },
+            render(event){
+                console.log(event)
             },
             generateUrlFromTitle() {
                 let self = this;

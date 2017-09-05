@@ -384,6 +384,10 @@ class ShopBaseModel extends Model
         return $photos;
     }
 
+    public function setPhotosAttribute(){
+        $this->savePhotos();
+    }
+
     public function photos()
     {
         return $this->hasMany(Photos::class, 'entity_id')->where('entity', '=', self::getClassName());
@@ -400,14 +404,19 @@ class ShopBaseModel extends Model
         $photos = [];
         foreach (Photos::$sizes as $size => $photo) {
             foreach ($ph as $num) {
-                if ($this->url) {
-                    $photos[$num][$size] = Photos::PIC_PATH . '/' . $size . '/' . $this->url . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
-                }
-                else {
-                    $photos[$num][$size] = Photos::PIC_PATH . '/' . $size . '/' . self::getTableName(true) . '/' . $this->id . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
-                }
+                $this->getPhotoUrl($size, $num, $ext);
             }
         }
         return $photos;
+    }
+
+    public function getPhotoUrl($size, $num = 1, $ext = 'jpg')
+    {
+        if ($this->url) {
+            return Photos::PIC_PATH . '/' . $size . '/' . $this->attributes['url'] . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
+        }
+        else {
+            return Photos::PIC_PATH . '/' . $size . '/' . self::getTableName(true) . '/' . $this->id . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
+        }
     }
 }

@@ -67,15 +67,6 @@ new Vue({
             this.$content.innerHTML = '';
             let $el = this.setTarget(this.$content);
 
-            new Photos({
-                el: $el,
-                propsData: {
-                    id: parseInt(id),
-                    entity: entity,
-                },
-            });
-            this.toggleMenu(false);
-            return;
             new EntityEdit({
                 el: $el,
                 propsData: {
@@ -99,7 +90,7 @@ new Vue({
             new SectionView({
                 el: $el,
                 data: {
-                    id: this.curSection,
+                    id: parseInt(this.curSection),
                     filters: Url.get('filters'),
                     showMenu: this.toggleMenu
                 }

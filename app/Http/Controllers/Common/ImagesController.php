@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Common;
 
 use App\Http\Controllers\Controller;
 use App\Models\Photos\Photos;
+use App\Models\Photos\TempPhotos;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
 use App\Services\Common\Images;
-use Faker\Provider\Image;
 
 class ImagesController extends Controller
 {
+
+    const WATERMARK = '/images/watermarks/logo.png';
+
     public function index()
     {
         $Info = $this->getImageInfo();
@@ -22,15 +25,29 @@ class ImagesController extends Controller
             ->where('entity_id', '=', $Info['entity_id'])
             ->where('photo_id', '=', $Info['photo_id'])->first();
 
-
-        if(!$photo || !file_exists($photo->path) || !isset(Photos::$sizes[$Info['size']])) return $this->page_404();
+        $filePath = Photos::getBaseStoragePath() . $photo->path;
+        if (!$photo || !file_exists($filePath) || !isset(Photos::$sizes[$Info['size']])) {
+            return $this->page_404();
+        }
 
         $img = new Images();
-        $img->fromFile($photo->path);
+        $img->fromFile($filePath);
         $size = Photos::$sizes[$Info['size']];
-        $img->resize($size['width'], null);
+        $img->resizeNotBigger($size['width'], $size['height']);
 
-        $path = str_replace(Photos::PIC_PATH,'','/'.\Request::path());
+        $path = str_replace(Photos::PIC_PATH, '', '/' . \Request::path());
+        TempPhotos::create([
+            'entity'    => $Info['entity'],
+            'entity_id' => $Info['entity_id'],
+            'photo_id'  => $Info['photo_id'],
+            'filetype'  => $Info['filetype'],
+            'path'      => $path,
+        ]);
+        if (!isset($size['no_water_mark']) || !$size['no_water_mark']) {
+            if (file_exists(public_path() . self::WATERMARK)) {
+                $img->overlay(new Images(public_path() . self::WATERMARK), 'bottom', 0.5, 0, -20);
+            }
+        }
 
         Photos::saveFile($img, $path, Photos::getBasePublicPath());
         return $img->toScreen();
@@ -83,5 +100,105 @@ class ImagesController extends Controller
         }
 
         return $Data;
+    }
+
+    /**
+     * Images function
+     */
+    public function getEntityPhotos($entity, $id, $ext = 'jpg')
+    {
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return [];
+        }
+
+        $e      = $entity::findOrFail($id);
+        $photos = $e->photos()->orderBy('photo_id', 'asc')->get()->toArray();
+        foreach (Photos::$sizes as $size => $photo) {
+            foreach ($photos as &$p) {
+                $p['urls'][$size] = $e->getPhotoUrl($size, $p['photo_id'], str_replace('image/', '', $p['filetype']));
+            }
+        }
+        return $photos;
+    }
+
+    public function uploadImgs()
+    {
+        $id     = \Request::get('id');
+        $entity = \Request::get('entity');
+        $images = \Request::file('images');
+
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return [];
+        }
+
+        if ($images) {
+            foreach ($images as $k => $img) {
+                Photos::addImg($entity, $id, new Images($img->path()));
+            }
+        }
+        else if (\Request::get('image')) {
+            Photos::addImg($entity, $id, new Images(\Request::get('image')));
+        }
+
+        return [
+            'result' => true,
+        ];
+    }
+
+    public function reOrder($entity, $id, $new_order)
+    {
+        $res = ['result' => false];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $res;
+        }
+
+        return Photos::reOrderImgs($entity, $id, $new_order);
+    }
+
+    public function rotateImg($entity, $id, $num, $side)
+    {
+        $res = ['result' => false];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $res;
+        }
+
+        return Photos::rotateImg($entity, $id, $num, $side);
+    }
+
+    public function deleteImg($entity, $id, $num)
+    {
+        $res = ['result' => false];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $res;
+        }
+
+        return Photos::deleteImg($entity, $id, $num);
+    }
+
+    public function toggleHideImg($entity, $id, $num, $hide)
+    {
+        $res = ['result' => false];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $res;
+        }
+
+        $e          = $entity::findOrFail($id);
+        $ph         = Photos::where('entity', '=', $entity)->where('entity_id', '=', $id)->where('photo_id', '=',
+            $num)->first();
+        $ph->hidden = intval($hide);
+        $ph->save();
+        $e->savePhotos();
+        $res['result'] = true;
+        return $res;
+    }
+
+    public function reloadImages($entity, $id)
+    {
+        $res = ['result' => false];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $res;
+        }
+        $res['result'] = TempPhotos::deleteFiles($entity, $id);
+        return $res;
     }
 }

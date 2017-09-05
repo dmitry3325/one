@@ -11,7 +11,6 @@ use App\Models\Shop\Sections;
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
-use App\Services\Common\Images;
 
 class ShopController extends Controller
 {
@@ -55,7 +54,7 @@ class ShopController extends Controller
 
     public function deleteEntity($entity, $id)
     {
-        if (!$this->checkEntity($entity)) {
+        if (!ShopBaseModel::checkEntity($entity)) {
             return [];
         }
 
@@ -156,27 +155,5 @@ class ShopController extends Controller
             return [];
         }
         return $entity::getBaseFields();
-    }
-
-    /**
-     * Images function
-     */
-    public function uploadImgs()
-    {
-        $id     = \Request::get('id');
-        $entity = \Request::get('entity');
-        $images = \Request::file('images');
-
-        if (!ShopBaseModel::checkEntity($entity)) {
-            return [];
-        }
-
-        foreach ($images as $k => $img) {
-            Photos::addImg($entity, $id, new Images($img->path()));
-        }
-
-        return [
-            'result' => true,
-        ];
     }
 }
