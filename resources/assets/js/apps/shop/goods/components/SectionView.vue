@@ -94,10 +94,10 @@
                 this.showSearch(Url.get('search'));
             }
 
-            if(Url.get('filter')){
-                this.$set(this,'filters', Url.get('filter'));
-            }else if(Ls.get('selected_filters')){
-                this.$set(this,'filters', Ls.get('selected_filters'));
+            if (Url.get('filter')) {
+                this.$set(this, 'filters', Url.get('filter'));
+            } else if (Ls.get('selected_filters')) {
+                this.$set(this, 'filters', Ls.get('selected_filters'));
             }
 
             if (!activeTab || !this.tabs[activeTab]) {
@@ -111,6 +111,40 @@
                 this.activeTab = selected;
                 Url.set('tab', selected);
                 this.showContent();
+            },
+            showContent: function () {
+                let tab = this.tabs[this.activeTab];
+                if (tab.builded) return;
+
+                let $target = document.querySelector('.tab-content .tab.' + this.activeTab);
+                $target.innerHTML = '';
+                let contType = this._getContType();
+
+                if (contType === 'ItemsList') {
+                    let fields = Ls.get(this._getCurEntity() + 'fields');
+                    this.tabs[this.activeTab].view = new ItemsList({
+                        el: this.setTarget($target),
+                        data: {
+                            entity: this._getCurEntity(),
+                            section: this.id,
+                            filters: Funs.cloneObject(this.filters),
+                            fields: (fields) ? fields : []
+                        },
+                    });
+                } else if (contType === 'EntityEdit') {
+                    let $el = this.setTarget($target);
+                    let $cont = this.setTarget($el);
+                    $el.classList.add('mt-3');
+                    this.tabs[this.activeTab].view = new EntityEdit({
+                        el: $cont,
+                        propsData: {
+                            id: this.id,
+                            entity: this._getCurEntity(),
+                        },
+                    });
+                }
+
+                tab.builded = true;
             },
             showSearch: function (value, e) {
                 this.tabs['search'] = {
@@ -133,40 +167,6 @@
                 }
                 Url.unset('tab');
             },
-            showContent: function () {
-                let tab = this.tabs[this.activeTab];
-                if (tab.builded) return;
-
-                let $target = document.querySelector('.tab-content .tab.' + this.activeTab);
-                $target.innerHTML = '';
-                let contType = this._getContType();
-
-                if (contType === 'ItemsList') {
-                    let fields = Ls.get(this._getCurEntity() + 'fields');
-                    this.tabs[this.activeTab].view = new ItemsList({
-                        el: this.setTarget($target),
-                        data: {
-                            entity: this._getCurEntity(),
-                            section: this.id,
-                            filters: Funs.cloneObject(this.filters),
-                            fields: (fields)?fields:[]
-                        },
-                    });
-                } else if (contType === 'EntityEdit') {
-                    let $el = this.setTarget($target);
-                    let $cont = this.setTarget($el);
-                    $el.classList.add('mt-3');
-                    this.tabs[this.activeTab].view = new EntityEdit({
-                        el: $cont,
-                        propsData: {
-                            id: this.id,
-                            entity: this._getCurEntity(),
-                        },
-                    });
-                }
-
-                tab.builded = true;
-            },
             createEntity(e) {
                 let self = this;
                 let entity = this._getCurEntity(true);
@@ -186,11 +186,11 @@
                 }
             },
             callLoadData(callback, setData) {
-                if(typeof setData === 'undefined') setData = {};
+                if (typeof setData === 'undefined') setData = {};
                 if (this.tabs[this.activeTab].view) {
                     let module = this.tabs[this.activeTab].view;
-                    for(let i in setData){
-                        module.$set(module,i, setData[i]);
+                    for (let i in setData) {
+                        module.$set(module, i, setData[i]);
                     }
                     if (module.loadData) {
                         let def = module.loadData();
@@ -203,7 +203,13 @@
                 }
             },
             loadFile(e) {
-
+                Ajax.getFile('/shop', 'loadFile', {
+                    'entity': this._getCurEntity(), 'options': {
+                        'filters': this.filters,
+                        'fields': Ls.get(this._getCurEntity() + 'fields'),
+                        'section_id': this.id,
+                    }
+                })
             },
             showFiltersSelector() {
                 let self = this;

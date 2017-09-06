@@ -273,7 +273,7 @@ class ShopBaseModel extends Model
 
         $metaData = [];
         $select   = [$table . '.*', 'urls.url'];
-        if (isset($options['fields'])) {
+        if (isset($options['fields']) && count($options['fields'])) {
             $select = [];
             $metaFields = ShopMetadata::getAllFields();
             foreach ($options['fields'] as $fld) {

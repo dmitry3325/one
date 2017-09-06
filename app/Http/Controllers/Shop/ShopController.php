@@ -11,6 +11,9 @@ use App\Models\Shop\Sections;
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
+use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Writers\LaravelExcelWriter;
 
 class ShopController extends Controller
 {
@@ -155,5 +158,26 @@ class ShopController extends Controller
             return [];
         }
         return $entity::getBaseFields();
+    }
+
+    public function loadFile($entity, $options = [])
+    {
+        $result = [
+            'result' => false,
+        ];
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $result;
+        }
+
+        $list = $entity::getData($options);
+
+        return Excel::create('file', function ($excel) use ($list) {
+            /**@var LaravelExcelWriter $excel */
+            $excel->sheet('Sheetname', function ($sheet) use ($list) {
+                /**@var LaravelExcelWorksheet $sheet */
+                $sheet->disableHeadingGeneration();
+                $sheet->with($list);
+            });
+        })->download('xls');
     }
 }

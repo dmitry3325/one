@@ -1,7 +1,12 @@
 module.exports = [
     [{
+        'type': 'info',
+        'model': 'Section',
         'field': 'filter_1',
-        'size': 9
+        'size': 3
+    }, {
+        'field': 'filter_1',
+        'size': 6
     }, {
         'field': 'filter_1_id',
         'size': 3

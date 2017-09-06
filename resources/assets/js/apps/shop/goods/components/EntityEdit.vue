@@ -100,6 +100,7 @@
                 'curTab': 'common',
                 'Fields': {},
                 'Model': {},
+                'Section' : {},
                 'BaseModel': {},
                 'packages': {
                     'Sections': require('../packages/section.js'),
@@ -119,7 +120,14 @@
                     Data.entity.get(this.entity, this.id, true).then(function (res) {
                         self.$set(self, 'Model', Funs.cloneObject(res));
                         self.$set(self, 'BaseModel', Funs.cloneObject(res));
+
+                        if(self.Model.section_id){
+                            Data.section.get(self.Model.section_id).then(function(res){
+                                console.log(res)
+                            });
+                        }
                     });
+
                 }
             }
         },
@@ -136,9 +144,6 @@
                 if (typeof this.Fields[field].editable !== 'undefined' && !Boolean(this.Fields[field].editable)) {
                     return true;
                 } else return false;
-            },
-            render(event){
-                console.log(event)
             },
             generateUrlFromTitle() {
                 let self = this;

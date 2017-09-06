@@ -28,7 +28,7 @@ class Ajax {
         });
     }
 
-    get(className, method, data, callbackSuccess, callBackError) {
+    get (className, method, data, callbackSuccess, callBackError) {
         if (typeof className === 'undefined') return false;
         if (typeof data === 'undefined') data = {};
 
@@ -39,15 +39,7 @@ class Ajax {
 
         let params = '';
         if (data) {
-            params = [];
-            for (var i in data) {
-                params.push('params[' + i + ']=' + data[i]);
-            }
-            params = params.join('&');
-
-            if (params.length) {
-                params = ((func) ? '&' : '?') + params;
-            }
+            params = this._prepareParams({'params': data}, func);
         }
 
         return new Promise((resolve, reject) => {
@@ -70,6 +62,21 @@ class Ajax {
         });
     }
 
+
+    getFile(className, method, data) {
+        let func = '';
+        if (method) {
+            func = '?method=' + method;
+        }
+
+        let params = '';
+        if (data) {
+            params = this._prepareParams({'params': data}, func);
+        }
+
+        window.open(className + func + params, '_blank');
+    }
+
     when(defs, callbackSuccess, callBackError) {
         let def = Promise.all(defs);
 
@@ -88,13 +95,18 @@ class Ajax {
         return def;
     }
 
-    getHistory() {
+    _getHistory() {
         return this.requests;
     }
 
-    pushToHistory(request) {
+    _pushToHistory(request) {
         this.requests.push(request);
         return this;
+    }
+
+    _prepareParams(data, funs) {
+        let p = $.param(data);
+        return (funs) ? '&' + p : '?' + p;
     }
 }
 
