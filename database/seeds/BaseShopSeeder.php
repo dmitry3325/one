@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Shop\Photos;
+use App\Models\Photos\Photos;
 use Illuminate\Database\Seeder;
 use Faker\Factory;
 use App\Models\Shop\Vendors;
