@@ -273,7 +273,7 @@ class ShopBaseModel extends Model
 
         $metaData = [];
         $select   = [$table . '.*', 'urls.url'];
-        if (isset($options['fields']) && count($options['fields'])) {
+        if (array_get($options, 'fields')) {
             $select = [];
             $metaFields = ShopMetadata::getAllFields();
             foreach ($options['fields'] as $fld) {
@@ -288,18 +288,17 @@ class ShopBaseModel extends Model
                 }
             }
         }
-
         $q = self::select($select)
             ->leftJoin('shop.urls', function ($on) use ($entity, $table) {
                 $on->where('entity', '=', $entity);
                 $on->where('entity_id', '=', \DB::raw($table . '.id'));
             });
 
-        if (isset($options['section_id']) && $options['section_id']) {
+        if (array_get($options, 'section_id')) {
             $q->where($table . '.section_id', '=', $options['section_id']);
         }
 
-        if (isset($options['filters']) && count($options['filters'])) {
+        if (array_get($options, 'filters')) {
             $allFields = array_keys(self::getAllFields($entity));
             self::addFilterByParams($q, $options['filters']);
         }
