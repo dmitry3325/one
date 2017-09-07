@@ -18,11 +18,9 @@ class Ajax {
                     }
                 }
             }, function (response) {
-                if (response.data) {
-                    reject(response.data);
-                    if (typeof callBackError === 'function') {
-                        callBackError(response.data)
-                    }
+                reject(response);
+                if (typeof callBackError === 'function') {
+                    callBackError(response)
                 }
             });
         });
@@ -52,11 +50,9 @@ class Ajax {
                     }
                 }
             }, function (response) {
-                if (response.data) {
-                    reject(response.data);
-                    if (typeof callBackError === 'function') {
-                        callBackError(response.data)
-                    }
+                reject(response);
+                if (typeof callBackError === 'function') {
+                    callBackError(response)
                 }
             });
         });

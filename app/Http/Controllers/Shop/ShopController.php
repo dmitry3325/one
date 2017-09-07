@@ -95,7 +95,7 @@ class ShopController extends Controller
         }
     }
 
-    public function generateUrl($entity, $id)
+    public function generateUrl($entity, $id, $title='')
     {
         $result = [
             'result' => false,
@@ -110,7 +110,7 @@ class ShopController extends Controller
             return $result;
         }
 
-        $url  = Urls::generateUrlFromText($e->title);
+        $url  = Urls::generateUrlFromText(($title)?$title:$e->title);
         $find = Urls::where('url', '=', $url)->first();
         if ($find) {
             $result['errors'][] = 'Такой URL уже существует на вашем сайте! Адрес должен быть уникален!';

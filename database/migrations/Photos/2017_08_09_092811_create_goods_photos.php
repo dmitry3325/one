@@ -21,15 +21,15 @@ class CreateGoodsPhotos extends Migration
             Schema::create('photos.photos', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('entity')->default(null);
-                $table->integer('entity_id');
-                $table->integer('photo_id');
+                $table->integer('entity_id')->default(0);
+                $table->integer('photo_id')->default(1);
                 $table->smallInteger('hidden')->default(0);
                 $table->smallInteger('width')->nullable();
                 $table->smallInteger('height')->nullable();
                 $table->string('filetype')->default('');
                 $table->integer('watermark_id')->nullable();
-                $table->string('path');
-                $table->unsignedInteger('hash');
+                $table->string('path')->nullable();
+                $table->unsignedInteger('hash')->nullable();
                 $table->timestamps();
 
                 //keys
@@ -42,10 +42,10 @@ class CreateGoodsPhotos extends Migration
             Schema::create('photos.temp_photos', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('entity')->default(null);
-                $table->integer('entity_id');
-                $table->integer('photo_id');
+                $table->integer('entity_id')->default(0);
+                $table->integer('photo_id')->default(1);
                 $table->string('filetype')->default('');
-                $table->string('path');
+                $table->string('path')->nullable();
                 $table->timestamps();
 
                 //keys
