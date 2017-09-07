@@ -24,8 +24,15 @@
                 <div v-show="index == curTab" class="mt-3" :ref="index">
                     <div v-if="tab.content">
                         <div v-for="row in tab.content" class="mb-2 row">
-                            <div v-for="field in row" :class="((field.size)?'col-md-'+field.size:'')">
-                                <div v-if="Fields[field.field]">
+                            <div v-for="field in row"
+                                 :class="((field.size)?'col-md-'+field.size:'') + ' ' + ((field.class)?field.class:'')">
+                                <div v-if="field.type && field.type =='info' && field.model">
+                                    <span v-if="_self[field.model] && _self[field.model][field.field]"
+                                        class="badge badge-default  ">
+                                        {{_self[field.model][field.field]}}
+                                    </span>
+                                </div>
+                                <div v-else-if="Fields[field.field]">
                                     <div class="label">{{Fields[field.field].title}}</div>
                                     <div v-if="Fields[field.field].type==='int' || Fields[field.field].type==='double'">
                                         <input type="number" class="form-control" v-model="Model[field.field]"
@@ -72,12 +79,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="field.content" v-html="field.content"></div>
+                                <div v-else-if="field.content" v-html="field.content"></div>
                             </div>
                         </div>
                     </div>
                     <div v-else-if="tab.component">
-                        <div v-if="tab.component == 'photos'"><photos :entity="entity" :id="id"></photos></div>
+                        <div v-if="tab.component == 'photos'">
+                            <photos :entity="entity" :id="id"></photos>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,7 +100,7 @@
         components: {
             'photos': Photos
         },
-        props:{
+        props: {
             'id': Number,
             'entity': String,
         },
@@ -100,7 +109,7 @@
                 'curTab': 'common',
                 'Fields': {},
                 'Model': {},
-                'Section' : {},
+                'Section': {},
                 'BaseModel': {},
                 'packages': {
                     'Sections': require('../packages/section.js'),
@@ -121,9 +130,9 @@
                         self.$set(self, 'Model', Funs.cloneObject(res));
                         self.$set(self, 'BaseModel', Funs.cloneObject(res));
 
-                        if(self.Model.section_id){
-                            Data.section.get(self.Model.section_id).then(function(res){
-                                console.log(res)
+                        if (self.Model.section_id) {
+                            Data.sections.get(self.Model.section_id).then(function (res) {
+                                self.$set(self, 'Section', Funs.cloneObject(res));
                             });
                         }
                     });
@@ -147,7 +156,7 @@
             },
             generateUrlFromTitle() {
                 let self = this;
-                Ajax.post('/shop', 'generateUrl', {'entity': this.entity, 'id': this.id})
+                Ajax.post('/shop', 'generateUrl', {'entity': this.entity, 'id': this.id, 'title': this.Model.title})
                     .then(function (res) {
                         if (res.result && res.url) {
                             self.$set(self.Model, 'url', res.url);
@@ -217,8 +226,13 @@
         cursor: pointer;
     }
 
-    .Editor .row{
+    .Editor .row {
         margin-right: -10px;
         margin-left: -10px;
+    }
+    .Editor .section-filter-title .badge{
+        width: 100%;
+        margin-top:25px;
+        font-size: 24px;
     }
 </style>
