@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\CurrentPageState;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Support\Facades\Input;
 
 class AuthController extends Controller
 {
