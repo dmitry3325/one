@@ -44,11 +44,6 @@ class CreateGoodsTables extends Migration
                 $table->double('price_opt2')->default(0);
                 $table->double('discount')->default(0);
 
-                for ($i = 1; $i <= Filters::COUNT; $i++) {
-                    $table->string('filter_' . $i)->default('');
-                    $table->string('filter_' . $i . '_id')->default(0);
-                }
-
                 $table->double('tarif')->default(0);
                 $table->double('tarif_discount')->default(0);
                 $table->double('min_qty')->nullable();
@@ -89,11 +84,6 @@ class CreateGoodsTables extends Migration
                 $table->integer('orderby')->default(0);
                 $table->tinyInteger('hidden')->default(0);
 
-                for ($i = 1; $i <= Filters::COUNT; $i++) {
-                    $table->string('filter_' . $i)->default('');
-                    $table->string('filter_' . $i . '_id')->default(0);
-                }
-
                 $table->integer('picture_id')->default(0);
                 $table->string('photos')->default('');
                 $table->string('short_description')->default('');
@@ -114,11 +104,6 @@ class CreateGoodsTables extends Migration
                 $table->string('path_title')->default('');
                 $table->integer('orderby')->default(0);
                 $table->tinyInteger('hidden')->default(0);
-
-                for ($i = 1; $i <= Filters::COUNT; $i++) {
-                    $table->string('filter_' . $i)->default('');
-                    $table->string('filter_' . $i . '_id')->default(0);
-                }
 
                 $table->integer('picture_id')->default(0);
                 $table->string('photos')->default('');
@@ -153,8 +138,8 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('urls')) {
             Schema::create('shop.urls', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('entity')->default('');
-                $table->integer('entity_id');
+                $table->string('entity', 20)->default('');
+                $table->integer('entity_id')->default(0);
                 $table->string('url')->default('');
                 $table->timestamps();
 
@@ -179,11 +164,27 @@ class CreateGoodsTables extends Migration
             });
         }
 
+        if(!Schema::hasTable('entity_filters')){
+            Schema::create('shop.entity_filters', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('entity', 20)->default('');
+                $table->integer('entity_id')->default(0);
+                $table->integer('num')->default(0);
+                $table->string('value')->default('');
+                $table->integer('code')->default(0);
+
+                $table->timestamps();
+
+                $table->index(['entity','entity_id']);
+                $table->index(['code','num']);
+            });
+        }
+
         if (!Schema::hasTable('shop_metadata')) {
             Schema::create('shop.shop_metadata', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('entity')->default('');
-                $table->integer('entity_id');
+                $table->string('entity', 20)->default('');
+                $table->integer('entity_id')->default(0);
                 $table->string('key')->default('');
                 $table->longText('value');
                 $table->timestamps();

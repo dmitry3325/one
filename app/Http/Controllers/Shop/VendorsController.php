@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Shop\Vendors;
 
+/**
+ * Class VendorsController
+ * @package App\Http\Controllers\Shop
+ */
 class VendorsController extends Controller
 {
 
@@ -14,11 +18,20 @@ class VendorsController extends Controller
         'css'   => ['apps/shop/vendors.css'],
     ];
 
+    /**
+     * @return array
+     */
     public function getAllFields()
     {
         return Vendors::getAllFields();
     }
 
+    /**
+     * @param array $filters
+     * @param array $fields
+     *
+     * @return array
+     */
     public function getVendorsList($filters = [], $fields = [])
     {
 
@@ -30,6 +43,12 @@ class VendorsController extends Controller
         ];
     }
 
+    /**
+     * @param $id
+     * @param $data
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
+     */
     public function update($id, $data){
         $vendor = Vendors::find($id);
 
@@ -42,6 +61,11 @@ class VendorsController extends Controller
 
     }
 
+    /**
+     * @param $id
+     *
+     * @return array
+     */
     public function delete($id){
         $vendor = Vendors::find($id)->delete();
 
@@ -51,6 +75,9 @@ class VendorsController extends Controller
 
     }
 
+    /**
+     * @return array
+     */
     public function create(){
         $vendor =  new Vendors();
         $result = $vendor->save();
@@ -64,6 +91,9 @@ class VendorsController extends Controller
 
     }
 
+    /**
+     * @param null $img
+     */
     public function imgupload($img = null){
         var_dump($img);exit();
 

@@ -14,11 +14,19 @@ use App\Models\Shop\Urls;
 trait QueryFilterTrait
 {
 
+    /**
+     * @return array
+     */
     public static function getFilterMethods()
     {
         return ['=','!=', '>', '<', '>=', '<=', 'LIKE', 'IN'];
     }
 
+    /**
+     * @param $Q
+     * @param $filters
+     * @param array $allowedFields
+     */
     public static function addFilterByParams($Q, $filters, $allowedFields = [])
     {
         $methods = self::getFilterMethods();

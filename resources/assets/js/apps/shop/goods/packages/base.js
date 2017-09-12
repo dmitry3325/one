@@ -58,7 +58,7 @@ module.exports = {
     },
     'filters': {
         'title': 'Фильтры',
-        'content': []
+        'component': 'filters'
     },
     'photos': {
         'title': 'Фото',

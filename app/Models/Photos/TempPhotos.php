@@ -4,11 +4,22 @@ namespace App\Models\Photos;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class TempPhotos
+ * @package App\Models\Photos
+ */
 class TempPhotos extends Model
 {
     protected $table   = 'photos.temp_photos';
     protected $guarded = ['id'];
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param null $num
+     *
+     * @return bool
+     */
     public static function deleteFiles($entity, $id, $num = null)
     {
         $q = self::where('entity', '=', $entity)->where('entity_id', '=', $id);

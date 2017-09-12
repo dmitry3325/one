@@ -8,6 +8,10 @@
 
 namespace App\Classes\Blocks;
 
+/**
+ * Class AdminBar
+ * @package App\Classes\Blocks
+ */
 class AdminBar
 {
     private static $baseNamespace = 'App\Http\Controllers\\';
@@ -21,17 +25,27 @@ class AdminBar
         ],
     ];
 
+    /**
+     * @return array
+     */
     public static function getMenu()
     {
         self::prepareMenu(self::$app);
         return self::$app;
     }
 
+    /**
+     * @return mixed
+     */
     public static function shareMenu()
     {
         return \View::share('admin_bar', self::getMenu());
     }
 
+    /**
+     * @param $list
+     * @param string $baseUrl
+     */
     private static function prepareMenu(&$list, $baseUrl = '')
     {
         foreach ($list as $url => &$block) {
@@ -78,6 +92,10 @@ class AdminBar
         }
     }
 
+    /**
+     * @param $block
+     * @param array $setts
+     */
     private static function setSettings(&$block, $setts = [])
     {
         foreach ($setts as $k => $v) {

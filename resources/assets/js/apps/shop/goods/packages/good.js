@@ -1,4 +1,3 @@
-let Funs = require('../../../../classes/funs.js');
 let good = Funs.cloneObject(require('./base.js'));
 
 good['common']['content'] = [
@@ -200,7 +199,6 @@ good['prices'] = {
             ],
         ],
 };
-good['filters']['content'] = require('./filters_list.js');
 good['good_links'] = {
     'title': 'Связанные товары / Компоненты',
     'content': [

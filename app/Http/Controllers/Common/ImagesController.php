@@ -14,6 +14,9 @@ class ImagesController extends Controller
 
     const WATERMARK = '/images/watermarks/logo.png';
 
+    /**
+     * @return $this|\Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     */
     public function index()
     {
         $Info = $this->getImageInfo();
@@ -53,13 +56,16 @@ class ImagesController extends Controller
         return $img->toScreen();
     }
 
+    /**
+     * @return array
+     */
     private function getImageInfo()
     {
         $Data = [];
         $path = \Request::path();
         preg_match('#p\/(.+)\.(gif|jpg|jpeg|png)\z#', $path, $matches);
         if (count($matches) != 3) {
-            return false;
+            return $Data;
         }
         $Data['filetype'] = $matches[2];
 
@@ -105,6 +111,13 @@ class ImagesController extends Controller
     /**
      * Images function
      */
+    /**
+     * @param $entity
+     * @param $id
+     * @param string $ext
+     *
+     * @return array
+     */
     public function getEntityPhotos($entity, $id, $ext = 'jpg')
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -121,6 +134,9 @@ class ImagesController extends Controller
         return $photos;
     }
 
+    /**
+     * @return array
+     */
     public function uploadImgs()
     {
         $id     = \Request::get('id');
@@ -145,6 +161,13 @@ class ImagesController extends Controller
         ];
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $new_order
+     *
+     * @return array|static
+     */
     public function reOrder($entity, $id, $new_order)
     {
         $res = ['result' => false];
@@ -155,6 +178,14 @@ class ImagesController extends Controller
         return Photos::reOrderImgs($entity, $id, $new_order);
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $num
+     * @param $side
+     *
+     * @return array
+     */
     public function rotateImg($entity, $id, $num, $side)
     {
         $res = ['result' => false];
@@ -165,6 +196,13 @@ class ImagesController extends Controller
         return Photos::rotateImg($entity, $id, $num, $side);
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $num
+     *
+     * @return array
+     */
     public function deleteImg($entity, $id, $num)
     {
         $res = ['result' => false];
@@ -175,6 +213,14 @@ class ImagesController extends Controller
         return Photos::deleteImg($entity, $id, $num);
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $num
+     * @param $hide
+     *
+     * @return array
+     */
     public function toggleHideImg($entity, $id, $num, $hide)
     {
         $res = ['result' => false];
@@ -192,6 +238,12 @@ class ImagesController extends Controller
         return $res;
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     *
+     * @return array
+     */
     public function reloadImages($entity, $id)
     {
         $res = ['result' => false];

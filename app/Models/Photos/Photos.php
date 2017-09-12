@@ -5,8 +5,15 @@ namespace App\Models\Photos;
 use App\Services\Common\Images;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Photos
+ * @package App\Models\Photos
+ */
 class Photos extends Model
 {
+    /**
+     * @var string
+     */
     protected $table   = 'photos.photos';
     protected $guarded = ['id'];
 
@@ -34,11 +41,22 @@ class Photos extends Model
         ],
     ];
 
+    /**
+     * @return mixed
+     */
     public function getExtension()
     {
         return str_replace('image/', '', $this->filetype);
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param Images $img
+     * @param array $props
+     *
+     * @return mixed
+     */
     public static function addImg($entity, $id, Images $img, $props = [])
     {
         $e = $entity::findOrFail($id);
@@ -66,6 +84,13 @@ class Photos extends Model
         return $e->savePhotos();
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param string $num
+     *
+     * @return mixed
+     */
     public static function deleteImg($entity, $id, $num = 'all')
     {
         $e = $entity::findOrFail($id);
@@ -86,6 +111,13 @@ class Photos extends Model
         return $e->savePhotos();
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param array $new_order
+     *
+     * @return static
+     */
     public static function reOrderImgs($entity, $id, $new_order = [])
     {
         $e = $entity::findOrFail($id);
@@ -130,6 +162,14 @@ class Photos extends Model
         return $photos;
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $num
+     * @param $side
+     *
+     * @return array
+     */
     public static function rotateImg($entity, $id, $num, $side){
         $e = $entity::findOrFail($id);
 
@@ -145,6 +185,13 @@ class Photos extends Model
         return ['result'=>$ph->save()];
     }
 
+    /**
+     * @param $img
+     * @param $img_path
+     * @param null $basePath
+     *
+     * @return mixed
+     */
     public static function saveFile($img, $img_path, $basePath = null)
     {
         if (!$basePath) {
@@ -165,16 +212,30 @@ class Photos extends Model
         return $img->toFile($basePath . $fileName);
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param int $num
+     * @param string $extension
+     *
+     * @return string
+     */
     public static function getOriginalPath($entity, $id, $num = 1, $extension = 'jpeg')
     {
         return $entity::getTableName(true) . '/' . $id . '/' . $num . '.' . $extension;
     }
 
+    /**
+     * @return string
+     */
     public static function getBaseStoragePath()
     {
         return storage_path() . self::STORAGE_DIR . '/';
     }
 
+    /**
+     * @return string
+     */
     public static function getBasePublicPath()
     {
         return public_path() . self::PIC_PATH . '/';

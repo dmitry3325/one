@@ -4,12 +4,23 @@ namespace App\Models\Shop;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Urls
+ * @package App\Models\Shop
+ */
 class Urls extends Model
 {
     protected $table = 'shop.urls';
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
 
+    /**
+     * @param $entity
+     * @param $entity_id
+     * @param $url
+     *
+     * @return array
+     */
     public static function createNew($entity, $entity_id, $url){
         $result = [
             'result' => false
@@ -32,6 +43,11 @@ class Urls extends Model
         return $result;
     }
 
+    /**
+     * @param $xxx
+     *
+     * @return mixed|string
+     */
     public static function generateUrlFromText($xxx){
         $xxx = mb_strtolower($xxx) ;
         $sf = array('/ё/','/а/','/б/','/в/','/г/','/д/','/е/','/ж/','/з/','/и/','/й/','/к/','/л/','/м/','/н/','/о/','/п/','/р/','/с/','/т/','/у/','/ф/','/х/','/ц/','/ч/','/ш/','/щ/','/ъ/','/ь/','/ы/','/э/','/ю/','/я/') ;

@@ -4,6 +4,10 @@ namespace App\Models\Shop;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Vendors
+ * @package App\Models\Shop
+ */
 class Vendors extends Model
 {
     protected $table = 'shop.vendors';
@@ -50,6 +54,9 @@ class Vendors extends Model
         ]
     ];
 
+    /**
+     * @return array
+     */
     public static function getAllFields()
     {
         return self::$commonFields;

@@ -13,6 +13,10 @@ use App\Models\Photos\Photos;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 
+/**
+ * Class ShopBaseModel
+ * @package App\Models\Shop
+ */
 class ShopBaseModel extends Model
 {
     use QueryFilterTrait;
@@ -99,11 +103,21 @@ class ShopBaseModel extends Model
     ];
     protected        $guarded      = ['id', 'created_at', 'updated_at'];
 
+    /**
+     * @param $entity
+     *
+     * @return bool
+     */
     public static function checkEntity($entity)
     {
         return in_array($entity, ['Sections', 'Filters', 'Goods', 'HtmlPages']);
     }
 
+    /**
+     * @param bool $onlyTable
+     *
+     * @return mixed
+     */
     public static function getTableName($onlyTable = false)
     {
         $name = with(new static)->getTable();
@@ -113,6 +127,11 @@ class ShopBaseModel extends Model
         return $name;
     }
 
+    /**
+     * @param bool $full
+     *
+     * @return string
+     */
     public static function getClassName($full = false)
     {
         if (self::$class_name && !$full) {
@@ -128,6 +147,9 @@ class ShopBaseModel extends Model
         return ($full) ? self::$class_full_name : self::$class_name;
     }
 
+    /**
+     * @return array
+     */
     public static function getAllFields()
     {
         $ownFields = [];
@@ -140,26 +162,14 @@ class ShopBaseModel extends Model
             $ownFields['manid']['options'] = Vendors::all()->pluck('title', 'id');
         }
 
-        $filters = [];
-        if ($className != 'HtmlPages') {
-            for ($i = 1; $i <= Filters::COUNT; $i++) {
-                $filters['filter_' . $i]         = [
-                    'title' => 'Фильтр №' . $i,
-                    'type'  => self::FIELD_TYPE_STRING,
-                ];
-                $filters['filter_' . $i . '_id'] = [
-                    'title'    => 'Фильтр id №' . $i,
-                    'type'     => self::FIELD_TYPE_INT,
-                    'editable' => false,
-                ];
-            }
-        }
-
         $metaFields = ShopMetadata::getAllFields();
 
-        return array_merge(self::$commonFields, $filters, $ownFields, $metaFields);
+        return array_merge(self::$commonFields, $ownFields, $metaFields);
     }
 
+    /**
+     * @return array
+     */
     public static function getBaseFields()
     {
         $fields = [];
@@ -174,11 +184,18 @@ class ShopBaseModel extends Model
     /**
      * Url functions
      */
+
+    /**
+     * @return $this
+     */
     public function url()
     {
         return $this->hasOne(Urls::class, 'entity_id')->where('entity', '=', self::getClassName());
     }
 
+    /**
+     * @return mixed
+     */
     public function getUrlAttribute()
     {
         if (isset($this->attributes['url'])) {
@@ -199,11 +216,19 @@ class ShopBaseModel extends Model
     /**
      * Metadata functions
      */
+
+    /**
+     * @return $this
+     */
     public function metadata()
     {
         return $this->hasMany(ShopMetadata::class, 'entity_id')->where('entity', '=', self::getClassName());
     }
 
+    /**
+     * @param $data
+     * @param array $fields
+     */
     public static function addMeta(&$data, $fields = [])
     {
         foreach ($data as $entity) {
@@ -211,6 +236,11 @@ class ShopBaseModel extends Model
         }
     }
 
+    /**
+     * @param array $fields
+     *
+     * @return $this
+     */
     public function getMetaData($fields = [])
     {
         $q = $this->metadata();
@@ -225,7 +255,24 @@ class ShopBaseModel extends Model
     }
 
     /**
+     * Filters functions
+     */
+
+    /**
+     * @return $this
+     */
+    public function filter(){
+        return $this->hasMany(ShopMetadata::class, 'entity_id')->where('entity', '=', self::getClassName());
+    }
+
+    /**
      * Data functions
+     */
+
+    /**
+     * @param array $options
+     *
+     * @return array
      */
     public static function getData($options = [])
     {
@@ -266,6 +313,12 @@ class ShopBaseModel extends Model
         return $data;
     }
 
+    /**
+     * @param array $options
+     * @param bool $getMetaFields
+     *
+     * @return array|\Illuminate\Database\Query\Builder|static
+     */
     public static function getDataQuery($options = [], $getMetaFields = false)
     {
         $table  = self::getTableName();
@@ -314,6 +367,11 @@ class ShopBaseModel extends Model
         }
     }
 
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
     public function save(array $options = [])
     {
         $metaDataFields = ShopMetadata::getAllFields();
@@ -355,6 +413,11 @@ class ShopBaseModel extends Model
         return $result;
     }
 
+    /**
+     * @param $id
+     *
+     * @return bool|null
+     */
     public static function deleteEntity($id)
     {
         $entity = self::getClassName();
@@ -365,6 +428,10 @@ class ShopBaseModel extends Model
 
     /**
      * Photos functions
+     */
+
+    /**
+     * @return array
      */
     public function savePhotos()
     {
@@ -384,20 +451,34 @@ class ShopBaseModel extends Model
         return $photos;
     }
 
+    /**
+     * @return array
+     */
     public function setPhotosAttribute(){
         $this->savePhotos();
     }
 
+    /**
+     * @return $this
+     */
     public function photos()
     {
         return $this->hasMany(Photos::class, 'entity_id')->where('entity', '=', self::getClassName());
     }
 
+    /**
+     * @return array
+     */
     public function getPhotosAttribute()
     {
         return $this->getPhotos('jpeg');
     }
 
+    /**
+     * @param string $ext
+     *
+     * @return array
+     */
     public function getPhotos($ext = 'jpeg')
     {
         $ph     = ($this->attributes['photos']) ? json_decode($this->attributes['photos'], true) : [];
@@ -410,6 +491,13 @@ class ShopBaseModel extends Model
         return $photos;
     }
 
+    /**
+     * @param $size
+     * @param int $num
+     * @param string $ext
+     *
+     * @return string
+     */
     public function getPhotoUrl($size, $num = 1, $ext = 'jpg')
     {
         if ($this->url) {

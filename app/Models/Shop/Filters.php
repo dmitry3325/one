@@ -2,9 +2,11 @@
 
 namespace App\Models\Shop;
 
+/**
+ * Class Filters
+ * @package App\Models\Shop
+ */
 class Filters extends ShopBaseModel
 {
-    const COUNT = 8;
-
     protected $table = 'shop.filters';
 }

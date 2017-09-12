@@ -5,6 +5,10 @@ namespace App\Models\Shop;
 use Illuminate\Database\Eloquent\Model;
 use phpDocumentor\Reflection\Types\Integer;
 
+/**
+ * Class ShopMetadata
+ * @package App\Models\Shop
+ */
 class ShopMetadata extends Model
 {
     protected $table = 'shop.shop_metadata';
@@ -43,21 +47,33 @@ class ShopMetadata extends Model
         ],
     ];
 
+    /**
+     * @return array
+     */
     public static function getAllFields()
     {
-        for($i = 1; $i<=Filters::COUNT; $i++){
+        /*for($i = 1; $i<=Filters::COUNT; $i++){
             self::$fields['filter_'.$i.'_use_in_autocreate'] = [
                 'title' => 'Создавать автоматически',
                 'type'  => ShopBaseModel::FIELD_TYPE_CHECKBOX,
             ];
-        }
+        }*/
         return self::$fields;
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param array $data
+     *
+     * @return array|bool
+     */
     public static function saveMetadata($entity, $id, array $data)
     {
         if (!$entity || !$id || !count($data)) {
-            return false;
+            return [
+                'result' => false,
+            ];
         }
 
         foreach ($data as $key => $val) {

@@ -3,11 +3,6 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
-use App\Models\Photos\Photos;
-use App\Models\Shop\Filters;
-use App\Models\Shop\Goods;
-use App\Models\Shop\HtmlPages;
-use App\Models\Shop\Sections;
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
@@ -25,6 +20,13 @@ class ShopController extends Controller
         'css'   => ['apps/shop/goods.css'],
     ];
 
+    /**
+     * @param $entity
+     * @param array $data
+     * @param bool $getEntity
+     *
+     * @return array
+     */
     public function createEntity($entity, $data = [], $getEntity = false)
     {
         $result = [
@@ -55,6 +57,12 @@ class ShopController extends Controller
         return $result;
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     *
+     * @return array
+     */
     public function deleteEntity($entity, $id)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -67,6 +75,13 @@ class ShopController extends Controller
         ];
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     * @param $data
+     *
+     * @return array
+     */
     public function updateEntity($entity, $id, $data)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -79,6 +94,12 @@ class ShopController extends Controller
         return $res;
     }
 
+    /**
+     * @param $entity
+     * @param $id
+     *
+     * @return array
+     */
     public function getEntity($entity, $id)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -95,7 +116,14 @@ class ShopController extends Controller
         }
     }
 
-    public function generateUrl($entity, $id, $title='')
+    /**
+     * @param $entity
+     * @param $id
+     * @param string $title
+     *
+     * @return array
+     */
+    public function generateUrl($entity, $id, $title = '')
     {
         $result = [
             'result' => false,
@@ -110,7 +138,7 @@ class ShopController extends Controller
             return $result;
         }
 
-        $url  = Urls::generateUrlFromText(($title)?$title:$e->title);
+        $url  = Urls::generateUrlFromText(($title) ? $title : $e->title);
         $find = Urls::where('url', '=', $url)->first();
         if ($find) {
             $result['errors'][] = 'Такой URL уже существует на вашем сайте! Адрес должен быть уникален!';
@@ -123,6 +151,11 @@ class ShopController extends Controller
         return $result;
     }
 
+    /**
+     * @param $entity
+     *
+     * @return array
+     */
     public function getAllFields($entity)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -131,6 +164,12 @@ class ShopController extends Controller
         return $entity::getAllFields();
     }
 
+    /**
+     * @param $entity
+     * @param array $options
+     *
+     * @return array
+     */
     public function getItemsList($entity, $options = [])
     {
         $result = [
@@ -152,6 +191,11 @@ class ShopController extends Controller
         }
     }
 
+    /**
+     * @param $entity
+     *
+     * @return array
+     */
     public function getBaseFields($entity)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
@@ -160,6 +204,12 @@ class ShopController extends Controller
         return $entity::getBaseFields();
     }
 
+    /**
+     * @param $entity
+     * @param array $options
+     *
+     * @return array
+     */
     public function loadFile($entity, $options = [])
     {
         $result = [

@@ -5,6 +5,10 @@ namespace App\Models\Shop;
 use App\Models\Goods\Vendors;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Goods
+ * @package App\Models\Shop
+ */
 class Goods extends ShopBaseModel
 {
     protected $table = 'shop.goods';
