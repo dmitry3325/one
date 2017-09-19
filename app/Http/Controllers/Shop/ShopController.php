@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Classes\Traits\Shop\QueryFilterTrait;
+use App\Models\Shop\EntityFilters;
 use App\Models\Shop\ShopBaseModel;
+use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
@@ -229,5 +231,89 @@ class ShopController extends Controller
                 $sheet->with($list);
             });
         })->download('xls');
+    }
+
+    /**
+     * Фильтры
+     */
+
+    /**
+     * @param $entity
+     * @param $id
+     *
+     * @return array|\Illuminate\Database\Eloquent\Collection
+     */
+    public function getEntityFilters($entity, $id)
+    {
+        $result = [
+            'result' => false,
+        ];
+
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $result;
+        }
+
+        return EntityFilters::where('entity', $entity)->where('entity_id', $id)->get();
+    }
+
+    /**
+     * @param $entity
+     * @param $id
+     * @param $filters
+     *
+     * @return array|bool|\Illuminate\Database\Eloquent\Model
+     */
+    public function saveFilters($entity, $id, $filters)
+    {
+        $result = [
+            'result' => false,
+        ];
+
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return $result;
+        }
+
+
+        EntityFilters::where('entity',$entity)->where('entity_id', $id)->delete();
+        foreach($filters as $filter){
+            if (!array_get($filter, 'value') || !array_get($filter, 'num')) {
+                continue;
+            }
+            EntityFilters::addFilter($entity, $id, $filter['num'], $filter['value'],
+                array_get($filter, 'auto_create', 0));
+        }
+        $result['result'] = true;
+        return $result;
+    }
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public function getSectionFilters($id)
+    {
+        $filters = EntityFilters::where('entity_id', $id)->get()->toArray();
+
+        $return = [];
+        if (count($filters)) {
+            $goodsTable   = Goods::getTableName();
+            $filtersTable = EntityFilters::getTableName();
+            $values       = EntityFilters::select(\DB::raw('DISTINCT num, value, code'))->join($goodsTable,
+                function ($join) use ($goodsTable, $filtersTable) {
+                    $join->on($goodsTable . '.id', '=', $filtersTable . '.entity_id');
+                    $join->on($filtersTable . '.entity', '=', \DB::raw('"Goods"'));
+                })->where('goods.section_id', '=', $id)->orderBy('value','asc')->get();
+
+            foreach($filters as &$filter){
+                foreach($values as $v){
+                    if($filter['num'] == $v->num){
+                        $filter['distinct_values'][] = $v;
+                    }
+                }
+            }
+        }
+
+        return $filters;
     }
 }

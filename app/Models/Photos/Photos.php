@@ -2,14 +2,14 @@
 
 namespace App\Models\Photos;
 
+use App\Models\BaseModel;
 use App\Services\Common\Images;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Photos
  * @package App\Models\Photos
  */
-class Photos extends Model
+class Photos extends BaseModel
 {
     /**
      * @var string

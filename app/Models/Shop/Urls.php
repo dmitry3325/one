@@ -2,13 +2,13 @@
 
 namespace App\Models\Shop;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 
 /**
  * Class Urls
  * @package App\Models\Shop
  */
-class Urls extends Model
+class Urls extends BaseModel
 {
     protected $table = 'shop.urls';
 

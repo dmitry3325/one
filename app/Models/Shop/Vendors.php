@@ -2,13 +2,13 @@
 
 namespace App\Models\Shop;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\BaseModel;
 
 /**
  * Class Vendors
  * @package App\Models\Shop
  */
-class Vendors extends Model
+class Vendors extends BaseModel
 {
     protected $table = 'shop.vendors';
 

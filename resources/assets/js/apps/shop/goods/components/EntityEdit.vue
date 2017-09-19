@@ -199,6 +199,7 @@
                         }
                     }
                 });
+                Vue.Events.emit('entity_save');
             },
             deleteEntity() {
                 let self = this;

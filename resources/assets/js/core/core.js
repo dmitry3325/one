@@ -8,11 +8,13 @@ import Cookies from '../classes/cookies.js';
 import Ls from '../classes/ls.js';
 import Data from '../classes/data.js';
 import Funs from '../classes/funs.js';
+import Events from '../classes/events.js';
 
 Vue.use(Url);
 Vue.use(Ajax);
 Vue.use(Cookies);
 Vue.use(Ls);
+Vue.use(Events);
 Vue.use({
     install(Vue){
         Vue.Funs = window.Funs = Funs;

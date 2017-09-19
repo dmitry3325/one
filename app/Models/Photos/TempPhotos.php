@@ -2,13 +2,13 @@
 
 namespace App\Models\Photos;
 
-use Illuminate\Database\Eloquent\Model;
+use \App\Models\BaseModel;
 
 /**
  * Class TempPhotos
  * @package App\Models\Photos
  */
-class TempPhotos extends Model
+class TempPhotos extends BaseModel
 {
     protected $table   = 'photos.temp_photos';
     protected $guarded = ['id'];

@@ -10,14 +10,14 @@ namespace App\Models\Shop;
 
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use App\Models\Photos\Photos;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
+use \App\Models\BaseModel;
 
 /**
  * Class ShopBaseModel
  * @package App\Models\Shop
  */
-class ShopBaseModel extends Model
+class ShopBaseModel extends BaseModel
 {
     use QueryFilterTrait;
 
@@ -31,9 +31,6 @@ class ShopBaseModel extends Model
     const FIELD_TYPE_DATE     = 'date';
     const FIELD_TYPE_OBJECT   = 'obejct';
 
-    const DB = 'shop';
-    protected static $class_name;
-    protected static $class_full_name;
     protected static $fields;
     protected static $commonFields = [
         'id'                => [
@@ -111,40 +108,6 @@ class ShopBaseModel extends Model
     public static function checkEntity($entity)
     {
         return in_array($entity, ['Sections', 'Filters', 'Goods', 'HtmlPages']);
-    }
-
-    /**
-     * @param bool $onlyTable
-     *
-     * @return mixed
-     */
-    public static function getTableName($onlyTable = false)
-    {
-        $name = with(new static)->getTable();
-        if ($onlyTable) {
-            $name = str_replace(self::DB . '.', '', $name);
-        }
-        return $name;
-    }
-
-    /**
-     * @param bool $full
-     *
-     * @return string
-     */
-    public static function getClassName($full = false)
-    {
-        if (self::$class_name && !$full) {
-            return self::$class_name;
-        }
-        if (self::$class_full_name && $full) {
-            return self::$class_full_name;
-        }
-
-        self::$class_full_name = get_called_class();
-        $arr                   = explode('\\', self::$class_full_name);
-        self::$class_name      = end($arr);
-        return ($full) ? self::$class_full_name : self::$class_name;
     }
 
     /**

@@ -171,7 +171,8 @@ class CreateGoodsTables extends Migration
                 $table->integer('entity_id')->default(0);
                 $table->integer('num')->default(0);
                 $table->string('value')->default('');
-                $table->integer('code')->default(0);
+                $table->unsignedInteger('code')->default(0);
+                $table->tinyInteger('auto_create')->default(0);
 
                 $table->timestamps();
 

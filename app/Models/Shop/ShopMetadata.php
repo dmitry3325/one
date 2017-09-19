@@ -2,14 +2,13 @@
 
 namespace App\Models\Shop;
 
-use Illuminate\Database\Eloquent\Model;
-use phpDocumentor\Reflection\Types\Integer;
+use App\Models\BaseModel;
 
 /**
  * Class ShopMetadata
  * @package App\Models\Shop
  */
-class ShopMetadata extends Model
+class ShopMetadata extends BaseModel
 {
     protected $table = 'shop.shop_metadata';
 
