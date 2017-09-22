@@ -4,16 +4,16 @@
         <div v-else>
             <div v-if="entity == 'Sections'">
                 <div v-for="filter in filters" class="row">
-                    <div class="col-md-3">
+                    <div class="col-sm-3">
                         <span class="badge badge-default">
                             {{((typeof filter.code !== 'undefined') ? 'Фильтр №' : 'Новый фильтр №') + filter.num}}
                         </span>
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-sm-5">
                         <input type="text" class="form-control" v-model="filter.value"
                                placeholder="Введите значение фильтра">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-sm-2">
                         <button type="button" class="btn w-100"
                                 :class="(filter.auto_create)?'btn-success':'btn-secondary'"
                                 @click="filter.auto_create = !filter.auto_create">
@@ -22,7 +22,7 @@
                             Авто-создание
                         </button>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-sm-2">
                         <button v-if="typeof filter.code!=='undefined'" @click="deleteFilter(filter.num)"
                                 class="btn w-100 btn-danger"><span class="glyphicon glyphicon-remove"></span> Удалить
                         </button>
@@ -30,21 +30,30 @@
                                 class="btn w-100 btn-success"><span class="glyphicon glyphicon-plus"></span> Добавить
                         </button>
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-sm-12">
                         <hr/>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-lg btn-warning float-left" @click="generateFilters">Сгенерировать фильтры</button>
+                        <div class="float-left field-description ml-4">
+                            Фильтры создаются в зависимости от товаров, которые доступны в этом разделе.<br>
+                            Создание фильтров происходит автоматически каждую ночь.
+                        </div>
                     </div>
                 </div>
             </div>
             <div v-else>
                 <div v-for="sf in sectionFilters" class="row">
-                    <div class="col-md-3">
+                    <div class="col-sm-3">
                         <span class="badge badge-default">
                             {{sf.value}}
                         </span>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-sm-9">
                         <div v-for="filter in filters" v-if="filter.num === sf.num" class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-sm-6">
                                 <div class="input-group w-100">
                                     <input type="text" v-model="filter.value"
                                            class="form-control border-right-0 dropdown-toggle" data-toggle="dropdown">
@@ -68,13 +77,13 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-sm-3">
                                 <input type="text" class="form-control" placeholder="ID после сохранения" disabled
                                        v-model="filter.code">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-sm-12">
                         <hr/>
                     </div>
                 </div>
@@ -190,6 +199,13 @@
                 }).then(function () {
                     self.loadFilters();
                 });
+            },
+            generateFilters(e){
+                if(this.entity !== 'Sections') return;
+                e.target.innerHTML = '<span class="glyphicon glyphicon-refresh"></span> Ожидайте...';
+                Ajax.post('/shop','generateFilters', {'section_id': this.id}).then(function(res){
+
+                });
             }
         }
     });
@@ -203,5 +219,8 @@
 
     .filters .dropdown-toggle::after {
         margin-left: 0;
+    }
+    .field-description{
+        color: #888;
     }
 </style>
