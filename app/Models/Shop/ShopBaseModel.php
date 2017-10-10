@@ -31,6 +31,8 @@ class ShopBaseModel extends BaseModel
     const FIELD_TYPE_DATE     = 'date';
     const FIELD_TYPE_OBJECT   = 'obejct';
 
+    private $metaLoaded = false;
+
     protected static $fields;
     protected static $commonFields = [
         'id'                => [
@@ -224,8 +226,16 @@ class ShopBaseModel extends BaseModel
     /**
      * @return $this
      */
-    public function filter(){
-        return $this->hasMany(ShopMetadata::class, 'entity_id')->where('entity', '=', self::getClassName());
+    public function filters(){
+        return $this->hasMany(EntityFilters::class, 'entity_id')->where('entity', '=', self::getClassName());
+    }
+
+    public function getFiltersAttribute(){
+        if(!isset($this->attributes['filters'])) {
+
+            $this->attributes['filters'] = $this->filters()->get();
+        }
+        return $this->attributes['filters'];
     }
 
     /**

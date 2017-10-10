@@ -8,6 +8,7 @@ use App\Models\Shop\EntityFilters;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
+use App\Services\Shop\FilterGeneratorService;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Writers\LaravelExcelWriter;
@@ -273,9 +274,8 @@ class ShopController extends Controller
             return $result;
         }
 
-
-        EntityFilters::where('entity',$entity)->where('entity_id', $id)->delete();
-        foreach($filters as $filter){
+        EntityFilters::where('entity', $entity)->where('entity_id', $id)->delete();
+        foreach ($filters as $filter) {
             if (!array_get($filter, 'value') || !array_get($filter, 'num')) {
                 continue;
             }
@@ -303,11 +303,11 @@ class ShopController extends Controller
                 function ($join) use ($goodsTable, $filtersTable) {
                     $join->on($goodsTable . '.id', '=', $filtersTable . '.entity_id');
                     $join->on($filtersTable . '.entity', '=', \DB::raw('"Goods"'));
-                })->where('goods.section_id', '=', $id)->orderBy('value','asc')->get();
+                })->where('goods.section_id', '=', $id)->orderBy('value', 'asc')->get();
 
-            foreach($filters as &$filter){
-                foreach($values as $v){
-                    if($filter['num'] == $v->num){
+            foreach ($filters as &$filter) {
+                foreach ($values as $v) {
+                    if ($filter['num'] == $v->num) {
                         $filter['distinct_values'][] = $v;
                     }
                 }
@@ -315,5 +315,12 @@ class ShopController extends Controller
         }
 
         return $filters;
+    }
+
+
+    public function generateFilters($section_id)
+    {
+        $FilterGenerator = new FilterGeneratorService($section_id);
+        $FilterGenerator->loadFilters();
     }
 }
