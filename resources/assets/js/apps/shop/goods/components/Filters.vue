@@ -125,6 +125,7 @@
                             Ajax.post('/shop', 'getSectionFilters', {
                                 'id': model.section_id
                             }).then(function (res) {
+                                console.log(res)
                                 self.sectionFilters = res;
                                 resolve();
                             });

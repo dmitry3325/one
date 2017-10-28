@@ -282,7 +282,6 @@ class ShopBaseModel extends BaseModel
                 self::addMeta($data, $res['meta']);
             }
         }
-        //dd(\DB::getQueryLog());
         return $data;
     }
 
@@ -371,7 +370,6 @@ class ShopBaseModel extends BaseModel
             $setUrl['url'] = $this->attributes['url'];
             unset($this->attributes['url']);
         }
-
         $result['result'] = parent::save($options);
 
         if (count($setToMeta)) {
@@ -418,17 +416,10 @@ class ShopBaseModel extends BaseModel
             $photos[] = $l->photo_id;
         }
 
-        $this->photos = json_encode($photos);
+        $this->photos = $photos;
         $this->save();
 
         return $photos;
-    }
-
-    /**
-     * @return array
-     */
-    public function setPhotosAttribute(){
-        $this->savePhotos();
     }
 
     /**
@@ -447,6 +438,10 @@ class ShopBaseModel extends BaseModel
         return $this->getPhotos('jpeg');
     }
 
+    public function setPhotosAttribute($photos)
+    {
+        $this->attributes['photos'] = json_encode($photos);
+    }
     /**
      * @param string $ext
      *

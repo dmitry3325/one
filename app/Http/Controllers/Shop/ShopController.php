@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Classes\Traits\Shop\QueryFilterTrait;
 use App\Models\Shop\EntityFilters;
+use App\Models\Shop\Sections;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
 use App\Services\Shop\FilterGeneratorService;
+use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Writers\LaravelExcelWriter;
@@ -90,7 +92,6 @@ class ShopController extends Controller
         if (!ShopBaseModel::checkEntity($entity)) {
             return ['result' => false];
         }
-
         $e = $entity::find($id);
         $e->fill($data);
         $res = $e->save();
@@ -293,7 +294,7 @@ class ShopController extends Controller
      */
     public function getSectionFilters($id)
     {
-        $filters = EntityFilters::where('entity_id', $id)->get()->toArray();
+        $filters = EntityFilters::where('entity_id', $id)->where('entity', Sections::getClassName())->get()->toArray();
 
         $return = [];
         if (count($filters)) {

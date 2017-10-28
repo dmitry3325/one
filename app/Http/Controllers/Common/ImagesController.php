@@ -228,9 +228,9 @@ class ImagesController extends Controller
             return $res;
         }
 
-        $e          = $entity::findOrFail($id);
-        $ph         = Photos::where('entity', '=', $entity)->where('entity_id', '=', $id)->where('photo_id', '=',
-            $num)->first();
+        $e  = $entity::findOrFail($id);
+        $ph = Photos::where('entity', '=', $entity)->where('entity_id', '=', $id)
+            ->where('photo_id', '=', $num)->first();
         $ph->hidden = intval($hide);
         $ph->save();
         $e->savePhotos();

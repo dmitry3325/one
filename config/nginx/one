@@ -6,11 +6,11 @@ server {
     #listen [::]:8080 default_server ipv6only=on; ## слушаем ipv6
 
     server_name lone;
-    root        /home/dmitry/my/one/public/;
+    root        /www/one/public/;
     index       index.php;
 
-    access_log  /home/dmitry/my/one/storage/logs/access.log;
-    error_log   /home/dmitry/my/one/storage/logs/error.log;
+    access_log  /www/one/storage/logs/access.log;
+    error_log   /www/one/storage/logs/error.log;
 
     location ~ /p/(.+).(gif|jpg|jpeg|png) {
         try_files $uri /;
@@ -27,7 +27,7 @@ server {
     location ~ \.php$ {
                     try_files $uri =404;
                     fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                    fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+                    fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;
                     fastcgi_index index.php;
                     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
                     include fastcgi_params;

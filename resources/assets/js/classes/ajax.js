@@ -1,6 +1,10 @@
 class Ajax {
     constructor() {
         this.requests = [];
+        this.J = axios.create({
+            headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')}
+            });
+
         return this;
     }
 
@@ -9,7 +13,7 @@ class Ajax {
         if (typeof data === 'undefined') data = {};
 
         return new Promise((resolve, reject) => {
-            let def = axios.post(className + '?method=' + method, {'params': data});
+            let def = this.J.post(className + '?method=' + method, {'params': data});
             def.then(function (response) {
                 if (response.data) {
                     resolve(response.data);
@@ -41,7 +45,7 @@ class Ajax {
         }
 
         return new Promise((resolve, reject) => {
-            let def = axios.get(className + func + params);
+            let def = this.J.get(className + func + params);
             def.then(function (response) {
                 if (response.data) {
                     resolve(response.data);

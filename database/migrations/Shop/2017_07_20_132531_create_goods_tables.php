@@ -59,6 +59,7 @@ class CreateGoodsTables extends Migration
                 $table->integer('comments_num')->nullable();
                 $table->integer('picture_id')->default(0);
                 $table->string('photos')->default('');
+                $table->string('short_description')->default('');
                 $table->dateTime('first_inventory')->nullable();
                 $table->tinyInteger('not_for_ya_market')->nullable();
                 $table->tinyInteger('not_for_site_map')->nullable();
