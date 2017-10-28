@@ -12,7 +12,7 @@ class BaseShopSeeder extends Seeder
      */
     private $faker;
 
-    private $names = [
+    static $names = [
         '1ST CHOICE',
 '7 собак',
 '8in1',

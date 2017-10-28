@@ -138,6 +138,7 @@
                     'num': num,
                     'hide': hide
                 }).then(function (res) {
+                    console.log(res);
                     self.loadData();
                 });
             },
