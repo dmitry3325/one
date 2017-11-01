@@ -417,7 +417,6 @@ class ShopBaseModel extends BaseModel
         }
 
         $this->photos = $photos;
-        var_dump($this->photos);exit();
         $this->save();
 
         return $photos;
