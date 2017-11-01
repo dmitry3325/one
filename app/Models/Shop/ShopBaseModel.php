@@ -417,6 +417,7 @@ class ShopBaseModel extends BaseModel
         }
 
         $this->photos = $photos;
+        var_dump($this->photos);exit();
         $this->save();
 
         return $photos;
@@ -453,7 +454,7 @@ class ShopBaseModel extends BaseModel
         $photos = [];
         foreach (Photos::$sizes as $size => $photo) {
             foreach ($ph as $num) {
-                $this->getPhotoUrl($size, $num, $ext);
+                $photos[] = $this->getPhotoUrl($size, $num, $ext);
             }
         }
         return $photos;
