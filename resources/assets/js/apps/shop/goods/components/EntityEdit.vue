@@ -144,15 +144,13 @@
 
                 }
             }
+            Vue.Events.on('entity_edit:setAttribute', this.setAttribute);
         },
         methods: {
             getPackage() {
                 if (this.entity && this.packages[this.entity]) {
                     return this.packages[this.entity];
                 } else return {};
-            },
-            showPhotoEditor() {
-
             },
             isNoEditable(field) {
                 if (typeof this.Fields[field].editable !== 'undefined' && !Boolean(this.Fields[field].editable)) {
@@ -176,13 +174,16 @@
                         }
                     });
             },
-            saveEntity() {
+            saveEntity(e) {
                 let newData = {};
                 for (let i in this.Model) {
                     if (typeof this.BaseModel[i] === 'undefined' || this.BaseModel[i] !== this.Model[i]) {
                         newData[i] = this.Model[i];
                     }
                 }
+
+                let $el = e.target;
+                $el.setAttribute("disabled", true);
                 Data.entity.update(this.entity, this.id, newData).then(function (res) {
                     if (res.result) {
                         AppNotifications.add({
@@ -198,6 +199,7 @@
                             });
                         }
                     }
+                    $el.removeAttribute("disabled");
                 });
                 Vue.Events.emit('entity_save');
             },
@@ -217,6 +219,12 @@
                         }
                     }
                 });
+            },
+            setAttribute(enity, id, data){
+                if(this.entity !== enity || this.id !== id) return;
+                for(var i in data){
+                    this.$set(this.Model,i, data[i]);
+                }
             }
         }
     });

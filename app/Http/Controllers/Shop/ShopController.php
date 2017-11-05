@@ -92,6 +92,10 @@ class ShopController extends Controller
         if (!ShopBaseModel::checkEntity($entity)) {
             return ['result' => false];
         }
+
+        //Фото сохраняются сами
+        if(isset($data['photos'])) unset($data['photos']);
+
         $e = $entity::find($id);
         $e->fill($data);
         $res = $e->save();

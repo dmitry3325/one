@@ -435,7 +435,7 @@ class ShopBaseModel extends BaseModel
      */
     public function getPhotosAttribute()
     {
-        return $this->getPhotos('jpeg');
+        return json_decode($this->attributes['photos'], true);
     }
 
     public function setPhotosAttribute($photos)
@@ -447,13 +447,13 @@ class ShopBaseModel extends BaseModel
      *
      * @return array
      */
-    public function getPhotos($ext = 'jpeg')
+    public function getPhotosUrls($ext = 'jpeg')
     {
         $ph     = ($this->attributes['photos']) ? json_decode($this->attributes['photos'], true) : [];
         $photos = [];
         foreach (Photos::$sizes as $size => $photo) {
             foreach ($ph as $num) {
-                $this->getPhotoUrl($size, $num, $ext);
+                $photos[$size] = $this->getPhotoUrl($size, $num, $ext);
             }
         }
         return $photos;

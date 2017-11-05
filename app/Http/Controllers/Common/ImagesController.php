@@ -40,11 +40,11 @@ class ImagesController extends Controller
 
         $path = str_replace(Photos::PIC_PATH, '', '/' . \Request::path());
         TempPhotos::create([
-            'entity'    => $Info['entity'],
+            'entity' => $Info['entity'],
             'entity_id' => $Info['entity_id'],
-            'photo_id'  => $Info['photo_id'],
-            'filetype'  => $Info['filetype'],
-            'path'      => $path,
+            'photo_id' => $Info['photo_id'],
+            'filetype' => $Info['filetype'],
+            'path' => $path,
         ]);
         if (!isset($size['no_water_mark']) || !$size['no_water_mark']) {
             if (file_exists(public_path() . self::WATERMARK)) {
@@ -70,36 +70,35 @@ class ImagesController extends Controller
         $Data['filetype'] = $matches[2];
 
         $fn = function ($url) {
-            $split  = explode('_', $url);
-            $last   = end($split);
+            $split = explode('_', $url);
+            $last = end($split);
             $number = 1; // По умолчанию 1 картинка
             if (is_numeric($last) && count($split) > 1) {
                 $number = $last;
-                $url    = substr($url, 0, strlen($url) - strlen($last) - 1);
+                $url = substr($url, 0, strlen($url) - strlen($last) - 1);
             }
             return [
                 'photo_id' => $number,
-                'url'      => $url,
+                'url' => $url,
             ];
         };
 
-        $info         = explode('/', $matches[1]);
+        $info = explode('/', $matches[1]);
         $Data['size'] = $info[0];
         if (count($info) == 2) {
             $Data = array_merge($Data, $fn($info[1]));
-            $res  = Urls::where('url', '=', $Data['url'])->first();
+            $res = Urls::where('url', '=', $Data['url'])->first();
             if ($res && $res->entity_id) {
-                $Data['entity']    = $res->entity;
+                $Data['entity'] = $res->entity;
                 $Data['entity_id'] = $res->entity_id;
             }
-        }
-        else if (count($info) == 3) {
+        } else if (count($info) == 3) {
             $ent = explode('_', $info[1]);
             foreach ($ent as &$v) {
                 $v = ucfirst($v);
             }
             $Data['entity'] = implode('', $ent);
-            $Data           = array_merge($Data, $fn($info[2]));
+            $Data = array_merge($Data, $fn($info[2]));
             if (is_numeric($Data['url'])) {
                 $Data['entity_id'] = $Data['url'];
             }
@@ -124,14 +123,18 @@ class ImagesController extends Controller
             return [];
         }
 
-        $e      = $entity::findOrFail($id);
+        $e = $entity::findOrFail($id);
         $photos = $e->photos()->orderBy('photo_id', 'asc')->get()->toArray();
         foreach (Photos::$sizes as $size => $photo) {
             foreach ($photos as &$p) {
                 $p['urls'][$size] = $e->getPhotoUrl($size, $p['photo_id'], str_replace('image/', '', $p['filetype']));
             }
         }
-        return $photos;
+
+        return [
+            'short_list' => $e->photos,
+            'photos' => $photos
+        ];
     }
 
     /**
@@ -139,7 +142,7 @@ class ImagesController extends Controller
      */
     public function uploadImgs()
     {
-        $id     = \Request::get('id');
+        $id = \Request::get('id');
         $entity = \Request::get('entity');
         $images = \Request::file('images');
 
@@ -151,8 +154,7 @@ class ImagesController extends Controller
             foreach ($images as $k => $img) {
                 Photos::addImg($entity, $id, new Images($img->path()));
             }
-        }
-        else if (\Request::get('image')) {
+        } else if (\Request::get('image')) {
             Photos::addImg($entity, $id, new Images(\Request::get('image')));
         }
 
@@ -228,7 +230,7 @@ class ImagesController extends Controller
             return $res;
         }
 
-        $e  = $entity::findOrFail($id);
+        $e = $entity::findOrFail($id);
         $ph = Photos::where('entity', '=', $entity)->where('entity_id', '=', $id)
             ->where('photo_id', '=', $num)->first();
         $ph->hidden = intval($hide);

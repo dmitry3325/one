@@ -8,11 +8,11 @@ class Events {
         this.events[name].push(callback);
     }
 
-    emit(name) {
+    emit(name, params) {
         if (this.events[name]) {
             for (let i = 0; i < this.events[name].length; i++) {
                 if (typeof this.events[name][i] === 'function') {
-                    this.events[name][i]();
+                    this.events[name][i].apply(null, params);
                 }
             }
         }

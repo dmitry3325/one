@@ -99,6 +99,7 @@
         },
         data: function () {
             return {
+                allowSave : false,
                 filters: {},
                 sectionFilters: {},
                 Model: {},
@@ -125,7 +126,6 @@
                             Ajax.post('/shop', 'getSectionFilters', {
                                 'id': model.section_id
                             }).then(function (res) {
-                                console.log(res)
                                 self.sectionFilters = res;
                                 resolve();
                             });
@@ -137,6 +137,7 @@
             },
             loadFilters() {
                 let self = this;
+                self.allowSave = false;
                 return Ajax.post('/shop', 'getEntityFilters', {
                     'entity': this.entity,
                     'id': this.id
@@ -160,6 +161,7 @@
                             });
                         });
                     }
+                    self.allowSave = true;
                 });
             },
             addFilter(filter, e) {
@@ -193,6 +195,8 @@
             },
             save() {
                 let self = this;
+                if(!self.allowSave) return null;
+                self.allowSave = false;
                 Ajax.post('/shop', 'saveFilters', {
                     'entity': this.entity,
                     'id': this.id,

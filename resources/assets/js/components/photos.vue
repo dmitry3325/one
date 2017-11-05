@@ -85,7 +85,8 @@
                 let self = this;
                 return Ajax.post(this.controller, 'getEntityPhotos', {'entity': this.entity, 'id': this.id})
                     .then(function (res) {
-                        self.$set(self, 'photos', res);
+                        self.$set(self, 'photos', res['photos']);
+                        Vue.Events.emit('entity_edit:setAttribute', [self.entity, self.id, {'photos': res['short_list']}]);
                     });
             },
             loadFiles(e) {
