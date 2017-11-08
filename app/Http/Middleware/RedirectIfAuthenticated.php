@@ -20,7 +20,7 @@ class RedirectIfAuthenticated
     {
         $urlParts = explode('/', $request->path());
         if (array_get($urlParts, 0) === 'p') {
-            
+            //отдаем картинки без авторизации
         }
         elseif ($request->wantsJson()) {
             if (!Auth::check()) {
