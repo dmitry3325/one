@@ -90,6 +90,9 @@
                         <div v-else-if="tab.component == 'filters'">
                             <filters :entity="entity" :id="id"></filters>
                         </div>
+                        <div v-else-if="tab.component == 'goods_links'">
+                            <goods_links :entity="entity" :id="id"></goods_links>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,11 +102,14 @@
 <script>
     let Photos = require('../../../../components/photos.vue');
     let Filters = require('./Filters.vue');
+    let GoodsLinks = require('./GoodsLinks.vue');
     let ConfirmModal = require('../../../../components/confirmModal.vue');
+
     module.exports = Vue.extend({
         components: {
             'photos': Photos,
-            'filters': Filters
+            'filters': Filters,
+            'goods_links': GoodsLinks
         },
         props: {
             'id': Number,

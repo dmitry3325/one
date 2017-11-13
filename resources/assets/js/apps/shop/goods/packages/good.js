@@ -201,32 +201,7 @@ good['prices'] = {
 };
 good['good_links'] = {
     'title': 'Связанные товары / Компоненты',
-    'content': [
-        [
-            {
-                'field': 'components',
-                'size': 12
-            }
-        ],
-        [
-            {
-                'content': '<hr>',
-                'size': 12
-            }
-        ],
-        [
-            {
-                'field': 'links_title',
-                'size': 12
-            }
-        ],
-        [
-            {
-                'field': 'links_list',
-                'size': 12
-            }
-        ]
-    ]
+    'component': 'goods_links'
 };
 
 module.exports = good;
