@@ -18,9 +18,16 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($request->wantsJson()) {
-            if(!Auth::check()) return response()->json(['error'=>'Not Authorized'], 403);
-        }else if (!Auth::check()) {
+        $urlParts = explode('/', $request->path());
+        if (array_get($urlParts, 0) === 'p') {
+            //отдаем картинки без авторизации
+        }
+        elseif ($request->wantsJson()) {
+            if (!Auth::check()) {
+                return response()->json(['error' => 'Not Authorized'], 403);
+            }
+        }
+        else if (!Auth::check()) {
             return redirect('/common/auth');
         }
 
