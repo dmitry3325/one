@@ -49,6 +49,21 @@
                 </div>
             </div>
         </div>
+        <div id="filterModal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myLargeModalLabel">Выберите фильтры</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <filter-selector :entity="_getCurEntity()" :callback="filterSelectorCallback"></filter-selector>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -58,6 +73,9 @@
     let EntityEdit = require('./EntityEdit.vue');
 
     module.exports = Vue.extend({
+        components: {
+            'filter-selector': FilterSelector
+        },
         data: function () {
             return {
                 id: null,
@@ -213,21 +231,16 @@
             },
             showFiltersSelector() {
                 let self = this;
-                new FilterSelector({
-                    el: this.setTarget('#goodsAdmin'),
-                    data: {
-                        'entity': this._getCurEntity(),
-                        'filters': ((this.filters) ? this.filters : []),
-                        'callback': function (filters) {
-                            self.filters = filters;
-                            Url.set('filters', filters);
-                            Ls.set('selected_filters', filters);
-                            self.callLoadData(null, {
-                                'filters': filters
-                            });
-                        }
-                    }
+                $('#filterModal').modal('show');
+            },
+            filterSelectorCallback(filters){
+                this.filters = filters;
+                Url.set('filters', filters);
+                Ls.set('selected_filters', filters);
+                this.callLoadData(null, {
+                    'filters': filters
                 });
+                $('#filterModal').modal('hide');
             },
             showFieldsEditor(e) {
                 let self = this;

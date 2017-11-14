@@ -1,6 +1,12 @@
 <template>
     <div class="row">
         <div class="links-filter-selector col-md-6">
+            <h1>Укажите подходящие товары:</h1>
+            <filter-selector
+                    :entity="entity"
+                    :callback="filterSelectorCallback">
+                    :ls_storage_key="null"
+            </filter-selector>
         </div>
         <div class="col-md-6">
 
@@ -15,22 +21,21 @@
             'id': Number,
             'entity': String,
         },
+        components: {
+            'filter-selector': FilterSelector
+        },
         data: function(){
             return {
 
             };
         },
         mounted() {
-            new FilterSelector({
-                el: this.setTarget(this.$el.getElementsByClassName('links-filter-selector')),
-                'entity': 'Goods',
-                'callback': function(){
 
-                }
-            });
         },
         methods: {
+            filterSelectorCallback(){
 
+            }
         }
     });
 </script>
