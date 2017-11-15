@@ -64,10 +64,10 @@
                               class="badge badge-default">Добавить</span>
             </div>
         </div>
-        <div>
-            <hr/>
-        </div>
-        <div>
+        <div v-if="!no_save_button">
+            <div>
+                <hr/>
+            </div>
             <button type="button" @click="save" class="btn btn-success float-right">Сохранить</button>
         </div>
     </div>
@@ -86,6 +86,9 @@
                 'default': function () {
                     return [{}];
                 },
+            },
+            'no_save_button': {
+                'default': false,
             },
             'callback':       {
                 'default': function () {
@@ -122,6 +125,10 @@
                 if (!filters) this.$set(this.filters, 0, [{}]);
                 else this.$set(self, 'filters', filters);
             }
+
+            Vue.Events.on('filtersSelector:save', function(){
+                this.save();
+            });
         },
         methods: {
             save() {

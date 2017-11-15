@@ -31,14 +31,9 @@ class ShopMetadata extends BaseModel
             'title' => 'Полное описание',
             'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
         ],
-        'links_title' => [
-            'title' => 'Заголовок к связанным товарам',
-            'type'  => ShopBaseModel::FIELD_TYPE_STRING,
-        ],
-        'links_list' => [
+        'goods_links_data' => [
             'title' => 'Список связаных товаров',
-            'type'  => ShopBaseModel::FIELD_TYPE_STRING,
-            'description'=>''
+            'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
         ],
         'components' => [
             'title' => 'Компоненты товара',
