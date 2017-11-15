@@ -10,33 +10,20 @@ class Entity {
     }
 
     getFilterMethods(force) {
-        let self = this;
-        if (self.filterMethods && !force) {
-            return new Promise((resolve, reject) => {
-                resolve(self.filterMethods);
-            });
-        } else {
-            return Ajax.post(this.className, 'getFilterMethods', {}, function (data) {
-                self.filterMethods = data;
-            });
+        if (!this.filterMethods || force) {
+            this.filterMethods = Ajax.post(this.className, 'getFilterMethods');
         }
+        return this.filterMethods;
     }
 
     getAllFields(entity, force) {
         if (typeof entity === 'undefined' && this.entity) {
             entity = this.entity;
         }
-
-        let self = this;
-        if (self.allFields[entity] && !force) {
-            return new Promise((resolve, reject) => {
-                resolve(self.allFields[entity]);
-            });
-        } else {
-            return Ajax.post(this.className, 'getAllFields', {entity: entity}, function (data) {
-                self.allFields[entity] = data;
-            });
+        if (!this.allFields[entity] || force) {
+            this.allFields[entity] = Ajax.post(this.className, 'getAllFields', {entity: entity});
         }
+        return this.allFields[entity];
     }
 
     getBaseFields(entity, force) {
@@ -44,47 +31,35 @@ class Entity {
             entity = this.entity;
         }
 
-        let self = this;
-        if (self.baseFields[entity] && !force) {
-            return new Promise((resolve, reject) => {
-                resolve(self.baseFields[entity]);
-            });
-        } else {
-            return Ajax.post(this.className, 'getBaseFields', {entity: entity}, function (data) {
-                self.baseFields[entity] = data;
-            });
+        if (!this.baseFields[entity] || force) {
+            this.baseFields[entity] = Ajax.post(this.className, 'getBaseFields', {entity: entity});
         }
+        return this.baseFields[entity];
     }
 
     getItemsList(entity, options, force) {
         if (typeof options !== 'object' && typeof entity === 'object') {
             force = options;
             entity = options;
-            entity = undefined;
         }
         if (typeof entity === 'undefined' && this.entity) {
             entity = this.entity;
         }
         if (typeof options === 'undefined') options = {};
 
-        let self = this;
         let key = JSON.stringify(options);
 
-        if (self.lists[entity] && self.lists[entity].key === key && !force) {
-            return new Promise((resolve, reject) => {
-                resolve(self.lists[entity].data);
-            });
-        } else {
-            return Ajax.post(this.className, 'getItemsList', {
-                entity: entity,
+        if (!this.lists[entity] || this.lists[entity].key === key || force) {
+            let def = Ajax.post(this.className, 'getItemsList', {
+                entity:  entity,
                 options: options
-            }, function (res) {
-                self.lists[entity] = {
-                    'key': key,
-                    'data': res
-                };
             });
+            this.lists[entity] = {
+                'key': key,
+                'def': def
+            };
         }
+        return this.lists[entity].def;
     }
 
     create(entity, data, getEntity) {
@@ -95,13 +70,13 @@ class Entity {
         }
 
         return Ajax.post(this.className, 'createEntity', {
-            entity: entity,
-            data: data,
+            entity:      entity,
+            data:        data,
             'getEntity': getEntity
         });
     }
 
-    update(entity, id, data){
+    update(entity, id, data) {
         if (typeof id === 'object' && typeof entity === 'number' && this.entity) {
             data = id;
             id = entity;
@@ -110,12 +85,12 @@ class Entity {
 
         return Ajax.post(this.className, 'updateEntity', {
             entity: entity,
-            id: id,
-            data: data
+            id:     id,
+            data:   data
         });
     }
 
-    deleteEntity(entity, id){
+    deleteEntity(entity, id) {
         if (typeof entity === 'number' && this.entity) {
             id = entity;
             entity = this.entity;
@@ -123,7 +98,7 @@ class Entity {
 
         return Ajax.post(this.className, 'deleteEntity', {
             entity: entity,
-            id: id
+            id:     id
         });
     }
 
@@ -133,22 +108,15 @@ class Entity {
             id = entity;
             entity = this.entity;
         }
+        if (!this.entities[entity] || !this.entities[entity][id] || force) {
+            if (!this.entities[entity]) this.entities[entity] = {};
 
-        let self = this;
-
-        if (this.entities[entity] && this.entities[entity][id] && !force) {
-            return new Promise((resolve, reject) => {
-                resolve(self.entities[entity][id]);
-            });
-        } else {
-            return Ajax.post(this.className, 'getEntity', {
+            this.entities[entity][id] = Ajax.post(this.className, 'getEntity', {
                 entity: entity,
-                id: id
-            }, function (res) {
-                if (!self.entities[entity]) self.entities[entity] = {};
-                self.entities[entity][id] = res;
+                id:     id
             });
         }
+        return  this.entities[entity][id];
     }
 }
 
@@ -181,9 +149,9 @@ class HtmlPages extends Entity {
 }
 
 module.exports = {
-    'entity': new Entity(),
+    'entity':   new Entity(),
     'sections': new Sections(),
-    'filters': new Filters(),
-    'goods': new Goods(),
-    'pages': new HtmlPages(),
+    'filters':  new Filters(),
+    'goods':    new Goods(),
+    'pages':    new HtmlPages(),
 };

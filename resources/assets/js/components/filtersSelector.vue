@@ -44,7 +44,7 @@
                             <div class="col-md-1">
                                 <button type="button" class="btn btn-sm btn-danger"
                                         @click="$delete(list,index_and);
-                                                ((Object.keys(filters).length>1 && Object.keys(list).length==0)?$delete(filters,index_or):'')">
+                                        ((Object.keys(filters).length>1 && Object.keys(list).length==0)?$delete(filters,index_or):'')">
                                     <span class="glyphicon glyphicon-remove"></span>
                                 </button>
                             </div>
@@ -64,7 +64,9 @@
                               class="badge badge-default">Добавить</span>
             </div>
         </div>
-        <div><hr/></div>
+        <div>
+            <hr/>
+        </div>
         <div>
             <button type="button" @click="save" class="btn btn-success float-right">Сохранить</button>
         </div>
@@ -73,28 +75,28 @@
 </template>
 <script>
     module.exports = Vue.extend({
-        props: {
-            'entity': {
+        props:   {
+            'entity':         {
                 'default': null
             },
             'ls_storage_key': {
                 'default': 'selected_filters'
             },
-            'filters': {
-                'default': function(){
+            'filters':        {
+                'default': function () {
                     return [{}];
                 },
             },
-            'callback': {
-                'default': function(){
+            'callback':       {
+                'default': function () {
                     return null;
                 }
             }
         },
-        data: function () {
+        data:    function () {
             return {
                 'allFields': {},
-                'methods': [],
+                'methods':   [],
             };
         },
         mounted() {
@@ -113,7 +115,7 @@
 
             if (!this.filters || !Object.keys(this.filters).length) {
                 let filters = null;
-                if(this.ls_storage_key) {
+                if (this.ls_storage_key) {
                     filters = Ls.get(this.ls_storage_key);
                 }
 
@@ -123,7 +125,7 @@
         },
         methods: {
             save() {
-                if(this.ls_storage_key) {
+                if (this.ls_storage_key) {
                     Ls.set(this.ls_storage_key, this.filters);
                 }
                 if (typeof this.callback === 'function') {

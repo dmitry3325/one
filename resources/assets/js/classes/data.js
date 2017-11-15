@@ -3,7 +3,7 @@ export default {
         window.Data = Vue.Data = {};
         let Entity = require('./data/entity.js');
 
-        for(var key in Entity){
+        for(let key in Entity){
             Data[key] = Entity[key];
         }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="row">
+    <div class="row" v-show="dataLoaded">
         <div class="links-filter-selector col-md-6">
             <h1>Укажите подходящие товары:</h1>
             <filter-selector
@@ -26,11 +26,13 @@
         },
         data: function(){
             return {
-
+                'dataLoaded' : false,
             };
         },
         mounted() {
+            Data.entity.get(this.entity, this.id, true).then(function (res) {
 
+            });
         },
         methods: {
             filterSelectorCallback(){
