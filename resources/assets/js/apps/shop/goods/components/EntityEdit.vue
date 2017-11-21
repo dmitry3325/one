@@ -91,7 +91,7 @@
                             <filters :entity="entity" :id="id"></filters>
                         </div>
                         <div v-else-if="tab.component == 'goods_links'">
-                            <goods_links :entity="entity" :id="id"></goods_links>
+                            <goods_links ref="goods_links" :entity="entity" :id="id" :links_data="Model.goods_links_data"></goods_links>
                         </div>
                     </div>
                 </div>
@@ -140,7 +140,6 @@
                     Data.entity.get(this.entity, this.id, true).then(function (res) {
                         self.$set(self, 'Model', Funs.cloneObject(res));
                         self.$set(self, 'BaseModel', Funs.cloneObject(res));
-
                         if (self.Model.section_id) {
                             Data.sections.get(self.Model.section_id).then(function (res) {
                                 self.$set(self, 'Section', Funs.cloneObject(res));
@@ -181,6 +180,10 @@
                     });
             },
             saveEntity(e) {
+                Vue.Events.emit('Entity:pre_save');
+
+                newData.goods_links_data = this.$refs.goods_links[0].getData();
+
                 let newData = {};
                 for (let i in this.Model) {
                     if (typeof this.BaseModel[i] === 'undefined' || this.BaseModel[i] !== this.Model[i]) {
@@ -206,8 +209,8 @@
                         }
                     }
                     $el.removeAttribute("disabled");
+                    Vue.Events.emit('Entity:after_save');
                 });
-                Vue.Events.emit('entity_save');
             },
             deleteEntity() {
                 let self = this;

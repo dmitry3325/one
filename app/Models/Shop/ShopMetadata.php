@@ -76,6 +76,9 @@ class ShopMetadata extends BaseModel
                 'entity_id' => $id,
                 'key'       => $key,
             ];
+            if(is_array($val)){
+                $val = json_encode($val);
+            }
             self::updateOrCreate($data, array_merge($data, ['value' => $val]));
         }
 

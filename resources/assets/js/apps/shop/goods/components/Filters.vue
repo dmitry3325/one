@@ -114,7 +114,7 @@
                     self.loading = false;
                 });
             });
-            Vue.Events.on('entity_save', this.save);
+            Vue.Events.on('Entity:after_save', this.save);
         },
         methods: {
             getData() {
