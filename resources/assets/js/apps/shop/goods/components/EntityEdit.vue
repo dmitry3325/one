@@ -183,7 +183,7 @@
                 Vue.Events.emit('Entity:pre_save');
 
                 this.Model.goods_links_data = this.$refs.goods_links[0].getData();
-               
+
                 let newData = {};
                 for (let i in this.Model) {
                     if (typeof this.BaseModel[i] === 'undefined' || this.BaseModel[i] !== this.Model[i]) {
