@@ -71,7 +71,6 @@
             <button type="button" @click="save" class="btn btn-success float-right">Сохранить</button>
         </div>
     </div>
-
 </template>
 <script>
     module.exports = Vue.extend({
@@ -126,11 +125,14 @@
                 else this.$set(self, 'filters', filters);
             }
 
-            Vue.Events.on('filtersSelector:save', function(){
+            Vue.Events.on('filtersSelector:save', function () {
                 this.save();
             });
         },
         methods: {
+            getData() {
+                return this.filters;
+            },
             save() {
                 if (this.ls_storage_key) {
                     Ls.set(this.ls_storage_key, this.filters);

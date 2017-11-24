@@ -7,8 +7,7 @@
                     :entity="entity"
                     :filters="Model.filters"
                     :no_save_button="true"
-                    :callback="filterSelectorCallback">
-                :ls_storage_key="null"
+                    :ls_storage_key="null">
             </filter-selector>
         </div>
         <div class="col-md-6">
@@ -81,9 +80,13 @@
             }
         },
         methods:    {
-            getFilterSelectorData
+            getFilters(){
+                this.Model.filters = this.$refs.filter_selector.getData();
+                return this.Model.filters;
+            },
             getData() {
-                return this.Model;
+                this.getFilters();
+                return JSON.stringify(this.Model);
             }
         }
     });
