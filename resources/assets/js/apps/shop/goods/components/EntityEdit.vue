@@ -182,7 +182,9 @@
             saveEntity(e) {
                 Vue.Events.emit('Entity:pre_save');
 
-                this.Model.goods_links_data = this.$refs.goods_links[0].getData();
+                if(this.$refs.goods_links && this.$refs.goods_links.length > 0) {
+                    this.Model.goods_links_data = this.$refs.goods_links[0].getData();
+                }
 
                 let newData = {};
                 for (let i in this.Model) {
