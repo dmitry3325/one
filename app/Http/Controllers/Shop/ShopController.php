@@ -9,7 +9,7 @@ use App\Models\Shop\Sections;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
-use App\Services\Shop\FilterGeneratorService;
+use App\Services\Shop\FiltersGeneratorService;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
@@ -325,7 +325,7 @@ class ShopController extends Controller
 
     public function generateFilters($section_id)
     {
-        $FilterGenerator = new FilterGeneratorService($section_id);
-        $FilterGenerator->loadFilters();
+        $FilterGenerateService = new FiltersGeneratorService();
+        $FilterGenerateService->generateForSection(2);
     }
 }

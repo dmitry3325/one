@@ -36,13 +36,6 @@ class BaseModel extends Model
      */
     public static function getClassName($full = false)
     {
-        if (self::$class_name && !$full) {
-            return self::$class_name;
-        }
-        if (self::$class_full_name && $full) {
-            return self::$class_full_name;
-        }
-
         self::$class_full_name = get_called_class();
         $arr                   = explode('\\', self::$class_full_name);
         self::$class_name      = end($arr);
