@@ -7,12 +7,32 @@ use App\Models\Shop\Filters;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
 
+/**
+ * Сервис создания фильтров.
+ *
+ * Class FiltersGeneratorService
+ * @package App\Services\Shop
+ */
 class FiltersGeneratorService
 {
 
+    /**
+     * Тут будем хранить всякое дабы по 100 раз не ходить в базку
+     *
+     * @var array
+     */
+    private $storage = [];
+
+    /**
+     * @param      $section_id
+     * @param null $entity
+     *
+     * @return mixed
+     */
     public function loadFilters($section_id, $entity = null)
     {
-        if(!$entity) $entity = Goods::getClassName();
+        if (!$entity) $entity = Goods::getClassName();
+
         return EntityFilters::select('shop.entity_filters.*')
             ->join('shop.goods', function ($join) {
                 $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
@@ -22,30 +42,108 @@ class FiltersGeneratorService
             ->get();
     }
 
+    /**
+     * @param $section_id
+     */
     public function generateForSection($section_id)
     {
-        $section = Sections::findOrFail($section_id);
-        $sectionFilters = $section->filters;
+        $sectionFilters = $this->loadSectionFilters($section_id);
         $goodsFL = $this->loadFilters($section_id, Goods::getClassName());
-        $filtersFL = $this->loadFilters($section_id, Filters::getClassName());
 
         $byGood = [];
-        foreach($goodsFL as $filter){
-            $byGood[$filter->entity_id][$filter->num][] = $filter->value;
+        foreach ($goodsFL as $filter) {
+            if (isset($sectionFilters[$filter->num]) && $sectionFilters[$filter->num]) {
+                $byGood[$filter->entity_id][$filter->num . '-' . $filter->code] = $filter;
+            }
         }
 
-        foreach($byGood as $goodFils){
-            $list = [];
-            foreach($goodFils as $num=>$value){
-                $list[$num] = $this->struktura_array($value);
-            }
-            $list = $this->struktura_array($list);
-            dd($list);
+
+        $neededFilters = [];
+        foreach ($byGood as $id => $goodFils) {
+            $arr = $this->generateByFilters($goodFils);
         }
 
     }
 
-    private function struktura_array($mas, $saveKeys = true)
+    /**
+     * @param Goods $good
+     */
+    public function generateForGood(Goods $good)
+    {
+        $sectionFilters = $this->loadSectionFilters($good->section_id);
+        $goodsFL = EntityFilters::select('shop.entity_filters.*')
+            ->where('shop.entity_filters.entity', '=', Goods::getClassName())
+            ->where('shop.entity_filters.entity_id', '=', $good->id)
+            ->get();
+
+        $grouped = [];
+        foreach ($goodsFL as $filter) {
+            $grouped[$filter->num . '-' . $filter->code] = $filter;
+        }
+
+        $neededFilters = $this->generateByFilters($grouped);
+
+    }
+
+    /**
+     * @param $list
+     */
+    private function generateByFilters($list)
+    {
+        $filtersList = $this->strukturaArray($list);
+        $Data = [];
+        foreach ($filtersList as $byKey) {
+            $key = [];
+            $list = [];
+            foreach ($byKey as $k => $filter) {
+                if ($filter) {
+                    $key[] = $k;
+                    $list[$filter->entity_id][$filter->num][$filter->code] = $filter;
+                }
+            }
+            sort($key);
+            $key = implode('|', $key);
+            $Data[$key] = [
+                'key' => $key,
+                'filters' => $list
+            ];
+            dump($key);
+        }
+    }
+
+    /**
+     * Загружаем настройки раздела
+     *
+     * @param      $section_id
+     * @param bool $force
+     *
+     * @return mixed
+     */
+    private function loadSectionFilters($section_id, $force = false)
+    {
+        if (isset($this->storage['section_filters'][$section_id]) && !$force) return $this->storage['section_filters'][$section_id];
+        $section = Sections::findOrFail($section_id);
+
+        /** У раздела можно включать и выключать формирование фильтра */
+        $sectionFilters = [];
+        foreach ($section->filters as $f) {
+            $sectionFilters[$f->num] = $f->auto_create;
+        }
+
+        $this->storage['section_filters'][$section_id] = $sectionFilters;
+
+        return $this->storage['section_filters'][$section_id];
+    }
+
+    /**
+     * Создает комбинации фильтров
+     *
+     * @param      $mas
+     * @param bool $saveKeys
+     *
+     * @return array
+     */
+    private function strukturaArray($mas, $saveKeys = true)
     {
         $keys = array_keys($mas);
         $mas = array_values($mas);
@@ -79,27 +177,4 @@ class FiltersGeneratorService
         return $return;
     }
 
-    private function walk($good, $arr = [], $filter = 1)
-    {
-        $r = [];
-        foreach ($good as $num => $vals) {
-            $n = substr($num, 7);
-            if ($n < $filter) continue;
-            $filter = $n;
-            foreach ($vals as $val) {
-                $arr[$num] = $val;
-                $filters = $this->walk($good, $arr, $filter + 1);
-                if (sizeof($filters) > 0) {
-                    foreach ($filters as $fils) {
-                        $r[] = array_merge($arr, $fils);
-                    }
-                } else {
-                    $r[] = $arr;
-                }
-            }
-            break;
-        }
-
-        return $r;
-    }
 }

@@ -21,15 +21,15 @@ class ShopBaseModel extends BaseModel
 {
     use QueryFilterTrait;
 
-    const FIELD_TYPE_INT      = 'int';
-    const FIELD_TYPE_STRING   = 'input';
-    const FIELD_TYPE_DOUBLE   = 'double';
-    const FIELD_TYPE_TEXT     = 'textarea';
+    const FIELD_TYPE_INT = 'int';
+    const FIELD_TYPE_STRING = 'input';
+    const FIELD_TYPE_DOUBLE = 'double';
+    const FIELD_TYPE_TEXT = 'textarea';
     const FIELD_TYPE_CHECKBOX = 'checkbox';
-    const FIELD_TYPE_RADIO    = 'radio';
-    const FIELD_TYPE_SELECT   = 'select';
-    const FIELD_TYPE_DATE     = 'date';
-    const FIELD_TYPE_OBJECT   = 'obejct';
+    const FIELD_TYPE_RADIO = 'radio';
+    const FIELD_TYPE_SELECT = 'select';
+    const FIELD_TYPE_DATE = 'date';
+    const FIELD_TYPE_OBJECT = 'obejct';
 
     private $metaLoaded = false;
 
@@ -100,7 +100,7 @@ class ShopBaseModel extends BaseModel
             'type'     => self::FIELD_TYPE_DATE,
         ],
     ];
-    protected        $guarded      = ['id', 'created_at', 'updated_at'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
     /**
      * @param $entity
@@ -143,6 +143,7 @@ class ShopBaseModel extends BaseModel
                 $fields[] = $k;
             }
         }
+
         return $fields;
     }
 
@@ -165,15 +166,14 @@ class ShopBaseModel extends BaseModel
     {
         if (isset($this->attributes['url'])) {
             return $this->attributes['url'];
-        }
-        else {
+        } else {
             if (isset($this->relations['url']->id)) {
                 $this->attributes['url'] = $this->relations['url']->url;
-            }
-            else {
-                $url                     = $this->url()->first();
+            } else {
+                $url = $this->url()->first();
                 $this->attributes['url'] = ($url) ? $url->url : '';
             }
+
             return $this->attributes['url'];
         }
     }
@@ -191,7 +191,7 @@ class ShopBaseModel extends BaseModel
     }
 
     /**
-     * @param $data
+     * @param       $data
      * @param array $fields
      */
     public static function addMeta(&$data, $fields = [])
@@ -216,6 +216,7 @@ class ShopBaseModel extends BaseModel
         foreach ($meta as $m) {
             $this->{$m->key} = $m->value;
         }
+
         return $this;
     }
 
@@ -226,15 +227,20 @@ class ShopBaseModel extends BaseModel
     /**
      * @return $this
      */
-    public function filters(){
+    public function filters()
+    {
         return $this->hasMany(EntityFilters::class, 'entity_id')->where('entity', '=', self::getClassName());
     }
 
-    public function getFiltersAttribute(){
-        if(!isset($this->attributes['filters'])) {
-
+    /**
+     * @return mixed
+     */
+    public function getFiltersAttribute()
+    {
+        if (!isset($this->attributes['filters'])) {
             $this->attributes['filters'] = $this->filters()->get();
         }
+
         return $this->attributes['filters'];
     }
 
@@ -250,7 +256,7 @@ class ShopBaseModel extends BaseModel
     public static function getData($options = [])
     {
         $res = self::getDataQuery($options, true);
-        $q   = $res['q'];
+        $q = $res['q'];
 
         if (isset($options['order_by']['field'])) {
             $type = 'asc';
@@ -259,7 +265,7 @@ class ShopBaseModel extends BaseModel
             }
             $q->orderBy($options['order_by']['field'], $type);
         }
-        \DB::enableQueryLog();
+
         $data = [];
         if (isset($options['paginate']) && $options['paginate']) {
             if (isset($options['current_page']) && $options['current_page']) {
@@ -275,40 +281,38 @@ class ShopBaseModel extends BaseModel
             if (count($res['meta'])) {
                 self::addMeta($data, $res['meta']);
             }
-        }
-        else {
+        } else {
             $data = $q->get();
             if (count($res['meta'])) {
                 self::addMeta($data, $res['meta']);
             }
         }
+
         return $data;
     }
 
     /**
      * @param array $options
-     * @param bool $getMetaFields
+     * @param bool  $getMetaFields
      *
      * @return array|\Illuminate\Database\Query\Builder|static
      */
     public static function getDataQuery($options = [], $getMetaFields = false)
     {
-        $table  = self::getTableName();
+        $table = self::getTableName();
         $entity = self::getClassName();
 
         $metaData = [];
-        $select   = [$table . '.*', 'urls.url'];
+        $select = [$table . '.*', 'urls.url'];
         if (array_get($options, 'fields')) {
             $select = [];
             $metaFields = ShopMetadata::getAllFields();
             foreach ($options['fields'] as $fld) {
                 if ($fld === 'url') {
                     $select[] = 'urls.url';
-                }
-                else if (isset($metaFields[$fld])) {
+                } else if (isset($metaFields[$fld])) {
                     $metaData[] = $fld;
-                }
-                else {
+                } else {
                     $select[] = $table . '.' . $fld;
                 }
             }
@@ -333,8 +337,7 @@ class ShopBaseModel extends BaseModel
                 'q'    => $q,
                 'meta' => $metaData,
             ];
-        }
-        else {
+        } else {
             return $q;
         }
     }
@@ -353,7 +356,7 @@ class ShopBaseModel extends BaseModel
         ];
 
         $setToMeta = [];
-        $dirty     = $this->getDirty();
+        $dirty = $this->getDirty();
         foreach ($metaDataFields as $fld => $val) {
             if (isset($this->attributes[$fld]) && isset($dirty[$fld])) {
                 $setToMeta[$fld] = $this->attributes[$fld];
@@ -394,6 +397,7 @@ class ShopBaseModel extends BaseModel
         $entity = self::getClassName();
         Urls::where('entity', '=', $entity)->where('id', '=', $id)->delete();
         ShopMetadata::where('entity', '=', $entity)->where('id', '=', $id)->delete();
+
         return self::where('id', '=', $id)->delete();
     }
 
@@ -442,6 +446,7 @@ class ShopBaseModel extends BaseModel
     {
         $this->attributes['photos'] = json_encode($photos);
     }
+
     /**
      * @param string $ext
      *
@@ -449,19 +454,20 @@ class ShopBaseModel extends BaseModel
      */
     public function getPhotosUrls($ext = 'jpeg')
     {
-        $ph     = ($this->attributes['photos']) ? json_decode($this->attributes['photos'], true) : [];
+        $ph = ($this->attributes['photos']) ? json_decode($this->attributes['photos'], true) : [];
         $photos = [];
         foreach (Photos::$sizes as $size => $photo) {
             foreach ($ph as $num) {
                 $photos[$size] = $this->getPhotoUrl($size, $num, $ext);
             }
         }
+
         return $photos;
     }
 
     /**
-     * @param $size
-     * @param int $num
+     * @param        $size
+     * @param int    $num
      * @param string $ext
      *
      * @return string
@@ -470,8 +476,7 @@ class ShopBaseModel extends BaseModel
     {
         if ($this->url) {
             return Photos::PIC_PATH . '/' . $size . '/' . $this->attributes['url'] . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
-        }
-        else {
+        } else {
             return Photos::PIC_PATH . '/' . $size . '/' . self::getTableName(true) . '/' . $this->id . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
         }
     }
