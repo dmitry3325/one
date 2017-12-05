@@ -9,4 +9,8 @@ namespace App\Models\Shop;
 class Filters extends ShopBaseModel
 {
     protected $table = 'shop.filters';
+
+    public function getStorageKey(){
+
+    }
 }

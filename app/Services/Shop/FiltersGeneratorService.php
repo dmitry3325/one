@@ -7,6 +7,7 @@ use App\Models\Shop\Filters;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
+use Illuminate\Support\Facades\Redis;
 
 /**
  * Сервис создания фильтров.
@@ -23,6 +24,22 @@ class FiltersGeneratorService
      * @var array
      */
     private $storage = [];
+
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
+    private $sectionFiltersStorage;
+
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
+    private $filterGoodsStorage;
+
+    public function __construct()
+    {
+        $this->sectionFiltersStorage = Redis::connection('section-filters');
+        $this->filterGoodsStorage = Redis::connection('filter-goods');
+    }
 
     /**
      * @param $section_id
@@ -240,6 +257,7 @@ class FiltersGeneratorService
 
     private function createFilters($Data, Sections $section)
     {
+        dd($Data);
         $entityName = Filters::getClassName();
 
         $sectionFilters = [];
@@ -277,6 +295,7 @@ class FiltersGeneratorService
             if(!Urls::where('url', $url)->first()){
                 $filter->url = $url;
             }
+            dump($key - 'Created!');
             $filter->save();
         }
     }
