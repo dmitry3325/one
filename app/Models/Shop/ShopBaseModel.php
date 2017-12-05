@@ -395,8 +395,9 @@ class ShopBaseModel extends BaseModel
     public static function deleteEntity($id)
     {
         $entity = self::getClassName();
-        Urls::where('entity', '=', $entity)->where('id', '=', $id)->delete();
-        ShopMetadata::where('entity', '=', $entity)->where('id', '=', $id)->delete();
+        Urls::where('entity', '=', $entity)->where('entity_id', '=', $id)->delete();
+        ShopMetadata::where('entity', '=', $entity)->where('entity_id', '=', $id)->delete();
+        EntityFilters::where('entity', '=', $entity)->where('entity_id', '=', $id)->delete();
 
         return self::where('id', '=', $id)->delete();
     }

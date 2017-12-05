@@ -6,6 +6,7 @@ use App\Models\Shop\EntityFilters;
 use App\Models\Shop\Filters;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
+use App\Models\Shop\Urls;
 
 /**
  * Сервис создания фильтров.
@@ -250,10 +251,10 @@ class FiltersGeneratorService
         foreach ($Data as $key => $data) {
             $filter = new Filters();
             $filter->section_id = $section->id;
-            //$filter->save();
+            $filter->save();
 
             $filters = [];
-            $forUrl = [$section->title];
+            $forUrl = [Urls::generateUrlFromText($section->title)];
             foreach ($data['entity_filters'] as $fNum => $filtersList) {
                 $values = [];
                 foreach ($filtersList as $fil) {
@@ -270,11 +271,13 @@ class FiltersGeneratorService
                     $forUrl[] = implode('_',$values);
                 }
             }
-            dd($forUrl);
-            //$filter->filters()->createMany($filters);
+            $filter->filters()->createMany($filters);
 
-
-
+            $url = Urls::generateUrlFromText(implode(' ', $forUrl));
+            if(!Urls::where('url', $url)->first()){
+                $filter->url = $url;
+            }
+            $filter->save();
         }
     }
 }
