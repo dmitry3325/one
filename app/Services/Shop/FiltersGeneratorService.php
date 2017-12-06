@@ -66,7 +66,7 @@ class FiltersGeneratorService
 
         $neededFilters = [];
         foreach ($byGood as $id => $goodFils) {
-            $filters = $this->generateByFilters($goodFils);
+            $filters = $this->generateByFilters($goodFils, $section_id);
             foreach ($filters as $key => $data) {
                 if (!isset($neededFilters[$key])) {
                     $neededFilters[$key] = $data;
@@ -127,16 +127,13 @@ class FiltersGeneratorService
         $filtersList = $this->strukturaArray($list);
         $Data = [];
         foreach ($filtersList as $byKey) {
-            $key = [];
             $list = [];
             foreach ($byKey as $k => $filter) {
                 if ($filter) {
-                    $key[] = $k;
                     $list[$filter->num][$filter->code] = $filter;
                 }
             }
-            sort($key);
-            $key = implode('|', $key);
+            $key = Filters::getFilterKey($byKey);
             $Data[$key] = [
                 'key'            => $key,
                 'entity_filters' => $list,
@@ -229,19 +226,16 @@ class FiltersGeneratorService
 
         $byFilter = [];
         foreach ($existingFilters as $filter) {
-            $byFilter[$filter->entity_id][$filter->num . '-' . $filter->code] = $filter;
+            $byFilter[$filter->entity_id][] = $filter;
         }
 
         $Data = [];
-        foreach ($byFilter as $id => $byCode) {
-            $key = [];
+        foreach ($byFilter as $id => $filters) {
             $list = [];
-            foreach ($byCode as $code => $eF) {
-                $key[] = $code;
+            foreach ($filters as $eF) {
                 $list[$eF->num][$eF->code] = $eF;
             }
-            sort($key);
-            $key = implode('|', $key);
+            $key = Filters::getFilterKey($filters);
             if (!isset($Data[$key])) {
                 $Data[$key] = [
                     'key'            => $key,
@@ -257,7 +251,6 @@ class FiltersGeneratorService
 
     private function createFilters($Data, Sections $section)
     {
-        dd($Data);
         $entityName = Filters::getClassName();
 
         $sectionFilters = [];
@@ -265,8 +258,11 @@ class FiltersGeneratorService
             $sectionFilters[$filter->num] = $filter;
         }
 
-
         foreach ($Data as $key => $data) {
+            $this->filterGoodsStorage->hset($section->id, $key, json_encode($data['goods']));
+
+            dd($key , 'Created!');
+
             $filter = new Filters();
             $filter->section_id = $section->id;
             $filter->save();
@@ -294,9 +290,11 @@ class FiltersGeneratorService
             $url = Urls::generateUrlFromText(implode(' ', $forUrl));
             if(!Urls::where('url', $url)->first()){
                 $filter->url = $url;
+                $filter->save();
             }
-            dump($key - 'Created!');
-            $filter->save();
+
+
+            dd($key);
         }
     }
 }
