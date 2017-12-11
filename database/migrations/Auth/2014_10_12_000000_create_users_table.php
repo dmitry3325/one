@@ -25,6 +25,13 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        Schema::create('auth.user_roles', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('role', 30);
+            $table->integer('user_id')->unsigned();
+            $table->softDeletes();
+        });
     }
 
     /**
@@ -36,5 +43,6 @@ class CreateUsersTable extends Migration
     {
         DB::statement('DROP DATABASE auth');
         Schema::dropIfExists('users');
+        Schema::dropIfExists('user_roles');
     }
 }
