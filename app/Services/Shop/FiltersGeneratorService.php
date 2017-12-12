@@ -6,6 +6,7 @@ use App\Models\Shop\EntityFilters;
 use App\Models\Shop\Filters;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
+use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
 use App\Services\Shop\GoodsStorage;
 use Illuminate\Support\Facades\Redis;
@@ -121,7 +122,26 @@ class FiltersGeneratorService
     {
         $sectionFilters = $this->loadSectionFilters($section_id);
         $filters = $this->getExistingFilters($section_id, true);
-        dump($filters, $sectionFilters);
+
+        $_class = Filters::getClassName();
+
+        $All = [];
+        foreach ($filters as $key => $data) {
+            if (count($data['codes_list']) === 1) {
+                foreach ($data['entity_filters'] as $num => $byCode) {
+                    foreach ($byCode as $code => $eF) {
+                        $All[$eF->num]['list'][$eF->code] = [
+                            'value' => $eF->value,
+                            'code'  => $eF->code,
+                            'url' => ShopBaseModel::generateUrl($_class, $data['filter']['id'], $data['filter']['url'])
+                        ];
+                    }
+                }
+            }
+        }
+
+        dump($filters, $All);
+
     }
 
     /**
@@ -240,23 +260,25 @@ class FiltersGeneratorService
             $byFilter[$filter->entity_id][] = $filter;
         }
 
-        $Data = [
-            'all' => []
-        ];
+        $Data = [];
         foreach ($byFilter as $id => $filters) {
             $list = [];
+            $groupedList = [];
             foreach ($filters as $eF) {
-                $list[$eF->num][$eF->code] = $eF;
+                $groupedList[$eF->num][$eF->code] = $eF;
+                $list[] = $eF->num . '-' . $eF->code;
             }
             $key = Filters::getFilterKey($filters);
+
             if (!isset($Data[$key])) {
                 $Data[$key] = [
                     'key'            => $key,
-                    'entity_filters' => $list,
+                    'entity_filters' => $groupedList,
+                    'codes_list'     => $list,
                     'filter'         => [
                         'id'     => $id,
                         'hidden' => $eF->hidden,
-                        'urls'   => $eF->url
+                        'href'   => $eF->url,
                     ],
                 ];
             }
