@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Auth\UserRole;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,12 +23,10 @@ class RedirectIfAuthenticated
         if (array_get($urlParts, 0) === 'p') {
             //отдаем картинки без авторизации
         }
-        elseif ($request->wantsJson()) {
-            if (!Auth::check()) {
+        elseif (!Auth::check() || !Auth::user()->hasRole(UserRole::ROLE_GOD)) {
+            if ($request->wantsJson()) {
                 return response()->json(['error' => 'Not Authorized'], 403);
             }
-        }
-        else if (!Auth::check()) {
             return redirect('/common/auth');
         }
 

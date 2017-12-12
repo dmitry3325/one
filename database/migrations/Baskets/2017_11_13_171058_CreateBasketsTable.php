@@ -131,6 +131,6 @@ class CreateBasketsTable extends Migration
      */
     public function down()
     {
-        //
+        DB::statement('DROP DATABASE baskets');
     }
 }
