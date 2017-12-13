@@ -301,7 +301,6 @@ class ShopController extends Controller
     {
         $filters = EntityFilters::where('entity_id', $id)->where('entity', Sections::getClassName())->get()->toArray();
 
-        $return = [];
         if (count($filters)) {
             $goodsTable   = Goods::getTableName();
             $filtersTable = EntityFilters::getTableName();
@@ -327,6 +326,7 @@ class ShopController extends Controller
     public function generateFilters($section_id)
     {
         $FilterGenerateService = new FiltersGeneratorService(new GoodsStorage());
-        $FilterGenerateService->fillFilterCombinations(2);
+        $FilterGenerateService->generateForSection($section_id);
+        $FilterGenerateService->fillFilterCombinations($section_id);
     }
 }

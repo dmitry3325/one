@@ -49,6 +49,7 @@ class FiltersGeneratorService
                 $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
             })
             ->where('shop.goods.section_id', '=', $section_id)
+            ->where('shop.goods.hidden', '=', 0)
             ->where('shop.entity_filters.entity', '=', Goods::getClassName())
             ->get();
 
@@ -70,21 +71,20 @@ class FiltersGeneratorService
                 $neededFilters[$key]['goods'][] = $id;
             }
         }
-
-        $existingFiltes = $this->getExistingFilters($section_id);
+        $existingFilters = $this->getExistingFilters($section_id);
         $toCreate = [];
         $toUpdate = [];
         $toHide = [];
 
-        foreach ($neededFilters as $key => $data) {
+        foreach ($existingFilters as $key => $data) {
             if (!isset($existingFiltes[$key])) {
                 $toCreate[$key] = $data;
-            } else if ($existingFiltes[$key]['filter']['hidden']) {
+            } else if ($existingFilters[$key]['filter']['hidden']) {
                 $toUpdate[$key] = $data;
             }
         }
 
-        foreach ($existingFiltes as $key => $data) {
+        foreach ($existingFilters as $key => $data) {
             if (!isset($neededFilters[$key])) {
                 $toHide[$key] = $data;
             }
@@ -117,11 +117,15 @@ class FiltersGeneratorService
 
     /**
      * @param $section_id
+     *
+     * @return array
      */
-    public function fillFilterCombinations($section_id)
+    public function fillFilterCombinations($section_id): array
     {
+        $startTime = microtime();
+
         $sectionFilters = $this->loadSectionFilters($section_id);
-        $filters = $this->getExistingFilters($section_id, true);
+        $filters = $this->getExistingFilters($section_id);
 
         $_class = Filters::getClassName();
 
@@ -129,19 +133,61 @@ class FiltersGeneratorService
         foreach ($filters as $key => $data) {
             if (count($data['codes_list']) === 1) {
                 foreach ($data['entity_filters'] as $num => $byCode) {
-                    foreach ($byCode as $code => $eF) {
-                        $All[$eF->num]['list'][$eF->code] = [
-                            'value' => $eF->value,
-                            'code'  => $eF->code,
-                            'url' => ShopBaseModel::generateUrl($_class, $data['filter']['id'], $data['filter']['url'])
-                        ];
+                    if (isset($sectionFilters[$num])) {
+                        foreach ($byCode as $code => $eF) {
+                            $All[$eF->num]['title'] = $sectionFilters[$num]->value;
+                            $All[$eF->num]['list'][$eF->code] = [
+                                'value' => $eF->value,
+                                'code'  => $eF->code,
+                                'url'   => ShopBaseModel::generateUrl($_class, $data['filter']['id'], $data['filter']['url']),
+                            ];
+                        }
                     }
                 }
             }
         }
+        /**
+         * Получили и сохранили базовую структуру фильтров для раздела
+         */
+        $this->goodsStorage->setSectionFilters($section_id, 'all', $All);
 
-        dump($filters, $All);
 
+        $Data = [];
+        foreach ($filters as $key => $data) {
+            $count = count($data['codes_list']);
+            foreach ($filters as $key2 => $data2) {
+                $count2 = count($data2['codes_list']);
+                /**
+                 * Проверяем, что фильтр включает все текущие +1
+                 * И все фильтры
+                 */
+                if (($count2 - $count) === 1) {
+                    $allow = true;
+                    foreach ($data['codes_list'] as $fkey) {
+                        if (!isset($data2['codes_list'][$fkey])) {
+                            $allow = false;
+                            break;
+                        }
+                    }
+
+                    if ($allow) {
+                        $filterCode = array_first(array_diff($data2['codes_list'], $data['codes_list']));
+                        $Data[$key][$filterCode] = $data2['filter'];
+                    }
+                }
+            }
+        }
+        /**
+         * Получили и сохранили для выбранных фильтров
+         */
+        foreach ($Data as $key => $data) {
+            $this->goodsStorage->setSectionFilters($section_id, $key, $data);
+        }
+
+        return [
+            'result' => 'Ok',
+            'time'   => microtime() - $startTime,
+        ];
     }
 
     /**
@@ -265,8 +311,9 @@ class FiltersGeneratorService
             $list = [];
             $groupedList = [];
             foreach ($filters as $eF) {
+                $fkey = $eF->num . '-' . $eF->code;
                 $groupedList[$eF->num][$eF->code] = $eF;
-                $list[] = $eF->num . '-' . $eF->code;
+                $list[$fkey] = $fkey;
             }
             $key = Filters::getFilterKey($filters);
 
@@ -278,7 +325,7 @@ class FiltersGeneratorService
                     'filter'         => [
                         'id'     => $id,
                         'hidden' => $eF->hidden,
-                        'href'   => $eF->url,
+                        'url'    => $eF->url,
                     ],
                 ];
             }
@@ -322,7 +369,7 @@ class FiltersGeneratorService
                     $values[] = $fil->value;
                 }
                 if (isset($sectionFilters[$fNum])) {
-                    $forUrl[] = implode('_', $values);
+                    $forUrl[] = $sectionFilters[$fNum]->value . '_' . implode('_', $values);
                 }
             }
             $filter->filters()->createMany($filters);

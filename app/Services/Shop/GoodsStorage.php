@@ -41,9 +41,59 @@ class GoodsStorage
         $this->filterGoodsStorage->hset($section_id, $filterKey, json_encode($goods));
     }
 
-    public function getFilterGoods(int $section_id, string $filterKey): array
+    /**
+     * @param int    $section_id
+     * @param string $filterKey
+     *
+     * @return array
+     */
+    public function getFilterGoods(int $section_id, string $filterKey = null): array
     {
-        $list = $this->filterGoodsStorage->hget($section_id, $filterKey);
-        return json_decode($list, true);
+        if ($filterKey) {
+            $list = $this->filterGoodsStorage->hget($section_id, $filterKey);
+
+            return json_decode($list, true);
+        } else {
+            $list = $this->filterGoodsStorage->hgetall($section_id);
+
+            foreach ($list as &$data) {
+                $data = json_decode($data, true);
+            }
+
+            return $list;
+        }
+    }
+
+    /**
+     * @param int    $section_id
+     * @param string $filterKey
+     * @param array  $data
+     */
+    public function setSectionFilters(int $section_id, string $filterKey, array $data)
+    {
+        $this->sectionFiltersStorage->hset($section_id, $filterKey, json_encode($data));
+    }
+
+    /**
+     * @param int    $section_id
+     * @param string $filterKey
+     *
+     * @return array
+     */
+    public function getSectionFilters(int $section_id, string $filterKey = null)
+    {
+        if ($filterKey) {
+            $list = $this->sectionFiltersStorage->hget($section_id, $filterKey);
+
+            return json_decode($list, true);
+        } else {
+            $list = $this->sectionFiltersStorage->hgetall($section_id);
+
+            foreach ($list as &$data) {
+                $data = json_decode($data, true);
+            }
+
+            return $list;
+        }
     }
 }
