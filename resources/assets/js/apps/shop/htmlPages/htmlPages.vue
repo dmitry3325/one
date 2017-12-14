@@ -204,7 +204,7 @@
 
     .edit-window {
         position: fixed;
-        background: #ccc;
+        background: #fff;
         top: 0;
         bottom: 0;
         left: 0;

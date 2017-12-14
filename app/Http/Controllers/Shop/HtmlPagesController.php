@@ -28,7 +28,7 @@ class HtmlPagesController extends Controller
 
     public function getHtmlPagesList($filters = [], $fields = [])
     {
-        $q = HtmlPages::query()->orderBy('id', 'DESC');
+        $q = HtmlPages::with('url')->orderBy('id', 'DESC');
 
         return new Success(null, $q->get());
     }
@@ -68,15 +68,6 @@ class HtmlPagesController extends Controller
 
         return new Success();
 
-    }
-
-    public function saveHtml($id, $content)
-    {
-        $htmlPage       = HtmlPages::find($id);
-        $htmlPage->body = $content;
-        $htmlPage->save();
-
-        return new Success();
     }
 
     public function getHtmlMeta($id)

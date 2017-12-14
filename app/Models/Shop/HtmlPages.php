@@ -52,13 +52,7 @@ class HtmlPages extends ShopBaseModel
             'title'     => '№ картинки',
             'type'      => ShopBaseModel::FIELD_TYPE_INT,
             'baseField' => true,
-        ],
-        'photos'            => [
-            'title'     => 'Изображения',
-            'type'      => ShopBaseModel::FIELD_TYPE_OBJECT,
-            'entity'    => 'photos',
-            'baseField' => true,
-        ],
+        ]
     ];
 
     /**
