@@ -20,7 +20,8 @@ class AdminBar
             'title' => 'Сайт',
             'children' => [
                 '' => [],
-                'vendors' => []
+                'vendors' => [],
+                'htmlPages' => []
             ]
         ],
     ];

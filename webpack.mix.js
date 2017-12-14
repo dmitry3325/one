@@ -21,5 +21,6 @@ mix.js('resources/assets/js/core/core.js', 'public/js')
 mix.js('resources/assets/js/apps/shop/goods/goods.js', 'public/js/apps/shop/goods.js')
     .sass('resources/assets/sass/apps/shop/goods.scss', 'public/css/apps/shop/goods.css');
 
-mix.js('resources/assets/js/apps/shop/vendors/vendors.js', 'public/js/apps/shop/vendors.js')
-    .sass('resources/assets/sass/apps/shop/vendors.scss', 'public/css/apps/shop/vendors.css');
+mix.js('resources/assets/js/apps/shop/vendors/vendors.js', 'public/js/apps/shop/vendors.js');
+
+mix.js('resources/assets/js/apps/shop/htmlPages/htmlPages.js', 'public/js/apps/shop/htmlPages.js');

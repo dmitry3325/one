@@ -190,6 +190,7 @@ class CreateGoodsTables extends Migration
                 $table->string('key')->default('');
                 $table->longText('value');
                 $table->timestamps();
+                $table->softDeletes();
 
                 //keys
                 $table->unique(['entity', 'entity_id','key']);

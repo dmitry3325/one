@@ -39,6 +39,10 @@ class ShopMetadata extends BaseModel
             'title' => 'Компоненты товара',
             'type'  => ShopBaseModel::FIELD_TYPE_STRING,
         ],
+        'body' => [
+            'title' => 'Body',
+            'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
+        ],
     ];
 
     /**

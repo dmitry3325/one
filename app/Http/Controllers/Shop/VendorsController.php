@@ -15,7 +15,6 @@ class VendorsController extends Controller
     public static $appSetts = [
         'title' => 'Производители',
         'js'    => ['apps/shop/vendors.js'],
-        'css'   => ['apps/shop/vendors.css'],
     ];
 
     /**
