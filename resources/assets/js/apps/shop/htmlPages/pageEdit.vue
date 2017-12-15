@@ -37,10 +37,10 @@
         data: function () {
             return {
                 content: "",
+                html_title: "",
+                html_keywords: "",
+                html_description: "",
                 url: null,
-                html_title: null,
-                html_keywords: null,
-                html_description: null,
             }
         },
         props: ['item'],
