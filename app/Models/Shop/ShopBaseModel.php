@@ -113,6 +113,35 @@ class ShopBaseModel extends BaseModel
     }
 
     /**
+     * @param $entity
+     * @param $id
+     * @param $url
+     *
+     * @return string
+     */
+    public static function generateUrl($entity, $id, $url): string
+    {
+        $entity_title = null;
+        switch ($entity){
+            case 'Sections':
+                $entity_title = 'section';
+                break;
+            case 'Filters':
+                $entity_title = 'filter';
+                break;
+            case 'Goods':
+                $entity_title = 'good';
+                break;
+            case 'HtmlPages':
+                $entity_title = 'page';
+                break;
+
+        }
+
+        return '/' . (($url) ? $url : $entity_title . '/' . $id) . '.html';
+    }
+
+    /**
      * @return array
      */
     public static function getAllFields()

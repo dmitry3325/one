@@ -6,7 +6,9 @@ use App\Models\Shop\EntityFilters;
 use App\Models\Shop\Filters;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
+use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
+use App\Services\Shop\GoodsStorage;
 use Illuminate\Support\Facades\Redis;
 
 /**
@@ -26,19 +28,13 @@ class FiltersGeneratorService
     private $storage = [];
 
     /**
-     * @var \Illuminate\Redis\Connections\Connection
+     * @var \App\Services\Shop\GoodsStorage
      */
-    private $sectionFiltersStorage;
+    private $goodsStorage;
 
-    /**
-     * @var \Illuminate\Redis\Connections\Connection
-     */
-    private $filterGoodsStorage;
-
-    public function __construct()
+    public function __construct(GoodsStorage $goodsStorage)
     {
-        $this->sectionFiltersStorage = Redis::connection('section-filters');
-        $this->filterGoodsStorage = Redis::connection('filter-goods');
+        $this->goodsStorage = $goodsStorage;
     }
 
     /**
@@ -53,12 +49,13 @@ class FiltersGeneratorService
                 $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
             })
             ->where('shop.goods.section_id', '=', $section_id)
+            ->where('shop.goods.hidden', '=', 0)
             ->where('shop.entity_filters.entity', '=', Goods::getClassName())
             ->get();
 
         $byGood = [];
         foreach ($goodsFL as $filter) {
-            if (isset($sectionFilters[$filter->num]) && $sectionFilters[$filter->num]) {
+            if (isset($sectionFilters[$filter->num]) && $sectionFilters[$filter->num]->auto_create) {
                 $byGood[$filter->entity_id][$filter->num . '-' . $filter->code] = $filter;
             }
         }
@@ -74,21 +71,20 @@ class FiltersGeneratorService
                 $neededFilters[$key]['goods'][] = $id;
             }
         }
-
-        $existingFiltes = $this->getExistingFilters($section_id);
+        $existingFilters = $this->getExistingFilters($section_id);
         $toCreate = [];
         $toUpdate = [];
         $toHide = [];
 
-        foreach ($neededFilters as $key => $data) {
+        foreach ($existingFilters as $key => $data) {
             if (!isset($existingFiltes[$key])) {
                 $toCreate[$key] = $data;
-            } else if (isset($existingFiltes[$key]['filters'][1])) {
+            } else if ($existingFilters[$key]['filter']['hidden']) {
                 $toUpdate[$key] = $data;
             }
         }
 
-        foreach ($existingFiltes as $key => $data) {
+        foreach ($existingFilters as $key => $data) {
             if (!isset($neededFilters[$key])) {
                 $toHide[$key] = $data;
             }
@@ -120,7 +116,84 @@ class FiltersGeneratorService
     }
 
     /**
+     * @param $section_id
+     *
+     * @return array
+     */
+    public function fillFilterCombinations($section_id): array
+    {
+        $startTime = microtime();
+
+        $sectionFilters = $this->loadSectionFilters($section_id);
+        $filters = $this->getExistingFilters($section_id);
+
+        $_class = Filters::getClassName();
+
+        $All = [];
+        foreach ($filters as $key => $data) {
+            if (count($data['codes_list']) === 1) {
+                foreach ($data['entity_filters'] as $num => $byCode) {
+                    if (isset($sectionFilters[$num])) {
+                        foreach ($byCode as $code => $eF) {
+                            $All[$eF->num]['title'] = $sectionFilters[$num]->value;
+                            $All[$eF->num]['list'][$eF->code] = [
+                                'value' => $eF->value,
+                                'code'  => $eF->code,
+                                'url'   => ShopBaseModel::generateUrl($_class, $data['filter']['id'], $data['filter']['url']),
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * Получили и сохранили базовую структуру фильтров для раздела
+         */
+        $this->goodsStorage->setSectionFilters($section_id, 'all', $All);
+
+
+        $Data = [];
+        foreach ($filters as $key => $data) {
+            $count = count($data['codes_list']);
+            foreach ($filters as $key2 => $data2) {
+                $count2 = count($data2['codes_list']);
+                /**
+                 * Проверяем, что фильтр включает все текущие +1
+                 * И все фильтры
+                 */
+                if (($count2 - $count) === 1) {
+                    $allow = true;
+                    foreach ($data['codes_list'] as $fkey) {
+                        if (!isset($data2['codes_list'][$fkey])) {
+                            $allow = false;
+                            break;
+                        }
+                    }
+
+                    if ($allow) {
+                        $filterCode = array_first(array_diff($data2['codes_list'], $data['codes_list']));
+                        $Data[$key][$filterCode] = $data2['filter'];
+                    }
+                }
+            }
+        }
+        /**
+         * Получили и сохранили для выбранных фильтров
+         */
+        foreach ($Data as $key => $data) {
+            $this->goodsStorage->setSectionFilters($section_id, $key, $data);
+        }
+
+        return [
+            'result' => 'Ok',
+            'time'   => microtime() - $startTime,
+        ];
+    }
+
+    /**
      * @param $list
+     *
+     * @return array
      */
     private function generateByFilters($list)
     {
@@ -159,7 +232,7 @@ class FiltersGeneratorService
         /** У раздела можно включать и выключать формирование фильтра */
         $sectionFilters = [];
         foreach ($section->filters as $f) {
-            $sectionFilters[$f->num] = $f->auto_create;
+            $sectionFilters[$f->num] = $f;
         }
 
         $this->storage['section_filters'][$section_id] = $sectionFilters;
@@ -216,9 +289,13 @@ class FiltersGeneratorService
      */
     private function getExistingFilters($section_id)
     {
-        $existingFilters = EntityFilters::select(['shop.entity_filters.*', 'shop.filters.hidden'])
+        $existingFilters = EntityFilters::select(['shop.entity_filters.*', 'shop.filters.hidden', 'shop.urls.url'])
             ->join('shop.filters', function ($join) {
                 $join->on('shop.filters.id', '=', 'shop.entity_filters.entity_id');
+            })
+            ->join('shop.urls', function ($join) {
+                $join->on('shop.filters.id', '=', 'shop.urls.entity_id');
+                $join->where('shop.urls.entity', '=', Filters::getClassName());
             })
             ->where('shop.filters.section_id', '=', $section_id)
             ->where('shop.entity_filters.entity', '=', Filters::getClassName())
@@ -232,36 +309,46 @@ class FiltersGeneratorService
         $Data = [];
         foreach ($byFilter as $id => $filters) {
             $list = [];
+            $groupedList = [];
             foreach ($filters as $eF) {
-                $list[$eF->num][$eF->code] = $eF;
+                $fkey = $eF->num . '-' . $eF->code;
+                $groupedList[$eF->num][$eF->code] = $eF;
+                $list[$fkey] = $fkey;
             }
             $key = Filters::getFilterKey($filters);
+
             if (!isset($Data[$key])) {
                 $Data[$key] = [
                     'key'            => $key,
-                    'entity_filters' => $list,
+                    'entity_filters' => $groupedList,
+                    'codes_list'     => $list,
+                    'filter'         => [
+                        'id'     => $id,
+                        'hidden' => $eF->hidden,
+                        'url'    => $eF->url,
+                    ],
                 ];
             }
-            $Data[$key]['filters'][$eF->hidden][] = $id;
         }
 
         return $Data;
     }
 
-
+    /**
+     * @param          $Data
+     * @param Sections $section
+     */
     private function createFilters($Data, Sections $section)
     {
         $entityName = Filters::getClassName();
 
         $sectionFilters = [];
-        foreach($section->filters as $filter){
+        foreach ($section->filters as $filter) {
             $sectionFilters[$filter->num] = $filter;
         }
 
         foreach ($Data as $key => $data) {
-            $this->filterGoodsStorage->hset($section->id, $key, json_encode($data['goods']));
-
-            dd($key , 'Created!');
+            $this->goodsStorage->setFilterGoods($section->id, $key, $data['goods']);
 
             $filter = new Filters();
             $filter->section_id = $section->id;
@@ -281,20 +368,17 @@ class FiltersGeneratorService
                     ];
                     $values[] = $fil->value;
                 }
-                if(isset($sectionFilters[$fNum])){
-                    $forUrl[] = implode('_',$values);
+                if (isset($sectionFilters[$fNum])) {
+                    $forUrl[] = $sectionFilters[$fNum]->value . '_' . implode('_', $values);
                 }
             }
             $filter->filters()->createMany($filters);
 
             $url = Urls::generateUrlFromText(implode(' ', $forUrl));
-            if(!Urls::where('url', $url)->first()){
+            if (!Urls::where('url', $url)->first()) {
                 $filter->url = $url;
                 $filter->save();
             }
-
-
-            dd($key);
         }
     }
 }

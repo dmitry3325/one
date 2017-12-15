@@ -10,6 +10,7 @@ use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
 use App\Services\Shop\FiltersGeneratorService;
+use App\Services\Shop\GoodsStorage;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
@@ -300,7 +301,6 @@ class ShopController extends Controller
     {
         $filters = EntityFilters::where('entity_id', $id)->where('entity', Sections::getClassName())->get()->toArray();
 
-        $return = [];
         if (count($filters)) {
             $goodsTable   = Goods::getTableName();
             $filtersTable = EntityFilters::getTableName();
@@ -325,7 +325,8 @@ class ShopController extends Controller
 
     public function generateFilters($section_id)
     {
-        $FilterGenerateService = new FiltersGeneratorService();
-        $FilterGenerateService->generateForSection(2);
+        $FilterGenerateService = new FiltersGeneratorService(new GoodsStorage());
+        $FilterGenerateService->generateForSection($section_id);
+        $FilterGenerateService->fillFilterCombinations($section_id);
     }
 }
