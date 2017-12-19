@@ -14,5 +14,12 @@
   "/css/apps/shop/vendors.css": "/css/apps/shop/vendors.css",
   "/js/apps/shop/vendors.js": "/js/apps/shop/vendors.js",
   "/css/apps/shop/goods.css": "/css/apps/shop/goods.css",
-  "/js/apps/shop/goods.js": "/js/apps/shop/goods.js"
+  "/js/apps/shop/goods.js": "/js/apps/shop/goods.js",
+  "/js/apps/shop/htmlPages.js": "/js/apps/shop/htmlPages.js",
+  "/js/apps/shop/goods.js.map": "/js/apps/shop/goods.js.map",
+  "/js/core.js.map": "/js/core.js.map",
+  "/css/app.css.map": "/css/app.css.map",
+  "/css/apps/shop/goods.css.map": "/css/apps/shop/goods.css.map",
+  "/js/apps/shop/htmlPages.js.map": "/js/apps/shop/htmlPages.js.map",
+  "/js/apps/shop/vendors.js.map": "/js/apps/shop/vendors.js.map"
 }

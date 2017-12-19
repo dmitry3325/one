@@ -8,6 +8,7 @@ export default {
         }
 
         Data['vendors'] = require('./data/vendors.js');
+        Data['htmlPages'] = require('./data/htmlPages.js');
 
     }
 }
