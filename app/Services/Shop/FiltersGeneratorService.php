@@ -148,8 +148,7 @@ class FiltersGeneratorService
         /**
          * Получили и сохранили базовую структуру фильтров для раздела
          */
-        $this->goodsStorage->setSectionFilters($section_id, 'all', $All);
-
+        $this->goodsStorage->setSectionFilters($section_id, 'all_data', $All);
 
         $Data = [];
         foreach ($filters as $key => $data) {
@@ -171,11 +170,13 @@ class FiltersGeneratorService
 
                     if ($allow) {
                         $filterCode = array_first(array_diff($data2['codes_list'], $data['codes_list']));
-                        $Data[$key][$filterCode] = $data2['filter'];
+                        list($num, $code) = explode('-',$filterCode);
+                        $Data[$key][$num][$code] = $data2['filter'];
                     }
                 }
             }
         }
+
         /**
          * Получили и сохранили для выбранных фильтров
          */
