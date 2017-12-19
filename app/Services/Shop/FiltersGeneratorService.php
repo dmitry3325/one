@@ -8,8 +8,7 @@ use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
-use App\Services\Shop\GoodsStorage;
-use Illuminate\Support\Facades\Redis;
+
 
 /**
  * Сервис создания фильтров.
@@ -76,7 +75,7 @@ class FiltersGeneratorService
         $toUpdate = [];
         $toHide = [];
 
-        foreach ($existingFilters as $key => $data) {
+        foreach ($neededFilters as $key => $data) {
             if (!isset($existingFiltes[$key])) {
                 $toCreate[$key] = $data;
             } else if ($existingFilters[$key]['filter']['hidden']) {
@@ -122,7 +121,7 @@ class FiltersGeneratorService
      */
     public function fillFilterCombinations($section_id): array
     {
-        $startTime = microtime();
+        $startTime = microtime(true);
 
         $sectionFilters = $this->loadSectionFilters($section_id);
         $filters = $this->getExistingFilters($section_id);
@@ -186,7 +185,7 @@ class FiltersGeneratorService
 
         return [
             'result' => 'Ok',
-            'time'   => microtime() - $startTime,
+            'time'   => microtime(true) - $startTime,
         ];
     }
 
