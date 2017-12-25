@@ -30,9 +30,14 @@
         </table>
 
         <editor v-model="content" @init="editorInit();" lang="html" theme="monokai" height="500px"></editor>
+
+        <photos :entity="'HtmlPages'" :id="item.id"></photos>
+
     </div>
 </template>
 <script>
+    let Photos = require('../../../components/photos.vue');
+
     export default {
         data: function () {
             return {
@@ -59,6 +64,7 @@
         },
         components: {
             editor: require('vue2-ace-editor'),
+            'photos': Photos,
         },
         methods: {
             editorInit: function () {

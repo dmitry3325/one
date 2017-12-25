@@ -188,7 +188,6 @@
 
                 self.showEdit = true;
                 self.editedItem = item;
-                console.log(item);
             }
         }
     });
@@ -203,7 +202,7 @@
     }
 
     .edit-window {
-        position: fixed;
+        position: absolute;
         background: #fff;
         top: 0;
         bottom: 0;
