@@ -27,8 +27,8 @@ class GoodsStorage
 
     public function __construct()
     {
-        $this->sectionFiltersStorage = Redis::connection('section-filters');
-        $this->filterGoodsStorage = Redis::connection('filter-goods');
+        $this->sectionFiltersStorage = Redis::connection(self::SECTION_FILTERS);
+        $this->filterGoodsStorage = Redis::connection(self::FILTERED_GOODS);
     }
 
     /**
@@ -47,12 +47,12 @@ class GoodsStorage
      *
      * @return array
      */
-    public function getFilterGoods(int $section_id, string $filterKey = null): array
+    public function getFilterGoods(int $section_id, string $filterKey = null)
     {
         if ($filterKey) {
             $list = $this->filterGoodsStorage->hget($section_id, $filterKey);
 
-            return json_decode($list, true);
+            return ($list) ? json_decode($list, true) : null;
         } else {
             $list = $this->filterGoodsStorage->hgetall($section_id);
 
@@ -85,7 +85,7 @@ class GoodsStorage
         if ($filterKey) {
             $list = $this->sectionFiltersStorage->hget($section_id, $filterKey);
 
-            return json_decode($list, true);
+            return ($list) ? json_decode($list, true) : null;
         } else {
             $list = $this->sectionFiltersStorage->hgetall($section_id);
 

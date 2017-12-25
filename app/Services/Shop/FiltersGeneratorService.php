@@ -8,8 +8,7 @@ use App\Models\Shop\Sections;
 use App\Models\Shop\Goods;
 use App\Models\Shop\ShopBaseModel;
 use App\Models\Shop\Urls;
-use App\Services\Shop\GoodsStorage;
-use Illuminate\Support\Facades\Redis;
+
 
 /**
  * Сервис создания фильтров.
@@ -76,7 +75,7 @@ class FiltersGeneratorService
         $toUpdate = [];
         $toHide = [];
 
-        foreach ($existingFilters as $key => $data) {
+        foreach ($neededFilters as $key => $data) {
             if (!isset($existingFiltes[$key])) {
                 $toCreate[$key] = $data;
             } else if ($existingFilters[$key]['filter']['hidden']) {
@@ -122,7 +121,7 @@ class FiltersGeneratorService
      */
     public function fillFilterCombinations($section_id): array
     {
-        $startTime = microtime();
+        $startTime = microtime(true);
 
         $sectionFilters = $this->loadSectionFilters($section_id);
         $filters = $this->getExistingFilters($section_id);
@@ -149,8 +148,7 @@ class FiltersGeneratorService
         /**
          * Получили и сохранили базовую структуру фильтров для раздела
          */
-        $this->goodsStorage->setSectionFilters($section_id, 'all', $All);
-
+        $this->goodsStorage->setSectionFilters($section_id, 'all_data', $All);
 
         $Data = [];
         foreach ($filters as $key => $data) {
@@ -172,11 +170,13 @@ class FiltersGeneratorService
 
                     if ($allow) {
                         $filterCode = array_first(array_diff($data2['codes_list'], $data['codes_list']));
-                        $Data[$key][$filterCode] = $data2['filter'];
+                        list($num, $code) = explode('-',$filterCode);
+                        $Data[$key][$num][$code] = $data2['filter'];
                     }
                 }
             }
         }
+
         /**
          * Получили и сохранили для выбранных фильтров
          */
@@ -186,7 +186,7 @@ class FiltersGeneratorService
 
         return [
             'result' => 'Ok',
-            'time'   => microtime() - $startTime,
+            'time'   => microtime(true) - $startTime,
         ];
     }
 

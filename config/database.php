@@ -107,18 +107,20 @@ return [
 
         'client' => 'predis',
 
-        'section-filters' => [
+        'section_filters' => [
             'host'     => env('REDIS_HOST', 'localhost'),
             'password' => env('REDIS_PASSWORD', null),
             'port'     => env('REDIS_PORT', 6379),
             'database' => 0,
+            'read_write_timeout' => 0,
         ],
 
-        'filter-goods' => [
+        'filtered_goods' => [
             'host'     => env('REDIS_HOST', 'localhost'),
             'password' => env('REDIS_PASSWORD', null),
             'port'     => env('REDIS_PORT', 6379),
             'database' => 1,
+            'read_write_timeout' => 0,
         ],
 
     ],
