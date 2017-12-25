@@ -26,7 +26,7 @@ abstract class AbstractResponse
         $this->data = $data;
     }
 
-    private function setMessage($message):void
+    private function setMessage($message): void
     {
         $this->message = $message;
     }

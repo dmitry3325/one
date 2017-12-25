@@ -95,7 +95,7 @@
         mounted: function () {
             let self = this;
             self.content = 'Загружаю...';
-            self.url = self.item.url.url;
+            self.url = self.item.url && self.item.url.url ? self.item.url.url : null;
 
             Data.htmlPages.getHtmlMeta(self.item.id).then(
                 data => {

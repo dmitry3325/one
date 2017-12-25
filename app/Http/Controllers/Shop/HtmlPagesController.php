@@ -49,7 +49,6 @@ class HtmlPagesController extends Controller
         $htmlPage->save();
 
         return new Success(null, $htmlPage);
-
     }
 
     /**
@@ -67,7 +66,6 @@ class HtmlPagesController extends Controller
         $htmlPage->save();
 
         return new Success();
-
     }
 
     public function getHtmlMeta($id)
