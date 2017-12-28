@@ -66,10 +66,8 @@ class CreateGoodsTables extends Migration
                 $table->timestamps();
 
                 $table->index('parent_id');
-                $table->index('section_id');
                 $table->index('type');
                 $table->index('orderby');
-                $table->index('hidden');
                 $table->index('picture_id');
                 $table->index(['manid','sarticul']);
                 $table->index(['section_id','hidden']);
@@ -112,9 +110,7 @@ class CreateGoodsTables extends Migration
                 $table->timestamps();
 
                 $table->index('parent_id');
-                $table->index('section_id');
-                $table->index('hidden');
-                $table->index('orderby');
+                $table->index(['section_id','hidden']);
             });
         }
         if (!Schema::hasTable('html_pages')) {
@@ -131,9 +127,6 @@ class CreateGoodsTables extends Migration
                 $table->string('short_description')->default('');
                 $table->timestamps();
 
-                $table->index('parent_id');
-                $table->index('orderby');
-                $table->index('hidden');
             });
         }
         if (!Schema::hasTable('urls')) {
