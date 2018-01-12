@@ -114,12 +114,14 @@ class FiltersGeneratorService
 
     }
 
+
+
     /**
      * @param $section_id
      *
      * @return array
      */
-    public function fillFilterCombinations($section_id): array
+    /*public function fillFilterCombinations($section_id): array
     {
         $startTime = microtime(true);
 
@@ -147,7 +149,7 @@ class FiltersGeneratorService
         }
         /**
          * Получили и сохранили базовую структуру фильтров для раздела
-         */
+
         $this->goodsStorage->setSectionFilters($section_id, 'all_data', $All);
 
         $Data = [];
@@ -158,7 +160,7 @@ class FiltersGeneratorService
                 /**
                  * Проверяем, что фильтр включает все текущие +1
                  * И все фильтры
-                 */
+
                 if (($count2 - $count) === 1) {
                     $allow = true;
                     foreach ($data['codes_list'] as $fkey) {
@@ -179,7 +181,7 @@ class FiltersGeneratorService
 
         /**
          * Получили и сохранили для выбранных фильтров
-         */
+
         foreach ($Data as $key => $data) {
             $this->goodsStorage->setSectionFilters($section_id, $key, $data);
         }
@@ -188,8 +190,7 @@ class FiltersGeneratorService
             'result' => 'Ok',
             'time'   => microtime(true) - $startTime,
         ];
-    }
-
+    }*/
     /**
      * @param $list
      *
@@ -289,16 +290,17 @@ class FiltersGeneratorService
      */
     private function getExistingFilters($section_id)
     {
+        $filterClassName = Filters::getClassName();
         $existingFilters = EntityFilters::select(['shop.entity_filters.*', 'shop.filters.hidden', 'shop.urls.url'])
             ->join('shop.filters', function ($join) {
                 $join->on('shop.filters.id', '=', 'shop.entity_filters.entity_id');
             })
-            ->join('shop.urls', function ($join) {
+            ->join('shop.urls', function ($join) use ($filterClassName) {
                 $join->on('shop.filters.id', '=', 'shop.urls.entity_id');
-                $join->where('shop.urls.entity', '=', Filters::getClassName());
+                $join->where('shop.urls.entity', '=', $filterClassName);
             })
             ->where('shop.filters.section_id', '=', $section_id)
-            ->where('shop.entity_filters.entity', '=', Filters::getClassName())
+            ->where('shop.entity_filters.entity', '=', $filterClassName)
             ->get();
 
         $byFilter = [];
@@ -308,30 +310,77 @@ class FiltersGeneratorService
 
         $Data = [];
         foreach ($byFilter as $id => $filters) {
-            $list = [];
-            $groupedList = [];
-            foreach ($filters as $eF) {
-                $fkey = $eF->num . '-' . $eF->code;
-                $groupedList[$eF->num][$eF->code] = $eF;
-                $list[$fkey] = $fkey;
-            }
             $key = Filters::getFilterKey($filters);
-
+            $eF = array_first($filters);
             if (!isset($Data[$key])) {
                 $Data[$key] = [
-                    'key'            => $key,
-                    'entity_filters' => $groupedList,
-                    'codes_list'     => $list,
-                    'filter'         => [
-                        'id'     => $id,
-                        'hidden' => $eF->hidden,
-                        'url'    => $eF->url,
-                    ],
+                    'key'    => $key,
+                    'id'     => $id,
+                    'hidden' => $eF->hidden,
+                    'url'    => ShopBaseModel::getUrl($filterClassName, $id, $eF->url),
+
                 ];
             }
         }
 
         return $Data;
+    }
+
+    /**
+     * Получаем схему фильтров для раздела
+     *
+     * @param $section_id
+     *
+     * @return array
+     */
+    public function getFiltersSchema($section_id)
+    {
+        $filters = EntityFilters::select('shop.entity_filters.num', 'shop.entity_filters.code', 'shop.entity_filters.value')
+            ->join('shop.goods', function ($join) {
+                $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
+            })
+            ->where('shop.goods.section_id', '=', $section_id)
+            ->where('shop.goods.hidden', '=', 0)
+            ->where('shop.entity_filters.entity', '=', Goods::getClassName())
+            ->groupBy('shop.entity_filters.num', 'shop.entity_filters.code')
+            ->orderBy(\DB::raw('null'))
+            ->get();
+
+        $data = [];
+        foreach ($filters as $fil) {
+            $data[$fil->num][$fil->code] = [
+                'value' => $fil->value,
+                'code'  => $fil->code,
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Получаем все товары по фильтрам
+     *
+     * @param $section_id
+     *
+     * @return array
+     */
+    public function getGoodsByFilter($section_id)
+    {
+        $goodsFLS = EntityFilters::select('shop.entity_filters.*')
+            ->join('shop.goods', function ($join) {
+                $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
+            })
+            ->where('shop.goods.section_id', '=', $section_id)
+            ->where('shop.goods.hidden', '=', 0)
+            ->where('shop.entity_filters.entity', '=', Goods::getClassName())
+            ->get();
+
+        $byFilter = [];
+        foreach ($goodsFLS as $fl) {
+            $byFilter[$fl->num][$fl->code][$fl->entity_id] = $fl->entity_id;
+        }
+
+        return $byFilter;
     }
 
     /**
