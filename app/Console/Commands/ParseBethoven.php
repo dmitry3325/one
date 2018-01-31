@@ -32,7 +32,6 @@ class ParseBethoven extends Command
             'https://www.bethowen.ru/catalogue/dogs/korma/syxoi/korm-dlya-sobak-duke-s-farm-dlya-srednikh-i-krupnykh-porod-indeyka-sukh-2kg/',
             'https://www.bethowen.ru/catalogue/cats/korma/vlazhnye-korma/korm-dlya-koshek-royal-canin-royal-kanin-ultra-light-dlya-koshek-sklonnykh-k-polnote-v-zhele-kons-85/',
             'https://www.bethowen.ru/catalogue/dogs/korma/syxoi/korm-dlya-sobak-royal-canin-royal-kanin-german-shepherd-24-dlya-porody-nemetskaya-ovcharka-starshe-1/',
-            'https://www.bethowen.ru/catalogue/vetapteka/antigelmintiki/antigelmintik-dlya-shchenkov-i-sobak-krka-milprazon-1tab-kh2-5-25mg/',
         ];
 
         //проверять не спаршен ли товар
