@@ -164,7 +164,7 @@ class BethovenParser extends ParserAbstractClass
 
             }
 
-            //            $createdGood->url = $i > 0 ? Urls::generateUrlFromText($good['title'] . '_' . $i) : Urls::generateUrlFromText($good['title']);
+            $createdGood->url = $i > 0 ? Urls::generateUrlFromText($good['title'] . '_' . $i) : Urls::generateUrlFromText($good['title']);
             $createdGood->save();
 
             $photos = array_get($good, 'photos');
