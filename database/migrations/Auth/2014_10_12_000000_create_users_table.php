@@ -30,6 +30,7 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('role', 30);
             $table->integer('user_id')->unsigned();
+            $table->timestamps();
             $table->softDeletes();
         });
     }

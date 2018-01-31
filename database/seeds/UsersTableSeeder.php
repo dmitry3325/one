@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Auth\User;
+use App\Models\Auth\UserRole;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -35,15 +36,20 @@ class UsersTableSeeder extends Seeder
             'is_confirmed' => true,
         ]);
 
-        foreach (range(0, 10) as $i) {
-            $user = User::create([
-                'firstname'    => $this->faker->firstName,
-                'lastname'     => $this->faker->lastName,
-                'email'        => $this->faker->email,
-                'password'     => md5((string)random_int(0, PHP_INT_MAX)),
-                'is_confirmed' => true,
-            ]);
-            echo ' - ' . $i . ': ' . $user->name . "\n";
-        }
+        UserRole::create([
+            'user_id' => 1,
+            'role' => UserRole::ROLE_GOD
+        ]);
+
+//        foreach (range(0, 10) as $i) {
+//            $user = User::create([
+//                'firstname'    => $this->faker->firstName,
+//                'lastname'     => $this->faker->lastName,
+//                'email'        => $this->faker->email,
+//                'password'     => md5((string)random_int(0, PHP_INT_MAX)),
+//                'is_confirmed' => true,
+//            ]);
+//            echo ' - ' . $i . ': ' . $user->name . "\n";
+//        }
     }
 }
