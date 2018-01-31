@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Photos\Photos;
+use App\Models\Shop\EntityFilters;
 use App\Models\Shop\ShopMetadata;
 use Illuminate\Database\Seeder;
 use Faker\Factory;
@@ -31,6 +32,7 @@ class BaseShopSeeder extends Seeder
         Photos::truncate();
         Sections::truncate();
         ShopMetadata::truncate();
+        EntityFilters::truncate();
         Artisan::call('parseBethoven');
     }
 }

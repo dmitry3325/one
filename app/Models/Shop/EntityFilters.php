@@ -46,4 +46,25 @@ class EntityFilters extends BaseModel
     {
         return crc32(mb_strtolower(trim($value)));
     }
+
+    /**
+     * @param $entity
+     * @param $id
+     * @param $value
+     *
+     * @return bool
+     */
+    public static function checkExists($entity, $id, $value)
+    {
+        if (!ShopBaseModel::checkEntity($entity)) {
+            return false;
+        }
+
+        $filter = EntityFilters::where('entity', $entity)
+            ->where('entity_id', $id)
+            ->where('code', self::getCode($value))
+            ->count();
+
+        return boolval($filter);
+    }
 }

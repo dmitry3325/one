@@ -493,4 +493,8 @@ class ShopBaseModel extends BaseModel
             return Photos::PIC_PATH . '/' . $size . '/' . self::getTableName(true) . '/' . $this->id . (($num !== 1) ? '_' . $num : '') . '.' . $ext;
         }
     }
+
+    public function section(){
+        return $this->belongsTo(Sections::class, 'section_id');
+    }
 }

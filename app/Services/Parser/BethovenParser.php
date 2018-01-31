@@ -3,6 +3,7 @@
 namespace App\Services\Parser;
 
 use App\Models\Photos\Photos;
+use App\Models\Shop\EntityFilters;
 use App\Models\Shop\Goods;
 use App\Models\Shop\Sections;
 use App\Models\Shop\Urls;
@@ -17,14 +18,13 @@ use Vendors;
  */
 class BethovenParser extends ParserAbstractClass
 {
+    public $filters;
+
     public function parseProduct(): void
     {
         $url   = $this->url;
         $html  = HtmlDomParser::file_get_html($url);
         $props = [];
-
-        //TODO
-        //filter generate
 
         $props['title']    = $html->find('h1', 0)->plaintext;
         $props['h1_title'] = $html->find('h1', 0)->plaintext;
@@ -38,6 +38,7 @@ class BethovenParser extends ParserAbstractClass
         $description = rtrim($description);
         $description = iconv('windows-1251', 'UTF-8', $description);
 
+        //состав товара
         $props['big_description'] = ($description);
 
         $parentSectionName = $html->find('.breadcrumb  li a span', 2)->plaintext;
@@ -48,6 +49,7 @@ class BethovenParser extends ParserAbstractClass
             $parentSection->save();
         }
 
+        //парсим табличку с фильтрами
         $properties = $html->find('.property-table tr');
         foreach ($properties as $property) {
             $name = $property->find('td', 0)->plaintext;
@@ -74,7 +76,24 @@ class BethovenParser extends ParserAbstractClass
                     $props['manid'] = $vendor->id;
                     break;
                 default:
-                    //                    $props['filters'][$name] = $val;
+                    //                                        $props['filters'][$name] = $val;
+                    $this->filters[$name] = $val;
+            }
+        }
+
+        //генерим фильтры для категории
+        if ($section) {
+            $lastFilter = EntityFilters::where('entity', Sections::getClassName())
+                ->where('id', $section->id)
+                ->orderBy('num', 'DESC')
+                ->first();
+            $num        = $lastFilter ? $lastFilter->num + 1 : 1;
+
+            foreach ($this->filters as $name => $val) {
+                $exists = EntityFilters::checkExists(Sections::getClassName(), $section->id, $name);
+                if (!$exists) {
+                    EntityFilters::addFilter(Sections::getClassName(), $section->id, $num++, $name, 1);
+                }
             }
         }
 
@@ -152,8 +171,20 @@ class BethovenParser extends ParserAbstractClass
             if ($photos) {
                 Photos::addImg('Goods', $createdGood->id, new Images($photos));
             }
+
+            if ($createdGood->section && $this->filters) {
+                foreach ($this->filters as $name => $val) {
+                    $sectionFilter = EntityFilters::where('entity', Sections::getClassName())
+                        ->where('entity_id', $createdGood->section->id)
+                        ->where('code', EntityFilters::getCode($name))
+                        ->first();
+
+                    if ($sectionFilter) {
+                        EntityFilters::addFilter(Goods::getClassName(), $createdGood->id, $sectionFilter->num, $val, 1);
+                    }
+                }
+            }
+
         }
-
     }
-
 }
