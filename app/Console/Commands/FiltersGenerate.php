@@ -38,15 +38,15 @@ class FiltersGenerate extends Command
         if (count($sections)) {
             foreach ($sections as $section_id) {
                 $FilterGenerateService->generateForSection($section_id);
-                $FilterGenerateService->saveFiltersSchema($section_id);
-                $FilterGenerateService->saveGoodsByFilter($section_id);
+//                $FilterGenerateService->saveFiltersSchema($section_id);
+//                $FilterGenerateService->saveGoodsByFilter($section_id);
             }
         } else {
             $sections = Sections::all();
             foreach($sections as $section){
                 $FilterGenerateService->generateForSection($section->id);
-                $FilterGenerateService->saveFiltersSchema($section->id);
-                $FilterGenerateService->saveGoodsByFilter($section->id);
+//                $FilterGenerateService->saveFiltersSchema($section->id);
+//                $FilterGenerateService->saveGoodsByFilter($section->id);
 
             }
         }

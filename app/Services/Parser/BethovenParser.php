@@ -22,126 +22,134 @@ class BethovenParser extends ParserAbstractClass
 
     public function parseProduct(): void
     {
-        $url   = $this->url;
-        $html  = HtmlDomParser::file_get_html($url);
-        $props = [];
 
-        $props['title']    = $html->find('h1', 0)->plaintext;
-        $props['h1_title'] = $html->find('h1', 0)->plaintext;
-        $props['photos']   = 'http://bethoven.ru/' . $html->find('.img-responsive', 0)->src;
+        try {
+            $url   = $this->url;
+            $html  = HtmlDomParser::file_get_html($url);
+            $props = [];
 
-        //удаляем первый абзац с кривой кодировкой
-        $html->find('.product-story-info-box', 0)->find('p', 0)->outertext = '';
+            $props['title']    = $html->find('h1', 0)->plaintext;
+            $props['h1_title'] = $html->find('h1', 0)->plaintext;
+            $props['photos']   = 'http://bethoven.ru/' . $html->find('.img-responsive', 0)->src;
 
-        $description = $html->find('.product-story-info-box', 0)->innertext();
-        $description = ltrim($description);
-        $description = rtrim($description);
-        $description = iconv('windows-1251', 'UTF-8', $description);
+            //удаляем первый абзац с кривой кодировкой
+            $html->find('.product-story-info-box', 0)->find('p', 0)->outertext = '';
 
-        //состав товара
-        $props['big_description'] = ($description);
+            $description = $html->find('.product-story-info-box', 0)->innertext();
+            $description = ltrim($description);
+            $description = rtrim($description);
+            $description = iconv('windows-1251', 'UTF-8', $description);
 
-        $parentSectionName = $html->find('.breadcrumb  li a span', 2)->plaintext;
-        $parentSection     = Sections::where('title', $parentSectionName)->first();
-        if (!$parentSection) {
-            $parentSection      = Sections::create(['title' => $parentSectionName, 'h1_title' => $parentSectionName]);
-            $parentSection->url = Urls::generateUrlFromText($parentSectionName);
-            $parentSection->save();
-        }
+            //состав товара
+            $props['big_description'] = ($description);
 
-        //парсим табличку с фильтрами
-        $properties = $html->find('.property-table tr');
-        foreach ($properties as $property) {
-            $name = $property->find('td', 0)->plaintext;
-            $name = ltrim(rtrim(str_replace(':', '', $name)));
-            $val  = ltrim(rtrim($property->find('td', 1)->plaintext));
-
-            switch ($name) {
-                case "Категория":
-                    $section = Sections::where('title', $val)->first();
-                    if (!$section) {
-                        $section      = Sections::create([
-                            'title'     => $val,
-                            'h1_title'  => $val,
-                            'parent_id' => $parentSection->id,
-                        ]);
-                        $section->url = Urls::generateUrlFromText($val);
-                        $section->save();
-                    }
-
-                    $props['section_id'] = $section->id;
-                    break;
-                case "Бренд":
-                    $vendor         = Vendors::firstOrCreate(['title' => $val])->first();
-                    $props['manid'] = $vendor->id;
-                    break;
-                default:
-                    //                                        $props['filters'][$name] = $val;
-                    $this->filters[$name] = $val;
+            $parentSectionName = $html->find('.breadcrumb  li a span', 2)->plaintext;
+            $parentSection     = Sections::where('title', $parentSectionName)->first();
+            if (!$parentSection) {
+                $parentSection      = Sections::create(['title'    => $parentSectionName,
+                                                        'h1_title' => $parentSectionName,
+                ]);
+                $parentSection->url = Urls::generateUrlFromText($parentSectionName);
+                $parentSection->save();
             }
-        }
 
-        //генерим фильтры для категории
-        if ($section) {
-            $lastFilter = EntityFilters::where('entity', Sections::getClassName())
-                ->where('id', $section->id)
-                ->orderBy('num', 'DESC')
-                ->first();
-            $num        = $lastFilter ? $lastFilter->num + 1 : 1;
+            //парсим табличку с фильтрами
+            $properties = $html->find('.property-table tr');
+            foreach ($properties as $property) {
+                $name = $property->find('td', 0)->plaintext;
+                $name = ltrim(rtrim(str_replace(':', '', $name)));
+                $val  = ltrim(rtrim($property->find('td', 1)->plaintext));
 
-            foreach ($this->filters as $name => $val) {
-                $exists = EntityFilters::checkExists(Sections::getClassName(), $section->id, $name);
-                if (!$exists) {
-                    EntityFilters::addFilter(Sections::getClassName(), $section->id, $num++, $name, 1);
+                switch ($name) {
+                    case "Категория":
+                        $section = Sections::where('title', $val)->first();
+                        if (!$section) {
+                            $section      = Sections::create([
+                                'title'     => $val,
+                                'h1_title'  => $val,
+                                'parent_id' => $parentSection->id,
+                            ]);
+                            $section->url = Urls::generateUrlFromText($val);
+                            $section->save();
+                        }
+
+                        $props['section_id'] = $section->id;
+                        break;
+                    case "Бренд":
+                        $vendor         = Vendors::firstOrCreate(['title' => $val])->first();
+                        $props['manid'] = $vendor->id;
+                        break;
+                    default:
+                        //                                        $props['filters'][$name] = $val;
+                        $this->filters[$name] = $val;
                 }
             }
+
+            //генерим фильтры для категории
+            if ($section) {
+                $lastFilter = EntityFilters::where('entity', Sections::getClassName())
+                    ->where('id', $section->id)
+                    ->orderBy('num', 'DESC')
+                    ->first();
+                $num        = $lastFilter ? $lastFilter->num + 1 : 1;
+
+                foreach ($this->filters as $name => $val) {
+                    $exists = EntityFilters::checkExists(Sections::getClassName(), $section->id, $name);
+                    if (!$exists) {
+                        EntityFilters::addFilter(Sections::getClassName(), $section->id, $num++, $name, 1);
+                    }
+                }
+            }
+
+            $products = $html->find('.productFilter');
+            $result   = [];
+            foreach ($products as $product) {
+                $new = [];
+
+                $articul        = $product->find('.product-code', 0)->plaintext;
+                $articul        = str_replace('Артикул: ', '', $articul);
+                $new['articul'] = $articul;
+
+                $weight        = $product->find('.weight-on', 0)->plaintext;
+                $weight        = floatval(str_replace('кг', '', $weight));
+                $new['weight'] = $weight;
+
+                //стандартная цена
+                $toRemove = $product->find('.price-standard', 0) ? $product->find('.price-standard', 0)->find('i') : [];
+                foreach ($toRemove as $r) {
+                    $r->innertext = '';
+                }
+                $standardPrice = $product->find('.price-standard', 0) ? intval($product->find('.price-standard',
+                    0)->plaintext) : null;
+
+                //цена со скидкой
+                $toRemove = $product->find('.price-sales', 0) ? $product->find('.price-sales', 0)->find('i') : [];
+                foreach ($toRemove as $r) {
+                    $r->innertext = '';
+                }
+                $salePrice = $product->find('.price-sales', 0) ? intval($product->find('.price-sales',
+                    0)->plaintext) : null;
+
+                //цена со скидкой по карте
+                $toRemove = $product->find('.skidkapokarte', 0) ? $product->find('.skidkapokarte', 0)->find('i') : [];
+                foreach ($toRemove as $r) {
+                    $r->innertext = '';
+                }
+                $skidkapokarte = $product->find('.skidkapokarte', 0) ? intval($product->find('.skidkapokarte',
+                    0)->plaintext) : null;
+
+                $new['price']       = $standardPrice ?: $salePrice ?: $skidkapokarte ?: 0;
+                $new['final_price'] = $salePrice ?: $skidkapokarte ?: $standardPrice ?: 0;
+
+                $new      += $props;
+                $result[] = $new;
+            }
+
+            $this->products = $result;
         }
+        catch (\Error $e) {
 
-        $products = $html->find('.productFilter');
-        $result   = [];
-        foreach ($products as $product) {
-            $new = [];
-
-            $articul        = $product->find('.product-code', 0)->plaintext;
-            $articul        = str_replace('Артикул: ', '', $articul);
-            $new['articul'] = $articul;
-
-            $weight        = $product->find('.weight-on', 0)->plaintext;
-            $weight        = floatval(str_replace('кг', '', $weight));
-            $new['weight'] = $weight;
-
-            //стандартная цена
-            $toRemove = $product->find('.price-standard', 0) ? $product->find('.price-standard', 0)->find('i') : [];
-            foreach ($toRemove as $r) {
-                $r->innertext = '';
-            }
-            $standardPrice = $product->find('.price-standard', 0) ? intval($product->find('.price-standard',
-                0)->plaintext) : null;
-
-            //цена со скидкой
-            $toRemove = $product->find('.price-sales', 0) ? $product->find('.price-sales', 0)->find('i') : [];
-            foreach ($toRemove as $r) {
-                $r->innertext = '';
-            }
-            $salePrice = $product->find('.price-sales', 0) ? intval($product->find('.price-sales',
-                0)->plaintext) : null;
-
-            //цена со скидкой по карте
-            $toRemove = $product->find('.skidkapokarte', 0) ? $product->find('.skidkapokarte', 0)->find('i') : [];
-            foreach ($toRemove as $r) {
-                $r->innertext = '';
-            }
-            $skidkapokarte = $product->find('.skidkapokarte', 0) ? intval($product->find('.skidkapokarte',
-                0)->plaintext) : null;
-
-            $new['price']       = $standardPrice ?: $salePrice ?: $skidkapokarte ?: 0;
-            $new['final_price'] = $salePrice ?: $skidkapokarte ?: $standardPrice ?: 0;
-
-            $new      += $props;
-            $result[] = $new;
         }
-
-        $this->products = $result;
     }
 
     public function saveParsed(): void

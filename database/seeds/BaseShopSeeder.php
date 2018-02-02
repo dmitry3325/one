@@ -27,12 +27,12 @@ class BaseShopSeeder extends Seeder
      */
     public function run()
     {
-        Goods::truncate();
-        Urls::truncate();
-        Photos::truncate();
-        Sections::truncate();
-        ShopMetadata::truncate();
-        EntityFilters::truncate();
-        Artisan::call('parseBethoven');
+//        Goods::truncate();
+//        Urls::truncate();
+//        Photos::truncate();
+//        Sections::truncate();
+//        ShopMetadata::truncate();
+//        EntityFilters::truncate();
+//        Artisan::call('parseBethoven');
     }
 }
