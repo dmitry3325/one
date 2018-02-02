@@ -49,7 +49,7 @@ class ParseBethoven extends Command
             foreach ($parseList as $num => $page) {
                 if ($page) {
                     $p = DB::table('shop.parse')->where('url', $page)->count();
-                    if ($p) {
+                    if (!$p) {
                         try {
                             $parser = new BethovenParser($page);
                             $parser->parseProduct();
