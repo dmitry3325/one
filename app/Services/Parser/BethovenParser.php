@@ -176,7 +176,7 @@ class BethovenParser extends ParserAbstractClass
             $createdGood->save();
 
             $photos = array_get($good, 'photos');
-            if ($photos) {
+            if ($photos && $photos !== 'http://www.bethowen.ru/img/nofoto.jpg') {
                 Photos::addImg('Goods', $createdGood->id, new Images($photos));
             }
 

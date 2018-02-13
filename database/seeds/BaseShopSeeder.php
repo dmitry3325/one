@@ -33,6 +33,6 @@ class BaseShopSeeder extends Seeder
 //        Sections::truncate();
 //        ShopMetadata::truncate();
 //        EntityFilters::truncate();
-        Artisan::call('parseBethoven');
+//        Artisan::call('parseBethoven');
     }
 }

@@ -57,10 +57,15 @@ class ParseBethoven extends Command
                             echo $num . ' ' . $page . PHP_EOL;
                             DB::table('shop.parse')->insert([
                                 'url' => $page,
+                                'success' => true
                             ]);
                         }
                         catch (\Exception $er) {
-                            echo $num . ' ' . $page . ' error' . PHP_EOL;
+                            DB::table('shop.parse')->insert([
+                                'url' => $page,
+                                'success' => false
+                            ]);
+                            echo $num . ' ' . $page . ' error ' . $er->getMessage() . PHP_EOL;
                         }
                     }
                 }

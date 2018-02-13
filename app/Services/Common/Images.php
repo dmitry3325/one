@@ -119,7 +119,9 @@ class Images
         if ($info === false) {
             throw new \Exception("Invalid image file: $file", self::ERR_INVALID_IMAGE);
         }
+        //TRY image/jpeg
         $this->mimeType = $info['mime'];
+//        $this->mimeType = 'image/jpeg';
 
         // Create image object from file
         switch ($this->mimeType) {
