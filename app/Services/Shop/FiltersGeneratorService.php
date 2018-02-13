@@ -43,7 +43,6 @@ class FiltersGeneratorService
     {
         $Section = Sections::findOrFail($section_id);
         $sectionFilters = $this->loadSectionFilters($section_id);
-        dd($sectionFilters);
 
         $goodsFL = EntityFilters::select('shop.entity_filters.*')
             ->join('shop.goods', function ($join) {
@@ -114,28 +113,6 @@ class FiltersGeneratorService
     }
 
     /**
-     * @param Goods $good
-     */
-    public function generateForGood(Goods $good)
-    {
-        $sectionFilters = $this->loadSectionFilters($good->section_id);
-        $goodsFL = EntityFilters::select('shop.entity_filters.*')
-            ->where('shop.entity_filters.entity', '=', Goods::getClassName())
-            ->where('shop.entity_filters.entity_id', '=', $good->id)
-            ->get();
-
-        $grouped = [];
-        foreach ($goodsFL as $filter) {
-            $grouped[$filter->num . '-' . $filter->code] = $filter;
-        }
-
-        $neededFilters = $this->generateByFilters($grouped);
-
-    }
-
-
-
-    /**
      * @param $section_id
      *
      * @return array
@@ -144,71 +121,11 @@ class FiltersGeneratorService
     {
         $startTime = microtime(true);
 
-        $sectionFilters = $this->loadSectionFilters($section_id);
-        $filters = $this->getExistingFilters($section_id);
+        list($schema, $goodsByFilter, $goodsDataById) = $this->getFiltersSchema($section_id);
+        $allFilters = $this->getExistingFilters($section_id);
 
-        $_class = Filters::getClassName();
 
-        $All = [];
-        foreach ($filters as $key => $data) {
-            if (count($data['codes_list']) === 1) {
-                foreach ($data['entity_filters'] as $num => $byCode) {
-                    if (isset($sectionFilters[$num])) {
-                        foreach ($byCode as $code => $eF) {
-                            $All[$eF->num]['title'] = $sectionFilters[$num]->value;
-                            $All[$eF->num]['list'][$eF->code] = [
-                                'value' => $eF->value,
-                                'code'  => $eF->code,
-                                'url'   => ShopBaseModel::generateUrl($_class, $data['filter']['id'], $data['filter']['url']),
-                            ];
-                        }
-                    }
-                }
-            }
-
-        }
-
-        /**
-         * Получили и сохранили базовую структуру фильтров для раздела
-         */
-
-        $this->goodsStorage->setSectionFilters($section_id, 'all_data', $All);
-
-        $Data = [];
-        foreach ($filters as $key => $data) {
-            $count = count($data['codes_list']);
-            foreach ($filters as $key2 => $data2) {
-                $count2 = count($data2['codes_list']);
-                /**
-                 * Проверяем, что фильтр включает все текущие +1
-                 * И все фильтры
-                 */
-
-                if (($count2 - $count) === 1) {
-                    $allow = true;
-                    foreach ($data['codes_list'] as $fkey) {
-                        if (!isset($data2['codes_list'][$fkey])) {
-                            $allow = false;
-                            break;
-                        }
-                    }
-
-                    if ($allow) {
-                        $filterCode = array_first(array_diff($data2['codes_list'], $data['codes_list']));
-                        list($num, $code) = explode('-',$filterCode);
-                        $Data[$key][$num][$code] = $data2['filter'];
-                    }
-                }
-            }
-        }
-
-        /**
-         * Получили и сохранили для выбранных фильтров
-        */
-
-        foreach ($Data as $key => $data) {
-            $this->goodsStorage->setSectionFilters($section_id, $key, $data);
-        }
+        $this->goodsStorage->setSectionFilters($section_id, $allFilters);
 
         return [
             'result' => 'Ok',
@@ -310,9 +227,9 @@ class FiltersGeneratorService
     }
 
     /**
-     * Загружает существующие фильтры
-     *
      * @param $section_id
+     *
+     * @return array
      */
     private function getExistingFilters($section_id)
     {
@@ -351,6 +268,7 @@ class FiltersGeneratorService
         return $Data;
     }
 
+
     /**
      * Получаем схему фильтров для раздела
      *
@@ -360,53 +278,104 @@ class FiltersGeneratorService
      */
     public function getFiltersSchema($section_id)
     {
-        $filters = EntityFilters::select('shop.entity_filters.num', 'shop.entity_filters.code', 'shop.entity_filters.value')
+        $filters = EntityFilters::select(
+            'shop.entity_filters.num',
+            'shop.entity_filters.code',
+            'shop.entity_filters.value',
+            'shop.entity_filters.entity_id',
+            'shop.goods.price',
+            'shop.goods.weight')
             ->join('shop.goods', function ($join) {
                 $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
             })
             ->where('shop.goods.section_id', '=', $section_id)
             ->where('shop.goods.hidden', '=', 0)
             ->where('shop.entity_filters.entity', '=', Goods::getClassName())
-            ->groupBy('shop.entity_filters.num', 'shop.entity_filters.code')
             ->orderBy(\DB::raw('null'))
             ->get();
 
-        $data = [];
+        $schema = [];
+        $goodsByFilter = [];
+        $goodsDataById = [];
+        $priceRange = $weightRange = [
+            'min' => 10000000000000,
+            'max' => 0,
+        ];
+
+        $Section = Sections::findOrFail($section_id);
+        foreach ($Section->filters as $filter) {
+            if ($filter->hidden) continue;
+
+            $schema[$filter->num] = [
+                'code'     => $filter->code,
+                'title'    => $filter->value,
+                'order_by' => $filter->order_by,
+            ];
+            if ($filter->code === EntityFilters::FILTER_PRICE) {
+                $schema[$filter->num]['view_type'] = 'data_range';
+                $schema[$filter->num]['range'] = [];
+            } else if ($filter->code === EntityFilters::FILTER_WEIGHT) {
+                $schema[$filter->num]['view_type'] = 'data_range';
+                $schema[$filter->num]['range'] = [];
+            } else {
+                $schema[$filter->num]['view_type'] = 'items_list';
+                $schema[$filter->num]['list'] = [];
+            }
+        }
+
         foreach ($filters as $fil) {
-            $data[$fil->num][$fil->code] = [
-                'value' => $fil->value,
-                'code'  => $fil->code,
+            if (!isset($schema[$fil->num])) continue;
+            if ($schema[$fil->num]['view_type'] === 'items_list') {
+                $schema[$fil->num]['list'][$fil->code] = [
+                    'value' => $fil->value,
+                    'code'  => $fil->code,
+                ];
+            }
+
+            if ($priceRange['min'] > $fil->price) {
+                $priceRange['min'] = $fil->price;
+            }
+            if ($priceRange['max'] < $fil->price) {
+                $priceRange['max'] = $fil->price;
+            }
+
+            if ($weightRange['min'] > $fil->weigth) {
+                $weightRange['min'] = $fil->weigth;
+            }
+            if ($weightRange['max'] < $fil->weigth) {
+                $weightRange['max'] = $fil->weigth;
+            }
+
+
+            $goodsByFilter[$fil->num][$fil->code][$fil->entity_id] = $fil->entity_id;
+            $goodsDataById[$fil->entity_id] = [
+                'price'  => $fil->price,
+                'weight' => $fil->weight,
             ];
         }
 
-        return $data;
-    }
-
-    /**
-     * Получаем все товары по фильтрам
-     *
-     * @param $section_id
-     *
-     * @return array
-     */
-    public function getGoodsByFilter($section_id)
-    {
-        $goodsFLS = EntityFilters::select('shop.entity_filters.*')
-            ->join('shop.goods', function ($join) {
-                $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
-            })
-            ->where('shop.goods.section_id', '=', $section_id)
-            ->where('shop.goods.hidden', '=', 0)
-            ->where('shop.entity_filters.entity', '=', Goods::getClassName())
-            ->get();
-
-        $byFilter = [];
-        foreach ($goodsFLS as $fl) {
-            $byFilter[$fl->num][$fl->code][$fl->entity_id] = $fl->entity_id;
+        foreach ($schema as $k => $sh) {
+            if ($schema[$k]['code'] === EntityFilters::FILTER_PRICE) {
+                $schema[$k]['range'] = $priceRange;
+            } else if ($schema[$k]['code'] === EntityFilters::FILTER_WEIGHT) {
+                $schema[$k]['range'] = $weightRange;
+            } else if ($schema[$k]['view_type'] === 'items_list') {
+                if (count($schema[$k]['list']) === 0) {
+                    unset($schema[$k]);
+                }
+            }
         }
 
-        return $byFilter;
+        uasort($schema, function ($a, $b) {
+            if ($a['order_by'] === $b['order_by']) return 0;
+
+            return (($a['order_by'] < $b['order_by']) ? 1 : -1);
+        });
+
+
+        return [$schema, $goodsByFilter, $goodsDataById];
     }
+
 
     /**
      * @param          $Data
@@ -422,8 +391,6 @@ class FiltersGeneratorService
         }
 
         foreach ($Data as $key => $data) {
-            $this->goodsStorage->setFilterGoods($section->id, $key, $data['goods']);
-
             $filter = new Filters();
             $filter->section_id = $section->id;
             $filter->save();
