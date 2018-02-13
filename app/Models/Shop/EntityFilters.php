@@ -10,30 +10,35 @@ use App\Models\BaseModel;
  */
 class EntityFilters extends BaseModel
 {
+    const FILTER_PRICE = 801197857;
+    const FILTER_WEIGHT= 782640242;
+
     protected $table   = 'shop.entity_filters';
     protected $guarded = ['id'];
 
     /**
      * @param $entity
      * @param $id
-     * @param $num
-     * @param $value
-     *
-     * @return $this|bool|\Illuminate\Database\Eloquent\Model
+     * @param $filter
+     * @return bool
      */
-    public static function addFilter($entity, $id, $num, $value, $auto_create = 0)
+    public static function addFilter($entity, $id, $filter)
     {
         if (!ShopBaseModel::checkEntity($entity)) {
             return false;
         }
 
+        if(!isset($filter['value'])) return false;
+
         return self::create([
             'entity'      => $entity,
             'entity_id'   => $id,
-            'num'         => $num,
-            'value'       => $value,
-            'code'        => self::getCode($value),
-            'auto_create' => $auto_create,
+            'num'         => array_get($filter, 'num', 1),
+            'value'       => $filter['value'],
+            'code'        => self::getCode($filter['value']),
+            'auto_create' => array_get($filter, 'auto_create', 0),
+            'hidden' => array_get($filter, 'hidden', 0),
+            'order_by' => array_get($filter, 'order_by', 0),
         ]);
     }
 
@@ -66,5 +71,15 @@ class EntityFilters extends BaseModel
             ->count();
 
         return boolval($filter);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDefaultFilters(){
+        return [
+            self::FILTER_PRICE => 'Цена',
+            self::FILTER_WEIGHT => 'Вес'
+        ];
     }
 }

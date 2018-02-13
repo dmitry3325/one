@@ -264,6 +264,13 @@ class ShopController extends Controller
     }
 
     /**
+     * @return array
+     */
+    public function getDefaultEntityFilters(){
+        return EntityFilters::getDefaultFilters();
+    }
+
+    /**
      * @param $entity
      * @param $id
      * @param $filters
@@ -285,8 +292,7 @@ class ShopController extends Controller
             if (!array_get($filter, 'value') || !array_get($filter, 'num')) {
                 continue;
             }
-            EntityFilters::addFilter($entity, $id, $filter['num'], $filter['value'],
-                array_get($filter, 'auto_create', 0));
+            EntityFilters::addFilter($entity, $id, $filter);
         }
         $result['result'] = true;
         return $result;

@@ -4,14 +4,44 @@
         <div v-else>
             <div v-if="entity == 'Sections'">
                 <div v-for="filter in filters" class="row">
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         <span class="badge badge-default">
                             {{((typeof filter.code !== 'undefined') ? 'Фильтр №' : 'Новый фильтр №') + filter.num}}
                         </span>
                     </div>
-                    <div class="col-sm-5">
-                        <input type="text" class="form-control" v-model="filter.value"
-                               placeholder="Введите значение фильтра">
+                    <div class="col-sm-4">
+                        <div v-if="!filter.code" class="input-group mb-3">
+                            <input type="text" class="form-control" v-model="filter.value"
+                                   placeholder="Введите значение фильтра">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                </button>
+                                <div class="pull-right dropdown-menu">
+                                    <a v-for="df in defaultFilters" class="dropdown-item" @click="filter.value = df" href="#">{{ df }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <input type="text" class="form-control" v-model="filter.value"
+                                   placeholder="Введите значение фильтра">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" v-model="filter.order_by"
+                                       placeholder="Очередь вывода">
+                            </div>
+                            <div class="col-sm-6">
+                                <button type="button" class="btn w-100"
+                                        :class="(filter.hidden)?'':'btn-secondary'"
+                                        @click="filter.hidden = !filter.hidden">
+                                    <span class="glyphicon"
+                                          :class="(filter.hidden)?'glyphicon-check':'glyphicon-unchecked'"></span>&nbsp;
+                                    Скрыт
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-sm-2">
                         <button type="button" class="btn w-100"
@@ -102,6 +132,7 @@
                 allowSave : false,
                 filters: {},
                 sectionFilters: {},
+                defaultFilters: {},
                 Model: {},
                 loading: true,
                 entity_filter_distinct: {},
@@ -130,6 +161,9 @@
                                 resolve();
                             });
                         } else {
+                            Ajax.post('/shop', 'getDefaultEntityFilters').then(function(res){
+                                self.defaultFilters = res;
+                            });
                             resolve();
                         }
                     });

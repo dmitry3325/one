@@ -43,6 +43,8 @@ class FiltersGeneratorService
     {
         $Section = Sections::findOrFail($section_id);
         $sectionFilters = $this->loadSectionFilters($section_id);
+        dd($sectionFilters);
+
         $goodsFL = EntityFilters::select('shop.entity_filters.*')
             ->join('shop.goods', function ($join) {
                 $join->on('shop.goods.id', '=', 'shop.entity_filters.entity_id');
@@ -70,16 +72,17 @@ class FiltersGeneratorService
                 $neededFilters[$key]['goods'][] = $id;
             }
         }
+
         $existingFilters = $this->getExistingFilters($section_id);
         $toCreate = [];
         $toUpdate = [];
         $toHide = [];
 
         foreach ($neededFilters as $key => $data) {
-            if (!isset($existingFiltes[$key])) {
+            if (!isset($existingFilters[$key])) {
                 $toCreate[$key] = $data;
-            } else if ($existingFilters[$key]['filter']['hidden']) {
-                $toUpdate[$key] = $data;
+            } else if ($existingFilters[$key]['hidden']) {
+                $toUpdate[$key] = $existingFilters[$key];
             }
         }
 
@@ -91,6 +94,22 @@ class FiltersGeneratorService
 
         if (count($toCreate) > 0) {
             $this->createFilters($toCreate, $Section);
+        }
+
+        if (count($toUpdate) > 0) {
+            $ids = [];
+            foreach($toUpdate as $filter){
+                $ids[] = $filter['id'];
+            }
+            Filters::getDataQuery()->whereIn('id', $ids)->update(['hidden' => 0]);
+        }
+
+        if(count($toHide) > 0){
+            $ids = [];
+            foreach($toUpdate as $filter){
+                $ids[] = $filter['id'];
+            }
+            Filters::getDataQuery()->whereIn('id', $ids)->update(['hidden' => 1]);
         }
     }
 
@@ -121,7 +140,7 @@ class FiltersGeneratorService
      *
      * @return array
      */
-    /*public function fillFilterCombinations($section_id): array
+    public function fillFilterCombinations($section_id): array
     {
         $startTime = microtime(true);
 
@@ -146,9 +165,12 @@ class FiltersGeneratorService
                     }
                 }
             }
+
         }
+
         /**
          * Получили и сохранили базовую структуру фильтров для раздела
+         */
 
         $this->goodsStorage->setSectionFilters($section_id, 'all_data', $All);
 
@@ -160,6 +182,7 @@ class FiltersGeneratorService
                 /**
                  * Проверяем, что фильтр включает все текущие +1
                  * И все фильтры
+                 */
 
                 if (($count2 - $count) === 1) {
                     $allow = true;
@@ -181,6 +204,7 @@ class FiltersGeneratorService
 
         /**
          * Получили и сохранили для выбранных фильтров
+        */
 
         foreach ($Data as $key => $data) {
             $this->goodsStorage->setSectionFilters($section_id, $key, $data);
@@ -190,7 +214,9 @@ class FiltersGeneratorService
             'result' => 'Ok',
             'time'   => microtime(true) - $startTime,
         ];
-    }*/
+    }
+
+
     /**
      * @param $list
      *
@@ -295,7 +321,7 @@ class FiltersGeneratorService
             ->join('shop.filters', function ($join) {
                 $join->on('shop.filters.id', '=', 'shop.entity_filters.entity_id');
             })
-            ->join('shop.urls', function ($join) use ($filterClassName) {
+            ->leftJoin('shop.urls', function ($join) use ($filterClassName) {
                 $join->on('shop.filters.id', '=', 'shop.urls.entity_id');
                 $join->where('shop.urls.entity', '=', $filterClassName);
             })
@@ -318,7 +344,6 @@ class FiltersGeneratorService
                     'id'     => $id,
                     'hidden' => $eF->hidden,
                     'url'    => ShopBaseModel::getUrl($filterClassName, $id, $eF->url),
-
                 ];
             }
         }
