@@ -97,15 +97,15 @@ class FiltersGeneratorService
 
         if (count($toUpdate) > 0) {
             $ids = [];
-            foreach($toUpdate as $filter){
+            foreach ($toUpdate as $filter) {
                 $ids[] = $filter['id'];
             }
             Filters::getDataQuery()->whereIn('id', $ids)->update(['hidden' => 0]);
         }
 
-        if(count($toHide) > 0){
+        if (count($toHide) > 0) {
             $ids = [];
-            foreach($toUpdate as $filter){
+            foreach ($toUpdate as $filter) {
                 $ids[] = $filter['id'];
             }
             Filters::getDataQuery()->whereIn('id', $ids)->update(['hidden' => 1]);
@@ -126,6 +126,9 @@ class FiltersGeneratorService
 
 
         $this->goodsStorage->setSectionFilters($section_id, $allFilters);
+        $this->goodsStorage->setGoodsByFilter($section_id, $goodsByFilter);
+        $this->goodsStorage->setFilterSchema($section_id, $schema);
+        $this->goodsStorage->setGoodsData($section_id, $goodsDataById);
 
         return [
             'result' => 'Ok',

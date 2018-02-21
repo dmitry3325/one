@@ -19,7 +19,7 @@ class GoodsStorage
     /**
      * Схема фильтров
      */
-    const SECTION_FILTER_SCHEMA = 'goods_by_filter';
+    const SECTION_FILTER_SCHEMA = 'section_filter_schema';
 
     /**
      * Данные для фильтрации вес, цена
@@ -64,7 +64,7 @@ class GoodsStorage
     }
 
     /**
-     * @param int    $section_id
+     * @param int $section_id
      *
      * @return array
      */
@@ -92,6 +92,48 @@ class GoodsStorage
     public function getSectionFilters(int $section_id)
     {
         $list = $this->sectionFiltersStorage->get($section_id);
+
+        return ($list) ? json_decode($list, true) : null;
+    }
+
+    /**
+     * @param int   $section_id
+     * @param array $schema
+     */
+    public function setFilterSchema(int $section_id, array $schema)
+    {
+        $this->sectionSchemaStorage->set($section_id, json_encode($schema));
+    }
+
+    /**
+     * @param int $section_id
+     *
+     * @return array
+     */
+    public function getFilterSchema(int $section_id)
+    {
+        $list = $this->sectionSchemaStorage->get($section_id);
+
+        return ($list) ? json_decode($list, true) : null;
+    }
+
+    /**
+     * @param int   $section_id
+     * @param array $goods
+     */
+    public function setGoodsData(int $section_id, array $goods)
+    {
+        $this->goodsDataStorage->set($section_id, json_encode($goods));
+    }
+
+    /**
+     * @param int $section_id
+     *
+     * @return array
+     */
+    public function getGoodsData(int $section_id)
+    {
+        $list = $this->goodsDataStorage->get($section_id);
 
         return ($list) ? json_decode($list, true) : null;
     }

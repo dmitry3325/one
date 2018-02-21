@@ -39,7 +39,6 @@ class FiltersGenerate extends Command
             foreach ($sections as $section_id) {
                 $FilterGenerateService->generateForSection($section_id);
                 $FilterGenerateService->fillFilterCombinations($section_id);
-
             }
         } else {
             $sections = Sections::all();
