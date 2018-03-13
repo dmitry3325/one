@@ -86,19 +86,23 @@ class BethovenParser extends ParserAbstractClass
                         $this->filters[$name] = $val;
                 }
             }
-
             //генерим фильтры для категории
             if ($section) {
                 $lastFilter = EntityFilters::where('entity', Sections::getClassName())
                     ->where('entity_id', $section->id)
                     ->orderBy('num', 'DESC')
                     ->first();
-                $num        = $lastFilter ? $lastFilter->num + 1 : 1;
+                $num        = $lastFilter && $lastFilter->num ? $lastFilter->num + 1 : 1;
 
                 foreach ($this->filters as $name => $val) {
                     $exists = EntityFilters::checkExists(Sections::getClassName(), $section->id, $name);
                     if (!$exists) {
-                        EntityFilters::addFilter(Sections::getClassName(), $section->id, $num++, $name, 1);
+                        $f = [];
+                        $f['num'] = $num++;
+                        $f['value'] = $name;
+                        $f['auto_create'] = 0;
+
+                        EntityFilters::addFilter(Sections::getClassName(), $section->id, $f);
                     }
                 }
             }
