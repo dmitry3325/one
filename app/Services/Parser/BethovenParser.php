@@ -26,6 +26,9 @@ class BethovenParser extends ParserAbstractClass
         try {
             $url   = $this->url;
             $html  = HtmlDomParser::file_get_html($url);
+            if(!$html){
+                return;
+            }
             $props = [];
 
             $props['title']    = $html->find('h1', 0)->plaintext;
@@ -154,7 +157,7 @@ class BethovenParser extends ParserAbstractClass
             $this->products = $result;
         }
         catch (\Error $e) {
-
+//            echo ($e->getLine(), $e->getMessage());
         }
     }
 
