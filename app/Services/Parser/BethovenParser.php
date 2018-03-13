@@ -194,7 +194,12 @@ class BethovenParser extends ParserAbstractClass
                         ->first();
 
                     if ($sectionFilter) {
-                        EntityFilters::addFilter(Goods::getClassName(), $createdGood->id, $sectionFilter->num, $val, 1);
+                        $f = [];
+                        $f['num'] = $sectionFilter->num;
+                        $f['value'] = $val;
+                        $f['auto_create'] = 1;
+
+                        EntityFilters::addFilter(Goods::getClassName(), $createdGood->id, $f);
                     }
                 }
             }
