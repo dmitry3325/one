@@ -100,7 +100,7 @@ class BethovenParser extends ParserAbstractClass
                         $f = [];
                         $f['num'] = $num++;
                         $f['value'] = $name;
-                        $f['auto_create'] = 0;
+                        $f['auto_create'] = 1;
 
                         EntityFilters::addFilter(Sections::getClassName(), $section->id, $f);
                     }
