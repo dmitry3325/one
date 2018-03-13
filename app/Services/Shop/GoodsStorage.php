@@ -8,92 +8,133 @@ class GoodsStorage
 {
     /**
      * Товары по фильтру
-     *
-     * sectionId -> filterKey -> goodsList
      */
-    const FILTERED_GOODS = 'filtered_goods';
+    const FILTERED_GOODS = 'goods_by_filter';
 
     /**
      * Фильтры разделов
-     *
-     * sectionId => filterKey -> filterData
-     *
      */
     const SECTION_FILTERS = 'section_filters';
 
+    /**
+     * Схема фильтров
+     */
+    const SECTION_FILTER_SCHEMA = 'section_filter_schema';
+
+    /**
+     * Данные для фильтрации вес, цена
+     */
+    const GOODS_IMPORTANT_DATA = 'goods_important_data';
+
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
     protected $sectionFiltersStorage;
 
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
     protected $filterGoodsStorage;
+
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
+    protected $goodsDataStorage;
+
+    /**
+     * @var \Illuminate\Redis\Connections\Connection
+     */
+    protected $sectionSchemaStorage;
 
     public function __construct()
     {
         $this->sectionFiltersStorage = Redis::connection(self::SECTION_FILTERS);
         $this->filterGoodsStorage = Redis::connection(self::FILTERED_GOODS);
+        $this->goodsDataStorage = Redis::connection(self::GOODS_IMPORTANT_DATA);
+        $this->sectionSchemaStorage = Redis::connection(self::SECTION_FILTER_SCHEMA);
     }
 
     /**
-     * @param int    $section_id
-     * @param string $filterKey
-     * @param array  $goods
+     * @param int   $section_id
+     * @param array $goods
      */
-    public function setFilterGoods(int $section_id, string $filterKey, array $goods)
+    public function setGoodsByFilter(int $section_id, array $goods)
     {
-        $this->filterGoodsStorage->hset($section_id, $filterKey, json_encode($goods));
+        $this->filterGoodsStorage->set($section_id, json_encode($goods));
     }
 
     /**
-     * @param int    $section_id
-     * @param string $filterKey
+     * @param int $section_id
      *
      * @return array
      */
-    public function getFilterGoods(int $section_id, string $filterKey = null)
+    public function getGoodsByFilter(int $section_id)
     {
-        if ($filterKey) {
-            $list = $this->filterGoodsStorage->hget($section_id, $filterKey);
+        $list = $this->filterGoodsStorage->get($section_id);
 
-            return ($list) ? json_decode($list, true) : null;
-        } else {
-            $list = $this->filterGoodsStorage->hgetall($section_id);
-
-            foreach ($list as &$data) {
-                $data = json_decode($data, true);
-            }
-
-            return $list;
-        }
+        return ($list) ? json_decode($list, true) : null;
     }
 
     /**
-     * @param int    $section_id
-     * @param string $filterKey
-     * @param array  $data
+     * @param int   $section_id
+     * @param array $data
      */
-    public function setSectionFilters(int $section_id, string $filterKey, array $data)
+    public function setSectionFilters(int $section_id, array $data)
     {
-        $this->sectionFiltersStorage->hset($section_id, $filterKey, json_encode($data));
+        $this->sectionFiltersStorage->set($section_id, json_encode($data));
     }
 
     /**
-     * @param int    $section_id
-     * @param string $filterKey
+     * @param int $section_id
      *
      * @return array
      */
-    public function getSectionFilters(int $section_id, string $filterKey = null)
+    public function getSectionFilters(int $section_id)
     {
-        if ($filterKey) {
-            $list = $this->sectionFiltersStorage->hget($section_id, $filterKey);
+        $list = $this->sectionFiltersStorage->get($section_id);
 
-            return ($list) ? json_decode($list, true) : null;
-        } else {
-            $list = $this->sectionFiltersStorage->hgetall($section_id);
+        return ($list) ? json_decode($list, true) : null;
+    }
 
-            foreach ($list as &$data) {
-                $data = json_decode($data, true);
-            }
+    /**
+     * @param int   $section_id
+     * @param array $schema
+     */
+    public function setFilterSchema(int $section_id, array $schema)
+    {
+        $this->sectionSchemaStorage->set($section_id, json_encode($schema));
+    }
 
-            return $list;
-        }
+    /**
+     * @param int $section_id
+     *
+     * @return array
+     */
+    public function getFilterSchema(int $section_id)
+    {
+        $list = $this->sectionSchemaStorage->get($section_id);
+
+        return ($list) ? json_decode($list, true) : null;
+    }
+
+    /**
+     * @param int   $section_id
+     * @param array $goods
+     */
+    public function setGoodsData(int $section_id, array $goods)
+    {
+        $this->goodsDataStorage->set($section_id, json_encode($goods));
+    }
+
+    /**
+     * @param int $section_id
+     *
+     * @return array
+     */
+    public function getGoodsData(int $section_id)
+    {
+        $list = $this->goodsDataStorage->get($section_id);
+
+        return ($list) ? json_decode($list, true) : null;
     }
 }
