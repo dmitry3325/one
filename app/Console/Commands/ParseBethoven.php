@@ -43,6 +43,7 @@ class ParseBethoven extends Command
             ////                'https://www.bethowen.ru/catalogue/dogs/korma/syxoi/korm-dlya-sobak-royal-canin-royal-kanin-german-shepherd-24-dlya-porody-nemetskaya-ovcharka-starshe-1/',
             //                'https://www.bethowen.ru/catalogue/dogs/korma/syxoi/korm_dlya_sobak_happy_dog_fit_well_senor_dlya_pozhilykh_sobak_ptitsa_losos_yagnenok_yaytsa_sukh_4kg/',
             //                'https://www.bethowen.ru/catalogue/dogs/korma/syxoi/korm_dlya_shchenkov_best_choice_junior_dlya_melkikh_i_srednikh_porod_kuritsa_kukuruza_ris_sukh_4kg/'
+//            'https://www.bethowen.ru/catalogue/dogs/gruming/furminator-dlya-sobak-furminator-dlya-dlinnosherstnykh-krupnykh-porod-10sm/'
             //            ];
 
             //проверять не спаршен ли товар

@@ -20,46 +20,46 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('goods')) {
             Schema::create('shop.goods', function (Blueprint $table) {
                 $table->increments('id');
-                $table->integer('parent_id')->default(0);
-                $table->integer('section_id')->default(0);
-                $table->string('type')->default('');
-                $table->string('title')->default('');
-                $table->string('h1_title')->default('');
-                $table->string('order_title')->default('');
-                $table->string('path_title')->default('');
-                $table->integer('orderby')->default(0);
-                $table->integer('orderby_manual')->default(0);
-                $table->integer('orderby_auto')->default(0);
-                $table->integer('ignore_orderby_auto')->default(0);
-                $table->tinyInteger('hidden')->default(0);
-                $table->tinyInteger('stop_sale')->default(0);
-                $table->tinyInteger('cancelled')->default(0);
-                $table->integer('manid')->default(0);
-                $table->string('articul')->default('');
-                $table->string('sarticul')->default('');
-                $table->double('cost')->default(0);
-                $table->double('price')->default(0);
-                $table->double('final_price')->default(0);
-                $table->double('price_opt1')->default(0);
-                $table->double('price_opt2')->default(0);
-                $table->double('discount')->default(0);
+                $table->integer('parent_id')->nullable();
+                $table->integer('section_id')->nullable();
+                $table->string('type')->nullable();
+                $table->string('title')->nullable();
+                $table->string('h1_title')->nullable();
+                $table->string('order_title')->nullable();
+                $table->string('path_title')->nullable();
+                $table->integer('orderby')->nullable();
+                $table->integer('orderby_manual')->nullable();
+                $table->integer('orderby_auto')->nullable();
+                $table->integer('ignore_orderby_auto')->nullable();
+                $table->tinyInteger('hidden')->nullable();
+                $table->tinyInteger('stop_sale')->nullable();
+                $table->tinyInteger('cancelled')->nullable();
+                $table->integer('manid')->nullable();
+                $table->string('articul')->nullable();
+                $table->string('sarticul')->nullable();
+                $table->double('cost')->nullable();
+                $table->double('price')->nullable();
+                $table->double('final_price')->nullable();
+                $table->double('price_opt1')->nullable();
+                $table->double('price_opt2')->nullable();
+                $table->double('discount')->nullable();
 
-                $table->double('tarif')->default(0);
-                $table->double('tarif_discount')->default(0);
+                $table->double('tarif')->nullable();
+                $table->double('tarif_discount')->nullable();
                 $table->double('min_qty')->nullable();
-                $table->tinyInteger('ignore_min_qty')->default(0);
-                $table->double('weight')->default(0);
-                $table->string('final_price_round_method', 25)->default(0);
-                $table->double('nds')->default(0);
+                $table->tinyInteger('ignore_min_qty')->nullable();
+                $table->double('weight')->nullable();
+                $table->string('final_price_round_method', 25)->nullable();
+                $table->double('nds')->nullable();
                 $table->integer('show_qty')->nullable();
                 $table->integer('show_buy')->nullable();
                 $table->tinyInteger('img_new')->nullable();
                 $table->tinyInteger('img_promo')->nullable();
                 $table->integer('comments_avg')->nullable();
                 $table->integer('comments_num')->nullable();
-                $table->integer('picture_id')->default(0);
-                $table->string('photos')->default('');
-                $table->string('short_description')->default('');
+                $table->integer('picture_id')->nullable();
+                $table->string('photos')->nullable();
+                $table->string('short_description')->nullable();
                 $table->dateTime('first_inventory')->nullable();
                 $table->tinyInteger('not_for_ya_market')->nullable();
                 $table->tinyInteger('not_for_site_map')->nullable();
@@ -76,16 +76,16 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('sections')) {
             Schema::create('shop.sections', function (Blueprint $table) {
                 $table->increments('id');
-                $table->integer('parent_id')->default(0);
-                $table->string('title')->default('');
-                $table->string('h1_title')->default('');
-                $table->string('path_title')->default('');
-                $table->integer('orderby')->default(0);
-                $table->tinyInteger('hidden')->default(0);
+                $table->integer('parent_id')->nullable();
+                $table->string('title')->nullable();
+                $table->string('h1_title')->nullable();
+                $table->string('path_title')->nullable();
+                $table->integer('orderby')->nullable();
+                $table->tinyInteger('hidden')->nullable();
 
-                $table->integer('picture_id')->default(0);
-                $table->string('photos')->default('');
-                $table->string('short_description')->default('');
+                $table->integer('picture_id')->nullable();
+                $table->string('photos')->nullable();
+                $table->string('short_description')->nullable();
                 $table->timestamps();
 
                 $table->index('parent_id');
@@ -96,17 +96,17 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('filters')) {
             Schema::create('shop.filters', function (Blueprint $table) {
                 $table->increments('id');
-                $table->integer('parent_id')->default(0);
-                $table->integer('section_id')->default(0);
-                $table->string('title')->default('');
-                $table->string('h1_title')->default('');
-                $table->string('path_title')->default('');
-                $table->integer('orderby')->default(0);
-                $table->tinyInteger('hidden')->default(0);
+                $table->integer('parent_id')->nullable();
+                $table->integer('section_id')->nullable();
+                $table->string('title')->nullable();
+                $table->string('h1_title')->nullable();
+                $table->string('path_title')->nullable();
+                $table->integer('orderby')->nullable();
+                $table->tinyInteger('hidden')->nullable();
 
-                $table->integer('picture_id')->default(0);
-                $table->string('photos')->default('');
-                $table->string('short_description')->default('');
+                $table->integer('picture_id')->nullable();
+                $table->string('photos')->nullable();
+                $table->string('short_description')->nullable();
                 $table->timestamps();
 
                 $table->index('parent_id');
@@ -116,15 +116,15 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('html_pages')) {
             Schema::create('shop.html_pages', function (Blueprint $table) {
                 $table->increments('id');
-                $table->integer('parent_id')->default(0);
-                $table->string('title')->default('');
-                $table->string('h1_title')->default('');
-                $table->string('path_title')->default('');
-                $table->integer('orderby')->default(0);
-                $table->tinyInteger('hidden')->default(0);
-                $table->integer('picture_id')->default(0);
-                $table->string('photos')->default('');
-                $table->string('short_description')->default('');
+                $table->integer('parent_id')->nullable();
+                $table->string('title')->nullable();
+                $table->string('h1_title')->nullable();
+                $table->string('path_title')->nullable();
+                $table->integer('orderby')->nullable();
+                $table->tinyInteger('hidden')->nullable();
+                $table->integer('picture_id')->nullable();
+                $table->string('photos')->nullable();
+                $table->string('short_description')->nullable();
                 $table->timestamps();
 
             });
@@ -132,9 +132,9 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('urls')) {
             Schema::create('shop.urls', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('entity', 20)->default('');
-                $table->integer('entity_id')->default(0);
-                $table->string('url')->default('');
+                $table->string('entity', 20)->nullable();
+                $table->integer('entity_id')->nullable();
+                $table->string('url')->nullable();
                 $table->timestamps();
 
                 $table->unique('url');
@@ -145,11 +145,11 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('vendors')) {
             Schema::create('shop.vendors', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('title')->default('');
-                $table->string('vendor_group')->default('');
-                $table->integer('orderby')->default(0);
-                $table->integer('picture_id')->default(0);
-                $table->string('photos')->default('');
+                $table->string('title')->nullable();
+                $table->string('vendor_group')->nullable();
+                $table->integer('orderby')->nullable();
+                $table->integer('picture_id')->nullable();
+                $table->string('photos')->nullable();
 
                 $table->timestamps();
 
@@ -161,14 +161,14 @@ class CreateGoodsTables extends Migration
         if(!Schema::hasTable('entity_filters')){
             Schema::create('shop.entity_filters', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('entity', 20)->default('');
-                $table->integer('entity_id')->default(0);
-                $table->integer('num')->default(0);
-                $table->string('value')->default('');
-                $table->unsignedInteger('code')->default(0);
-                $table->tinyInteger('auto_create')->default(0);
-                $table->tinyInteger('hidden')->default(0);
-                $table->integer('order_by')->default(0);
+                $table->string('entity', 20)->nullable();
+                $table->integer('entity_id')->nullable();
+                $table->integer('num')->nullable();
+                $table->string('value')->nullable();
+                $table->unsignedInteger('code')->nullable();
+                $table->tinyInteger('auto_create')->nullable();
+                $table->tinyInteger('hidden')->nullable();
+                $table->integer('order_by')->nullable();
 
                 $table->timestamps();
 
@@ -180,9 +180,9 @@ class CreateGoodsTables extends Migration
         if (!Schema::hasTable('shop_metadata')) {
             Schema::create('shop.shop_metadata', function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('entity', 20)->default('');
-                $table->integer('entity_id')->default(0);
-                $table->string('key')->default('');
+                $table->string('entity', 20)->nullable();
+                $table->integer('entity_id')->nullable();
+                $table->string('key')->nullable();
                 $table->longText('value');
                 $table->timestamps();
                 $table->softDeletes();

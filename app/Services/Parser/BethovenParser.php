@@ -88,7 +88,7 @@ class BethovenParser extends ParserAbstractClass
             //генерим фильтры для категории
             if ($section) {
                 $lastFilter = EntityFilters::where('entity', Sections::getClassName())
-                    ->where('id', $section->id)
+                    ->where('entity_id', $section->id)
                     ->orderBy('num', 'DESC')
                     ->first();
                 $num        = $lastFilter ? $lastFilter->num + 1 : 1;
