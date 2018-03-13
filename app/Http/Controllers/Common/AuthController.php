@@ -23,6 +23,11 @@ class AuthController extends Controller
         return view('auth.index');
     }
 
+    public function showLoginForm()
+    {
+        return view('auth.index');
+    }
+
     public function redirectTo()
     {
         return \Session::get(CurrentPageState::PAGE_NAME, '/');

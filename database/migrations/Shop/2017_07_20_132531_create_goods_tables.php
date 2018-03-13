@@ -191,6 +191,16 @@ class CreateGoodsTables extends Migration
                 $table->unique(['entity', 'entity_id','key']);
             });
         }
+
+        if (!Schema::hasTable('parse')) {
+            Schema::create('shop.parse', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('url', 255);
+                $table->boolean('success');
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

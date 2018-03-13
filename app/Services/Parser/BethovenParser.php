@@ -30,7 +30,7 @@ class BethovenParser extends ParserAbstractClass
 
             $props['title']    = $html->find('h1', 0)->plaintext;
             $props['h1_title'] = $html->find('h1', 0)->plaintext;
-            $props['photos']   = 'http://bethoven.ru/' . $html->find('.img-responsive', 0)->src;
+            $props['photos']   = 'http://bethoven.ru' . $html->find('.img-responsive', 0)->src;
 
             //удаляем первый абзац с кривой кодировкой
             $html->find('.product-story-info-box', 0)->find('p', 0)->outertext = '';
