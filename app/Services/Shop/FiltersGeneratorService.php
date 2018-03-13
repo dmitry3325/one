@@ -41,7 +41,6 @@ class FiltersGeneratorService
      */
     public function generateForSection($section_id)
     {
-        $section_id
         $Section = Sections::findOrFail($section_id);
         $sectionFilters = $this->loadSectionFilters($section_id);
 
