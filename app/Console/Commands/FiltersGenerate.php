@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Shop\Sections;
 use App\Services\Shop\FiltersGeneratorService;
 use App\Services\Shop\GoodsStorage;
+use App\Services\Shop\SearchService;
 use Illuminate\Console\Command;
 
 class FiltersGenerate extends Command
@@ -31,6 +32,11 @@ class FiltersGenerate extends Command
      */
     public function handle()
     {
+
+        $s = new SearchService();
+        $res = $s->find('Корм');
+        dd($res);
+
         $sections = $this->option('section');
 
         $goodsStorage = new GoodsStorage();

@@ -11,6 +11,7 @@ use App\Models\Shop\Goods;
 use App\Models\Shop\Urls;
 use App\Services\Shop\FiltersGeneratorService;
 use App\Services\Shop\GoodsStorage;
+use App\Services\Shop\SearchService;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Classes\LaravelExcelWorksheet;
 use Maatwebsite\Excel\Facades\Excel;
@@ -328,7 +329,21 @@ class ShopController extends Controller
         return $filters;
     }
 
+    /**
+     * @param       $input
+     * @param array $params
+     *
+     * @return array
+     */
+    public function search($input, $params = []){
+        $SearchService = new SearchService();
 
+        return $SearchService->find($input, $params);
+    }
+
+    /**
+     * @param $section_id
+     */
     public function generateFilters($section_id)
     {
         $FilterGenerateService = new FiltersGeneratorService(new GoodsStorage());
