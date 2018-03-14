@@ -32,11 +32,6 @@ class FiltersGenerate extends Command
      */
     public function handle()
     {
-
-        $s = new SearchService();
-        $res = $s->find('Корм');
-        dd($res);
-
         $sections = $this->option('section');
 
         $goodsStorage = new GoodsStorage();
