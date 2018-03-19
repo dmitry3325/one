@@ -13,11 +13,11 @@
             <div><input type="text" class="form-control" v-model="search" placeholder="Поиск по разделам"
                         @keyup="makeSearch"></div>
         </div>
-        <div v-if="!inProcess" class="tree">
+        <div v-if="!inProcess" v-bind:style="{'height': treeHeight+'px'}" class="tree">
             <div v-if="!tree || !Object.keys(tree).length" class="text-center">Ничего не найдено</div>
             <div v-else>
                 <div class="item" v-for="item in tree">
-                    <div class="row m-0" :class="((item.data.id == selected)?'selected':'')">
+                    <div class="row m-0" :class="((item.data.id === selected)?'selected':'')">
                         <div class="float-left btn-cont">
                             <button v-if="item.children && Object.keys(item.children).length"
                                     class="btn btn-secondary btn-sm" @click="toggle">+</button>
@@ -52,6 +52,7 @@
                 'tree': null,
                 'list': [],
                 'selected': null,
+                'treeHeight' : null,
                 inProcess: true
             };
         },
@@ -60,6 +61,7 @@
                 this.selected = Url.get('section');
             }
             let self = this;
+            this.treeHeight = window.innerHeight - 170;
             if (!this.list.length) {
                 this.loadData();
             } else {
@@ -166,7 +168,6 @@
     .sections-menu .tree {
         margin-top: 10px;
         overflow-y: auto;
-        max-height: calc(100% - 120px);
     }
 
     .sections-menu .search {
