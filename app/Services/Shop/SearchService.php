@@ -19,11 +19,11 @@ use Doctrine\DBAL\Query\QueryBuilder;
 class SearchService
 {
     const PARAM_SEARCH_LIMIT = 'limit';
-    const PARAM_SEARCH_ENTITY = 'search_entity';
+    const PARAM_SEARCH_ENTITY = 'entities';
 
     private $entities = [
-        'Sections',
         'Goods',
+        'Sections',
         'Filters',
         'HtmlPages',
     ];
@@ -48,56 +48,86 @@ class SearchService
         if (is_numeric($input)) {
             $searchList['id'] = $input;
             $vendorQ->where('id', $searchList['id']);
-        } else {
-            $searchList['text'] = $input;
-            $vendorQ->where('title', 'LIKE', '%'.$searchList['text'].'%');
         }
+        $searchList['text'] = $input;
+        $vendorQ->where('title', 'LIKE', $searchList['text'] . '%');
+
         $searchList['mans'] = $vendorQ->pluck('id');
 
         $result = [];
         foreach ($entities as $entity) {
+            if(isset($params['section']) && $params['section'] && $entity === 'Sections'){
+                continue;
+            }
             if (in_array($entity, $this->entities)) {
-                $result[$entity] = $this->makeSearch($entity, $searchList, $limit);
+                $result[$entity] = $this->makeSearch($entity, $searchList, $params);
             }
         }
 
         return $result;
     }
 
-
-    private function makeSearch($entity, $searchList, $limit)
+    /**
+     * @param $entity
+     * @param $searchList
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    private function makeSearch($entity, $searchList, $params = [])
     {
         /** @var \Illuminate\Database\Query\Builder $q */
         $q = $entity::getQuery();
+        $q->select($this->getSelectFields($entity));
 
-        if(isset($searchList['text'])) {
-            $text = '%'.$searchList['text'].'%';
-            $q->orWhere('title', 'LIKE', $text);
-            $q->orWhere('h1_title', 'LIKE', $text);
+        if (isset($params['section']) && $params['section'] && $entity !== 'Sections') {
+            $q->where('section_id', '=', $params['section']);
         }
-
-        if(isset($searchList['id'])){
-            $q->orWhere('id', $searchList['id']);
-        }
-
-        if($entity === 'Goods'){
-            if(isset($searchList['text'])) {
-                $text = '%'.$searchList['text'].'%';
-                $q->orWhere('articul', 'LIKE', $text);
-                $q->orWhere('sarticul', 'LIKE', $text);
+        $q->where(function ($q) use ($entity, $searchList) {
+            if (isset($searchList['text'])) {
+                $text = '%' . $searchList['text'] . '%';
+                $q->orWhere('title', 'LIKE', $text);
             }
 
-            if(isset($searchList['mans'])) {
-                $q->orWhere('manid', 'IN', $searchList['mans']);
+            if (isset($searchList['id'])) {
+                $q->orWhere('id', $searchList['id']);
             }
-        }
+
+            if ($entity === 'Goods') {
+                if (isset($searchList['text'])) {
+                    $text = '%' . $searchList['text'] . '%';
+                    $q->orWhere('articul', 'LIKE', $text);
+                    $q->orWhere('sarticul', 'LIKE', $text);
+                }
+
+                if (isset($searchList['mans']) && count($searchList['mans'])) {
+                    $q->orWhere('manid', 'IN', $searchList['mans']);
+                }
+            }
+        });
 
         $q->orderBy('orderby', 'desc');
-        if($limit) {
-            $q->offset(0)->limit($limit);
+
+        return $q->paginate(20, ['*'], 'page', $params['page'] ?? 1);
+    }
+
+    /**
+     * @param $entity
+     * @return array
+     */
+    private function getSelectFields($entity)
+    {
+        $fields = ['id', 'title', 'hidden'];
+
+        switch ($entity) {
+            case 'Goods':
+                $fields = array_merge($fields, [
+                    'manid', 'articul', 'price', 'final_price'
+                ]);
+                break;
         }
 
-        return $q->paginate(20);
+        $fields[] = 'updated_at';
+
+        return $fields;
     }
 
 }

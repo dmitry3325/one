@@ -7,11 +7,11 @@
                         <span class="glyphicon glyphicon-th-large"></span>&nbsp;&nbsp;&nbsp;&nbsp;
                     </a>
                 </li>
-                <li v-for="(tab,index) in tabs" class="nav-item">
+                <li v-for="(tab,index) in tabs" v-if="!tab.hidden" class="nav-item">
                     <a class="nav-link" :class="{active: index == activeTab}" href=""
                        @click.prevent="switchCategory(index)">
                         <span class="title text-ellipsis">{{tab.title}}</span>
-                        <span v-show="tab.isBase !== true" @click.prevent="removeTab(index)"
+                        <span v-show="tab.isBase !== true" @click.prevent="hideTab(index)"
                               class="glyphicon glyphicon-remove"></span>
                     </a>
                 </li>
@@ -71,6 +71,7 @@
     let FieldsSelector = require('../../../../components/fieldsSelector.vue');
     let ItemsList = require('./ItemsList.vue');
     let EntityEdit = require('./EntityEdit.vue');
+    let Search = require('./Search.vue');
 
     module.exports = Vue.extend({
         components: {
@@ -101,6 +102,12 @@
                         'isBase': true,
                         'entity': 'Sections',
                         'type': 'EntityEdit',
+                    },
+                    'search': {
+                        'title': 'Поиск',
+                        'isBase': false,
+                        'type': 'Search',
+                        'hidden' : true
                     }
                 }
             }
@@ -135,6 +142,7 @@
                 if (tab.builded) return;
 
                 let $target = document.querySelector('.tab-content .tab.' + this.activeTab);
+
                 $target.innerHTML = '';
                 let contType = this._getContType();
 
@@ -160,26 +168,36 @@
                             entity: this._getCurEntity(),
                         },
                     });
+                }else if(contType === 'Search'){
+                    let $el = this.setTarget($target);
+                    $el.classList.add('mt-3');
+                    let $cont = this.setTarget($el);
+                    this.tabs[this.activeTab].view = new Search({
+                        el: $cont,
+                        data: {
+                            section: this.id,
+                            search: this.curSearch,
+                        },
+                    });
                 }
 
                 tab.builded = true;
             },
             showSearch: function (value, e) {
-                this.tabs['search'] = {
-                    'title': 'Поиск',
-                    'isActive': false
-                };
+                this.$set(this.tabs['search'], 'hidden', false);
                 this.curSearch = value;
                 Url.set('search', value);
+                if(this.tabs['search'].view){
+                    this.tabs['search'].view.makeSearch(value);
+                }
+
                 if (e) {
                     e.target.value = '';
                     this.switchCategory('search');
                 }
-                this.$forceUpdate();
             },
-            removeTab: function (tab) {
-                this.$delete(this.tabs, tab);
-
+            hideTab: function (tab) {
+                this.$set(this.tabs[tab], 'hidden', true);
                 if (tab === 'search') {
                     Url.unset('search');
                 }

@@ -38,6 +38,9 @@
             },
             'change': {
                 'default': null
+            },
+            'alias': {
+                'default': '',
             }
         },
         data: function () {
@@ -116,7 +119,7 @@
                 this.buildPager();
 
                 if (typeof this.change === 'function') {
-                    this.change(page);
+                    this.change(page, this.alias);
                 }
             }
         }

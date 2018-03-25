@@ -1,7 +1,7 @@
 import SectionList from './components/SectionList.vue';
 import SectionView from './components/SectionView.vue';
 import EntityEdit from './components/EntityEdit.vue';
-import Photos from '../../../components/photos.vue';
+import Search from './components/Search.vue';
 
 new Vue({
     el: '#content',
@@ -11,6 +11,7 @@ new Vue({
         curSection: null,
         curEntity: null,
         curEntityId: null,
+        search: null,
         filters: {},
         fields: {},
     },
@@ -25,26 +26,47 @@ new Vue({
             this.curEntityId = Url.get('id');
         },
         buildApp() {
-            let self = this;
-            let $sectionList = this.setTarget('.section_list');
-            new SectionList({
-                el: $sectionList,
-                data: {
-                    curSection: this.curSection,
-                    selectAction: function (id) {
-                        Url.unset('filters');
-                        self.showSection(id);
-                    },
-                    toggleAction: this.toggleMenu
+            this.initSectionsList();
+            this.initSearch();
 
-                }
-            });
             if (this.curEntity && this.curEntityId) {
                 this.showEntityEdit(this.curEntity, this.curEntityId);
             } else if (this.curSection) {
                 this.showSection(this.curSection);
             } else {
                 this.showEmpty();
+            }
+        },
+        initSectionsList(){
+            if(this.sectionsList) return;
+            let self = this;
+            let $sectionList = this.setTarget('.section_list');
+            this.sectionsList = new SectionList({
+                el: $sectionList,
+                data: {
+                    curSection: this.curSection,
+                    selectAction: function (id) {
+                        Url.unset('filters');
+                        Url.unset('search');
+                        Url.unset('tab');
+                        self.showSection(id);
+                    },
+                    toggleAction: this.toggleMenu
+
+                }
+            });
+        },
+        initSearch(){
+            if(this.Search) return;
+            let $search = this.setTarget('#search');
+            this.Search = new Search({
+                'el': $search
+            });
+        },
+        makeSearch(e){
+            let val = e.target.value;
+            if(this.Search){
+                this.Search.makeSearch(val);
             }
         },
         toggleMenu(show) {

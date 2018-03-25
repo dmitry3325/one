@@ -1,7 +1,10 @@
 <div id="goodsAdmin">
     <div class="section_list"></div>
     <div class="main-content">
-        <div class="menu"></div>
-        <div class="list"></div>
+        <div style="width:300px;" class="menu float-left">&nbsp;</div>
+        <div style="width: calc(100% - 300px);" class="list float-left">
+            <input type="text" class="input-lg form-control" @change="makeSearch" placeholder="Поиск..."/>
+            <div id="search" class="mt-2"></div>
+        </div>
     </div>
 </div>
