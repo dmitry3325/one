@@ -157,7 +157,7 @@
             viewOriginalImg(photo) {
                 let $modal = new contentModal({
                     propsData: {
-                        'body': '<img style="max-width:100%;" src="' + photo.urls.big + '?' + Math.random() + '">'
+                        'body': '<div class="text-center"><img style="max-width:100%;" src="' + photo.urls.big + '?' + Math.random() + '"></div>'
                     }
                 });
             },

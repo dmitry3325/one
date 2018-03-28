@@ -51,11 +51,12 @@
             };
         },
         mounted: function () {
-            if (!this.curPage) {
+            if (this.curPage) {
                 this.current = this.curPage;
             } else if (Url.get('page')) {
                 this.current = Url.get('page');
             }
+            console.log(this.current)
             this.buildPager();
         },
         methods: {

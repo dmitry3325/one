@@ -6,7 +6,7 @@
             </div>
             <div v-else>
                 <div v-if="Object.keys(items).length > 0">
-                    <table class="table table-bordered">
+                    <table class="table items-list-table table-bordered">
                         <thead>
                         <tr>
                             <th class="edit-button-cont"></th>
@@ -25,7 +25,7 @@
                         </tr>
                         </tbody>
                     </table>
-                    <pager :total="total" curPage="curPage" :change="changePage" align="center"></pager>
+                    <pager :total="total" :curPage="curPage" :change="changePage" align="center"></pager>
                 </div>
                 <div v-else class="text-center"><h3>Ничего не нашлось</h3></div>
             </div>
@@ -129,5 +129,9 @@
 
     .edit-button-cont{
         width: 50px;
+    }
+    .items-list-table td,th{
+        max-width:350px;
+        word-wrap:break-word;
     }
 </style>

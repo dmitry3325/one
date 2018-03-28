@@ -11,7 +11,7 @@
                         <h5 class="mb-0">
                             <a class="btn btn-link" href="#" data-toggle="collapse" :data-target="'#collapse'+tab"
                                aria-expanded="true" :aria-controls="'collapse'+tab">
-                                {{(entities[tab])?entities[tab]:tab}} ({{Object.keys(data.data).length}})
+                                {{(entities[tab])?entities[tab]:tab}} ({{data.total}})
                             </a>
                         </h5>
                     </div>
@@ -40,7 +40,7 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                                <pager :total="data.last_page" curPage="pages[tab]" :alias="tab" :change="changePage" align="center"></pager>
+                                <pager :total="data.last_page" :curPage="pages[tab]" :alias="tab" :change="changePage" align="center"></pager>
                             </div>
                             <div v-else class="text-center"><h3>Ничего не нашлось</h3></div>
                         </div>
