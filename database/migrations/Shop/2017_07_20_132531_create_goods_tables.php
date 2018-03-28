@@ -117,6 +117,7 @@ class CreateGoodsTables extends Migration
             Schema::create('shop.html_pages', function (Blueprint $table) {
                 $table->increments('id');
                 $table->integer('parent_id')->default(0);
+                $table->integer('section_id')->default(0);
                 $table->string('title')->nullable();
                 $table->string('h1_title')->nullable();
                 $table->string('path_title')->nullable();

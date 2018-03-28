@@ -1,7 +1,7 @@
 <template>
     <div class="sections-menu">
         <div class="search">
-            <div class="mb-2    ">
+            <div class="mb-2">
                 <button style="width: 90px;" @click="((typeof toggleAction === 'function')?toggleAction(false):false)"
                         class="btn btn-sm btn-secondary">
                     <span class="glyphicon glyphicon-arrow-left"></span> Скрыть
@@ -16,7 +16,7 @@
         <div v-if="!inProcess" v-bind:style="{'height': treeHeight+'px'}" class="tree">
             <div v-if="!tree || !Object.keys(tree).length" class="text-center">Ничего не найдено</div>
             <div v-else>
-                <div class="item" v-for="item in tree">
+                <div class="item mb-1" v-for="item in tree">
                     <div class="row m-0" :class="((item.data.id === selected)?'selected':'')">
                         <div class="float-left btn-cont">
                             <button v-if="item.children && Object.keys(item.children).length"
@@ -25,14 +25,15 @@
                         <div @click="selectSection(item.data.id)" class="float-left title text-ellipsis cursor-pointer">
                             {{(item.data.title) ? item.data.title : item.data.id}}
                         </div>
+                        <div class="clearfix"></div>
                     </div>
                     <div class="children d-none">
-                        <div class="row m-0">
-                            <div v-for="ch in item.children" class="m-0 row"
+                        <div class="m-0">
+                            <div v-for="ch in item.children" class="m-0 "
                                  :class="((ch.id == selected)?'selected':'')">
                                 <div class="float-left btn-cont in">&nbsp;</div>
                                 <div @click="selectSection(ch.id)"
-                                     class="float-left title text-ellipsis cursor-pointer">
+                                     class="left title text-ellipsis cursor-pointer">
                                     {{(ch.title) ? ch.title : ch.id}}
                                 </div>
                             </div>

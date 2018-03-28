@@ -4,6 +4,7 @@ class Entity {
         this.entities = {};
         this.allFields = {};
         this.baseFields = {};
+        this.baseFields = {};
         this.filterMethods = null;
         this.entity = null;
         this.className = '/shop';
@@ -25,6 +26,7 @@ class Entity {
         }
         return this.allFields[entity];
     }
+
 
     getBaseFields(entity, force) {
         if (typeof entity === 'undefined' && this.entity) {
