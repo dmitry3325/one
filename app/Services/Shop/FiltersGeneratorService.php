@@ -50,7 +50,7 @@ class FiltersGeneratorService
             })
             ->where('shop.goods.section_id', '=', $section_id)
             ->where('shop.goods.hidden', '=', 0)
-            ->where('shop.goods.parent', '=', 0)
+            ->where('shop.goods.parent_id', '=', 0)
             ->where('shop.entity_filters.entity', '=', Goods::getClassName())
             ->get();
 
@@ -294,7 +294,7 @@ class FiltersGeneratorService
             })
             ->where('shop.goods.section_id', '=', $section_id)
             ->where('shop.goods.hidden', '=', 0)
-            ->where('shop.goods.parent', '=', 0)
+            ->where('shop.goods.parent_id', '=', 0)
             ->where('shop.entity_filters.entity', '=', Goods::getClassName())
             ->orderBy(\DB::raw('null'))
             ->get();
