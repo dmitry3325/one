@@ -41,7 +41,7 @@ class ShopMetadata extends BaseModel
         ],
         'body' => [
             'title' => 'Body',
-            'type'  => ShopBaseModel::FIELD_TYPE_TEXT,
+            'type'  => ShopBaseModel::FIELD_TYPE_HTML_TEXT,
         ],
     ];
 

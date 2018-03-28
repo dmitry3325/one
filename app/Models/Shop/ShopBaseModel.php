@@ -25,6 +25,7 @@ class ShopBaseModel extends BaseModel
     const FIELD_TYPE_STRING = 'input';
     const FIELD_TYPE_DOUBLE = 'double';
     const FIELD_TYPE_TEXT = 'textarea';
+    const FIELD_TYPE_HTML_TEXT = 'html_text';
     const FIELD_TYPE_CHECKBOX = 'checkbox';
     const FIELD_TYPE_RADIO = 'radio';
     const FIELD_TYPE_SELECT = 'select';
